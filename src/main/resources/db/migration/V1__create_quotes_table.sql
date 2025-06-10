@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS quotes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quote VARCHAR(255),
+    song VARCHAR(255),
+    album VARCHAR(255),
+    year INT,
+    artist VARCHAR(255),
+    posts INT NOT NULL DEFAULT 0,
+    hits INT NOT NULL DEFAULT 0
+);
