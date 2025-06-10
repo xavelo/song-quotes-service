@@ -2,7 +2,6 @@ package com.xavelo.sqs.adapter.out.chatgpt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xavelo.sqs.port.out.ChatGptPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

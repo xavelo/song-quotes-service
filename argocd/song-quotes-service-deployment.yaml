@@ -22,11 +22,5 @@ spec:
       containers:
         - name: song-quotes-service
           image: 'xavelo/song-quotes-service:44dab45ee750b04f842600697dee98b4b1dfe886'
-          env:
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: openai-api-key-secret
-                  key: apiKey
           ports:
             - containerPort: 80

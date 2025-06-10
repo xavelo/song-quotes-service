@@ -26,6 +26,3 @@ management:
 logging:
   level:
     org.springframework.security: DEBUG
-
-openai:
-  api-key: ${OPENAI_API_KEY:}
