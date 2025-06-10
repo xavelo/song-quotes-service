@@ -25,4 +25,4 @@ management:
         include: "health,info,metrics"
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
