@@ -1,0 +1,80 @@
+name: CI/CD Pipeline
+
+env:
+  GIT_REPO: 'song-quotes-service'
+  K8S_DEPLOYMENT: 'song-quotes-service-deployment.yaml'
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+        
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Install yq
+      run: |
+        sudo wget https://github.com/mikefarah/yq/releases/download/v4.13.4/yq_linux_amd64 -O /usr/bin/yq
+        sudo chmod +x /usr/bin/yq
+
+    - name: Update Kubernetes manifest with Commit ID and Version Tag
+      run: |
+        TAG=${GITHUB_SHA}        
+        sed -i "s/commitID:.*$/commitID: \"${GITHUB_SHA}\"/" argocd/${{ env.K8S_DEPLOYMENT }}
+        yq eval '.spec.template.spec.containers[0].image = "xavelo/${{ env.GIT_REPO }}:'$TAG'"' -i argocd/${{ env.K8S_DEPLOYMENT }}
+        cat argocd/${{ env.K8S_DEPLOYMENT }}
+
+    - name: Commit and Push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+        git config --global user.name 'xavelo'
+        git config --global user.email 'xavelo@users.noreply.github.com'
+        git add .
+        git commit -m \"${TIMESTAMP}\"
+        git remote set-url --push origin https://xavelo:$GITHUB_TOKEN@github.com/${{ github.repository }}
+        git push
+
+    - name: Build with Maven
+      run: mvn clean package
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        docker buildx build --platform linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ env.GIT_REPO }}:${GITHUB_SHA} . --push
+
+  

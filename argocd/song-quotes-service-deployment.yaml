@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: song-quotes-service-deployment
+  annotations:
+    commitID: "5deda845f1ef6d65ca70cbfba82d9d2919df5098"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: song-quotes-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: song-quotes-service
+    spec:
+      containers:
+        - name: song-quotes-service
+          image: 'xavelo/song-quotes-service:5deda845f1ef6d65ca70cbfba82d9d2919df5098'
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-api-key-secret
+                  key: apiKey
+          ports:
+            - containerPort: 80

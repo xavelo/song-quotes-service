@@ -1,0 +1,31 @@
+debug: false
+
+spring:
+  application:
+    name: song-quotes-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://http://192.168.1.139:32080/realms/xavelo
+          jwk-set-uri: https://http://192.168.1.139:32080/realms/xavelo/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:mysql://sqs-mysql.mysql.svc.cluster.local:3306/song-quotes
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: xavelo
+    password: sqs
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+openai:
+  api-key: ${OPENAI_API_KEY:}
