@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: song-quotes-service-deployment
   annotations:
-    commitID: "5deda845f1ef6d65ca70cbfba82d9d2919df5098"
+    commitID: "44dab45ee750b04f842600697dee98b4b1dfe886"
 spec:
   replicas: 1
   selector:
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: song-quotes-service
-          image: 'xavelo/song-quotes-service:5deda845f1ef6d65ca70cbfba82d9d2919df5098'
+          image: 'xavelo/song-quotes-service:44dab45ee750b04f842600697dee98b4b1dfe886'
           env:
             - name: OPENAI_API_KEY
               valueFrom:
