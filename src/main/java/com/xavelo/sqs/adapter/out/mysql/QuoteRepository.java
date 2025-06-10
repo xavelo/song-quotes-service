@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+import com.xavelo.sqs.adapter.out.mysql.ArtistQuoteCountView;
 
 public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
 
@@ -23,4 +26,10 @@ public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
     @Modifying
     @Query("update QuoteEntity q set q.hits = q.hits + 1 where q.id = :id")
     void incrementHits(@Param("id") Long id);
+
+    /**
+     * Retrieve the number of quotes for each artist.
+     */
+    @Query("SELECT q.artist as artist, COUNT(q) as quotes FROM QuoteEntity q GROUP BY q.artist")
+    List<ArtistQuoteCountView> findArtistQuoteCounts();
 }
