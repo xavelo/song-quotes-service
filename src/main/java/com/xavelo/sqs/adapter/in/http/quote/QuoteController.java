@@ -7,6 +7,8 @@ import com.xavelo.sqs.port.in.GetQuoteUseCase;
 import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
+import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,19 +24,22 @@ public class QuoteController {
     private final GetRandomQuoteUseCase getRandomQuoteUseCase;
     private final CountQuotesUseCase countQuotesUseCase;
     private final DeleteQuoteUseCase deleteQuoteUseCase;
+    private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
 
     public QuoteController(StoreQuoteUseCase storeQuoteUseCase,
                            GetQuotesUseCase getQuotesUseCase,
                            GetQuoteUseCase getQuoteUseCase,
                            DeleteQuoteUseCase deleteQuoteUseCase,
                            CountQuotesUseCase countQuotesUseCase,
-                           GetRandomQuoteUseCase getRandomQuoteUseCase) {
+                           GetRandomQuoteUseCase getRandomQuoteUseCase,
+                           GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase) {
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
         this.getRandomQuoteUseCase = getRandomQuoteUseCase;
         this.deleteQuoteUseCase = deleteQuoteUseCase;
         this.countQuotesUseCase = countQuotesUseCase;
+        this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
     }
 
     @PostMapping("/quote")
@@ -53,6 +58,12 @@ public class QuoteController {
     public ResponseEntity<java.util.List<Quote>> getQuotes() {
         java.util.List<Quote> quotes = getQuotesUseCase.getQuotes();
         return ResponseEntity.ok(quotes);
+    }
+
+    @GetMapping("/artists")
+    public ResponseEntity<java.util.List<ArtistQuoteCount>> getArtists() {
+        java.util.List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
+        return ResponseEntity.ok(artists);
     }
 
     @GetMapping("/quotes/count")

@@ -1,18 +1,20 @@
 package com.xavelo.sqs.adapter.out.mysql;
 
 import com.xavelo.sqs.application.domain.Quote;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
 import com.xavelo.sqs.port.out.StoreQuotePort;
 import com.xavelo.sqs.port.out.QuotesCountPort;
 import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
+import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort {
 
     private final QuoteRepository quoteRepository;
 
@@ -92,5 +94,13 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     @Override
     public void incrementHits(Long id) {
         quoteRepository.incrementHits(id);
+    }
+
+    @Override
+    public java.util.List<ArtistQuoteCount> loadArtistQuoteCounts() {
+        java.util.List<ArtistQuoteCountView> views = quoteRepository.findArtistQuoteCounts();
+        return views.stream()
+                .map(v -> new ArtistQuoteCount(v.getArtist(), v.getQuotes()))
+                .toList();
     }
 }
