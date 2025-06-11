@@ -9,12 +9,13 @@ import com.xavelo.sqs.port.out.QuotesCountPort;
 import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
+import com.xavelo.sqs.port.out.UpdateQuotePort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort {
 
     private final QuoteRepository quoteRepository;
 
@@ -102,5 +103,18 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         return views.stream()
                 .map(v -> new ArtistQuoteCount(v.getArtist(), v.getQuotes()))
                 .toList();
+    }
+
+    @Override
+    public void updateQuote(Quote quote) {
+        QuoteEntity entity = quoteRepository.findById(quote.id()).orElse(null);
+        if (entity != null) {
+            entity.setQuote(quote.quote());
+            entity.setSong(quote.song());
+            entity.setAlbum(quote.album());
+            entity.setYear(quote.year());
+            entity.setArtist(quote.artist());
+            quoteRepository.save(entity);
+        }
     }
 }

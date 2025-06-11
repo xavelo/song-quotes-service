@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,6 +34,7 @@ class QuoteControllerTest {
     @MockBean private CountQuotesUseCase countQuotesUseCase;
     @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;
     @MockBean private GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
+    @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
 
     @Test
     void createQuote() throws Exception {
@@ -127,5 +129,17 @@ class QuoteControllerTest {
     void deleteQuote() throws Exception {
         mockMvc.perform(delete("/api/quote/1"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void updateQuote() throws Exception {
+        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", null, null);
+
+        mockMvc.perform(put("/api/quote/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(quote)))
+                .andExpect(status().isNoContent());
+
+        verify(updateQuoteUseCase).updateQuote(new Quote(1L, "line", "song", "album", 1990, "artist", null, null));
     }
 }
