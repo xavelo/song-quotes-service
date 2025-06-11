@@ -64,6 +64,24 @@ jobs:
     - name: Build with Maven
       run: mvn clean verify
 
+    - name: Generate JaCoCo Badge
+      uses: cicirello/jacoco-badge-generator@v2
+      with:
+        jacoco-csv-file: target/site/jacoco/jacoco.csv
+
+    - name: Commit coverage badge
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [[ `git status --porcelain` ]]; then
+          git config --global user.name 'xavelo'
+          git config --global user.email 'xavelo@users.noreply.github.com'
+          git add -A
+          git commit -m "Update coverage badge"
+          git remote set-url --push origin https://xavelo:$GITHUB_TOKEN@github.com/${{ github.repository }}
+          git push
+        fi
+
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
       with:
