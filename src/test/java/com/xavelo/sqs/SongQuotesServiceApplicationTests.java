@@ -13,8 +13,8 @@ class SongQuotesServiceApplicationTests {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	//@Test
-	void contextLoads() {
+        @Test
+        void contextLoads() {
 		assertNotNull(applicationContext);
 	}
 
