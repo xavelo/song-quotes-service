@@ -1,6 +1,8 @@
 # Song Quotes Service
 
-[![CI/CD Pipeline](https://github.com/xavelo/api-template-spring-boot/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/xavelo/api-template-spring-boot/actions/workflows/ci-cd.yaml)
+[![CI/CD Pipeline](https://github.com/xavelo/song-quotes-service/actions/workflows/ci.yaml/badge.svg)](https://github.com/xavelo/song-quotes-service/actions/workflows/ci.yaml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/xavelo/song-quotes-service)](https://hub.docker.com/r/xavelo/song-quotes-service)
+[![Docker Image Version](https://img.shields.io/docker/v/xavelo/song-quotes-service?sort=semver)](https://hub.docker.com/r/xavelo/song-quotes-service/tags)
 
 ## Viewing code coverage
 
