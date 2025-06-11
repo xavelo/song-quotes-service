@@ -8,6 +8,7 @@ import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
+import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class QuoteController {
     private final CountQuotesUseCase countQuotesUseCase;
     private final DeleteQuoteUseCase deleteQuoteUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
+    private final UpdateQuoteUseCase updateQuoteUseCase;
 
     public QuoteController(StoreQuoteUseCase storeQuoteUseCase,
                            GetQuotesUseCase getQuotesUseCase,
@@ -32,7 +34,8 @@ public class QuoteController {
                            DeleteQuoteUseCase deleteQuoteUseCase,
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
-                           GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase) {
+                           GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase,
+                           UpdateQuoteUseCase updateQuoteUseCase) {
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
@@ -40,6 +43,7 @@ public class QuoteController {
         this.deleteQuoteUseCase = deleteQuoteUseCase;
         this.countQuotesUseCase = countQuotesUseCase;
         this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
+        this.updateQuoteUseCase = updateQuoteUseCase;
     }
 
     @PostMapping("/quote")
@@ -82,6 +86,14 @@ public class QuoteController {
     public ResponseEntity<Quote> getQuote(@PathVariable Long id) {
         Quote quote = getQuoteUseCase.getQuote(id);
         return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/quote/{id}")
+    public ResponseEntity<Void> updateQuote(@PathVariable Long id, @RequestBody Quote quote) {
+        updateQuoteUseCase.updateQuote(
+                new Quote(id, quote.quote(), quote.song(), quote.album(), quote.year(), quote.artist(), quote.posts(), quote.hits())
+        );
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/quote/{id}")

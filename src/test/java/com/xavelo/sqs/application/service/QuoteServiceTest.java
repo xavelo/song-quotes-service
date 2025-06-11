@@ -35,6 +35,8 @@ class QuoteServiceTest {
     private IncrementHitsPort incrementHitsPort;
     @Mock
     private LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
+    @Mock
+    private UpdateQuotePort updateQuotePort;
 
     @InjectMocks
     private QuoteService quoteService;
@@ -121,6 +123,12 @@ class QuoteServiceTest {
     void deleteQuote_delegatesToPort() {
         quoteService.deleteQuote(5L);
         verify(deleteQuotePort).deleteQuote(5L);
+    }
+
+    @Test
+    void updateQuote_delegatesToPort() {
+        quoteService.updateQuote(sampleQuote);
+        verify(updateQuotePort).updateQuote(sampleQuote);
     }
 
     @Test
