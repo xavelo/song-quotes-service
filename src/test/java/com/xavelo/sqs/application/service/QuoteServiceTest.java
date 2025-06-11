@@ -141,4 +141,23 @@ class QuoteServiceTest {
         assertEquals(expected, result);
         verify(loadArtistQuoteCountsPort).loadArtistQuoteCounts();
     }
+
+    @Test
+    void getArtistQuoteCounts_sortsByQuotesDescending() {
+        List<ArtistQuoteCount> unsorted = List.of(
+                new ArtistQuoteCount("a", 1L),
+                new ArtistQuoteCount("b", 3L),
+                new ArtistQuoteCount("c", 2L)
+        );
+        when(loadArtistQuoteCountsPort.loadArtistQuoteCounts()).thenReturn(unsorted);
+
+        List<ArtistQuoteCount> result = quoteService.getArtistQuoteCounts();
+
+        List<ArtistQuoteCount> expected = List.of(
+                new ArtistQuoteCount("b", 3L),
+                new ArtistQuoteCount("c", 2L),
+                new ArtistQuoteCount("a", 1L)
+        );
+        assertEquals(expected, result);
+    }
 }

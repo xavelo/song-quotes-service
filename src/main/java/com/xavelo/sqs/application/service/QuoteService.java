@@ -134,6 +134,9 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
 
     @Override
     public java.util.List<ArtistQuoteCount> getArtistQuoteCounts() {
-        return loadArtistQuoteCountsPort.loadArtistQuoteCounts();
+        return loadArtistQuoteCountsPort.loadArtistQuoteCounts()
+                .stream()
+                .sorted(java.util.Comparator.comparing(ArtistQuoteCount::quotes).reversed())
+                .toList();
     }
 }
