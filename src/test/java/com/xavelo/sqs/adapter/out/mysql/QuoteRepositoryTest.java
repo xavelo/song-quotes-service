@@ -1,6 +1,7 @@
 package com.xavelo.sqs.adapter.out.mysql;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class QuoteRepositoryTest {
 
     @Autowired
@@ -33,7 +35,7 @@ class QuoteRepositoryTest {
         return quoteRepository.save(e);
     }
 
-    //@Test
+    @Test
     void findRandomQuoteReturnsEntity() {
         createEntity("q1", "a1");
         entityManager.flush();
@@ -43,7 +45,7 @@ class QuoteRepositoryTest {
         assertThat(result.getId()).isNotNull();
     }
 
-    //@Test
+    @Test
     void incrementPostsAndHitsUpdatesFields() {
         QuoteEntity saved = createEntity("q2", "a2");
         entityManager.flush();
@@ -57,7 +59,7 @@ class QuoteRepositoryTest {
         assertThat(updated.getHits()).isEqualTo(1);
     }
 
-    //@Test
+    @Test
     void findArtistQuoteCountsReturnsGroupedCounts() {
         createEntity("q1", "ArtistA");
         createEntity("q2", "ArtistA");
