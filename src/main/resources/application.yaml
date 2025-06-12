@@ -15,7 +15,7 @@ spring:
     username: xavelo
     password: sqs
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: my-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092
   jpa:
     hibernate:
       ddl-auto: update
