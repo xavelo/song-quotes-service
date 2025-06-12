@@ -10,6 +10,7 @@ import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,37 +19,24 @@ import java.util.List;
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort {
 
     private final QuoteRepository quoteRepository;
+    private final QuoteMapper quoteMapper;
 
-    public MysqlAdapter(QuoteRepository quoteRepository) {
+    public MysqlAdapter(QuoteRepository quoteRepository, QuoteMapper quoteMapper) {
         this.quoteRepository = quoteRepository;
+        this.quoteMapper = quoteMapper;
     }
 
     public Long storeQuote(Quote quote) {
-        QuoteEntity entity = new QuoteEntity();
-        entity.setQuote(quote.quote());
-        entity.setSong(quote.song());
-        entity.setAlbum(quote.album());
-        entity.setYear(quote.year());
-        entity.setArtist(quote.artist());
-        entity.setPosts(0);
-        entity.setHits(0);
+        QuoteEntity entity = quoteMapper.toEntity(quote);
         QuoteEntity saved = quoteRepository.save(entity);
         return saved.getId();
     }
 
     @Override
     public java.util.List<Long> storeQuotes(List<Quote> quotes) {
-        java.util.List<QuoteEntity> entities = quotes.stream().map(q -> {
-            QuoteEntity e = new QuoteEntity();
-            e.setQuote(q.quote());
-            e.setSong(q.song());
-            e.setAlbum(q.album());
-            e.setYear(q.year());
-            e.setArtist(q.artist());
-            e.setPosts(0);
-            e.setHits(0);
-            return e;
-        }).toList();
+        java.util.List<QuoteEntity> entities = quotes.stream()
+                .map(quoteMapper::toEntity)
+                .toList();
         java.util.List<QuoteEntity> saved = quoteRepository.saveAll(entities);
         return saved.stream().map(QuoteEntity::getId).toList();
     }
@@ -57,14 +45,14 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     public java.util.List<Quote> loadQuotes() {
         java.util.List<QuoteEntity> entities = quoteRepository.findAll();
         return entities.stream()
-                .map(e -> new Quote(e.getId(), e.getQuote(), e.getSong(), e.getAlbum(), e.getYear(), e.getArtist(), e.getPosts(), e.getHits()))
+                .map(quoteMapper::toDomain)
                 .toList();
     }
 
     @Override
     public Quote loadQuote(Long id) {
         return quoteRepository.findById(id)
-                .map(e -> new Quote(e.getId(), e.getQuote(), e.getSong(), e.getAlbum(), e.getYear(), e.getArtist(), e.getPosts(), e.getHits()))
+                .map(quoteMapper::toDomain)
                 .orElse(null);
     }
 
@@ -74,7 +62,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         if (entity == null) {
             return null;
         }
-        return new Quote(entity.getId(), entity.getQuote(), entity.getSong(), entity.getAlbum(), entity.getYear(), entity.getArtist(), entity.getPosts(), entity.getHits());
+        return quoteMapper.toDomain(entity);
     }
 
     @Override
