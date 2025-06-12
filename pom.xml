@@ -29,10 +29,14 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
-		<!-- Spring Boot Web -->
+                <!-- Spring Boot Web -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-web</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>org.springframework.kafka</groupId>
+                        <artifactId>spring-kafka</artifactId>
                 </dependency>
                 <!-- Data access -->
                 <dependency>
