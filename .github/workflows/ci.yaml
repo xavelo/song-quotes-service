@@ -101,4 +101,19 @@ jobs:
       run: |
         docker buildx build --platform linux/arm64 -t ${{ secrets.DOCKER_USERNAME }}/${{ env.GIT_REPO }}:${GITHUB_SHA} . --push
 
+    - name: Install ArgoCD CLI
+      run: |
+        sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        sudo chmod +x /usr/local/bin/argocd
+
+    - name: Trigger ArgoCD sync
+      env:
+        ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+        ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
+        ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
+      run: |
+        argocd login "$ARGOCD_SERVER" --username "$ARGOCD_USERNAME" --password "$ARGOCD_PASSWORD" --insecure
+        argocd app sync song-quotes-service
+        argocd app wait song-quotes-service --health --timeout 300
+
   
