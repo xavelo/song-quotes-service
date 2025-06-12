@@ -55,59 +55,20 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
 
     @Override
     public Long storeQuote(Quote quote) {
-        Quote toStore = new Quote(
-                quote.id(),
-                quote.quote(),
-                quote.song(),
-                quote.album(),
-                quote.year(),
-                quote.artist(),
-                0,
-                0
-        );
+        Quote toStore = sanitize(quote);
         Long id = storeQuotePort.storeQuote(toStore);
-        Quote stored = new Quote(
-                id,
-                toStore.quote(),
-                toStore.song(),
-                toStore.album(),
-                toStore.year(),
-                toStore.artist(),
-                toStore.posts(),
-                toStore.hits()
-        );
-        publishQuoteCreatedPort.publishQuoteCreated(stored);
+        publishQuoteCreatedPort.publishQuoteCreated(withId(toStore, id));
         return id;
     }
 
     @Override
     public java.util.List<Long> storeQuotes(List<Quote> quotes) {
         java.util.List<Quote> sanitized = quotes.stream()
-                .map(q -> new Quote(
-                        q.id(),
-                        q.quote(),
-                        q.song(),
-                        q.album(),
-                        q.year(),
-                        q.artist(),
-                        0,
-                        0
-                ))
+                .map(this::sanitize)
                 .toList();
         java.util.List<Long> ids = storeQuotePort.storeQuotes(sanitized);
         for (int i = 0; i < ids.size(); i++) {
-            Quote s = sanitized.get(i);
-            Quote stored = new Quote(
-                    ids.get(i),
-                    s.quote(),
-                    s.song(),
-                    s.album(),
-                    s.year(),
-                    s.artist(),
-                    s.posts(),
-                    s.hits()
-            );
-            publishQuoteCreatedPort.publishQuoteCreated(stored);
+            publishQuoteCreatedPort.publishQuoteCreated(withId(sanitized.get(i), ids.get(i)));
         }
         return ids;
     }
@@ -122,17 +83,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote quote = loadQuotePort.loadQuote(id);
         if (quote != null) {
             incrementHitsPort.incrementHits(id);
-            int hitsCurrent = quote.hits() != null ? quote.hits() : 0;
-            quote = new Quote(
-                    quote.id(),
-                    quote.quote(),
-                    quote.song(),
-                    quote.album(),
-                    quote.year(),
-                    quote.artist(),
-                    quote.posts(),
-                    hitsCurrent + 1
-            );
+            quote = incrementHits(quote);
         }
         return quote;
     }
@@ -143,17 +94,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         if (quote != null) {
             // count how many times the quote has been served
             incrementPostsPort.incrementPosts(quote.id());
-            int current = quote.posts() != null ? quote.posts() : 0;
-            quote = new Quote(
-                    quote.id(),
-                    quote.quote(),
-                    quote.song(),
-                    quote.album(),
-                    quote.year(),
-                    quote.artist(),
-                    current + 1,
-                    quote.hits()
-            );
+            quote = incrementPosts(quote);
         }
         return quote;
     }
@@ -179,5 +120,59 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                 .stream()
                 .sorted(java.util.Comparator.comparing(ArtistQuoteCount::quotes).reversed())
                 .toList();
+    }
+
+    private Quote sanitize(Quote quote) {
+        return new Quote(
+                quote.id(),
+                quote.quote(),
+                quote.song(),
+                quote.album(),
+                quote.year(),
+                quote.artist(),
+                0,
+                0
+        );
+    }
+
+    private Quote withId(Quote quote, Long id) {
+        return new Quote(
+                id,
+                quote.quote(),
+                quote.song(),
+                quote.album(),
+                quote.year(),
+                quote.artist(),
+                quote.posts(),
+                quote.hits()
+        );
+    }
+
+    private Quote incrementPosts(Quote quote) {
+        int current = quote.posts() != null ? quote.posts() : 0;
+        return new Quote(
+                quote.id(),
+                quote.quote(),
+                quote.song(),
+                quote.album(),
+                quote.year(),
+                quote.artist(),
+                current + 1,
+                quote.hits()
+        );
+    }
+
+    private Quote incrementHits(Quote quote) {
+        int current = quote.hits() != null ? quote.hits() : 0;
+        return new Quote(
+                quote.id(),
+                quote.quote(),
+                quote.song(),
+                quote.album(),
+                quote.year(),
+                quote.artist(),
+                quote.posts(),
+                current + 1
+        );
     }
 }
