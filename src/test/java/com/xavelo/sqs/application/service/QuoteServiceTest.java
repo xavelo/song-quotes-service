@@ -2,7 +2,6 @@ package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.application.mapper.QuoteMapper;
 import com.xavelo.sqs.port.out.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,12 +10,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import org.mapstruct.factory.Mappers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,8 +41,6 @@ class QuoteServiceTest {
     @Mock
     private PublishQuoteCreatedPort publishQuoteCreatedPort;
 
-    @Spy
-    private QuoteMapper quoteMapper = org.mapstruct.factory.Mappers.getMapper(QuoteMapper.class);
 
     @InjectMocks
     private QuoteService quoteService;

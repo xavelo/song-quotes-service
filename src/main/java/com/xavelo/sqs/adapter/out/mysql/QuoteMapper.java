@@ -1,4 +1,4 @@
-package com.xavelo.sqs.application.mapper;
+package com.xavelo.sqs.adapter.out.mysql;
 
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.adapter.out.mysql.QuoteEntity;
