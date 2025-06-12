@@ -2,6 +2,7 @@ package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.application.mapper.QuoteMapper;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.GetQuotesUseCase;
@@ -35,13 +36,15 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     private final UpdateQuotePort updateQuotePort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
+    private final QuoteMapper quoteMapper;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
                         UpdateQuotePort updateQuotePort,
-                        PublishQuoteCreatedPort publishQuoteCreatedPort) {
+                        PublishQuoteCreatedPort publishQuoteCreatedPort,
+                        QuoteMapper quoteMapper) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
@@ -51,20 +54,12 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
         this.updateQuotePort = updateQuotePort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
+        this.quoteMapper = quoteMapper;
     }
 
     @Override
     public Long storeQuote(Quote quote) {
-        Quote toStore = new Quote(
-                quote.id(),
-                quote.quote(),
-                quote.song(),
-                quote.album(),
-                quote.year(),
-                quote.artist(),
-                0,
-                0
-        );
+        Quote toStore = quoteMapper.toDomain(quoteMapper.toEntity(quote));
         Long id = storeQuotePort.storeQuote(toStore);
         Quote stored = new Quote(
                 id,
@@ -83,16 +78,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     @Override
     public java.util.List<Long> storeQuotes(List<Quote> quotes) {
         java.util.List<Quote> sanitized = quotes.stream()
-                .map(q -> new Quote(
-                        q.id(),
-                        q.quote(),
-                        q.song(),
-                        q.album(),
-                        q.year(),
-                        q.artist(),
-                        0,
-                        0
-                ))
+                .map(q -> quoteMapper.toDomain(quoteMapper.toEntity(q)))
                 .toList();
         java.util.List<Long> ids = storeQuotePort.storeQuotes(sanitized);
         for (int i = 0; i < ids.size(); i++) {
