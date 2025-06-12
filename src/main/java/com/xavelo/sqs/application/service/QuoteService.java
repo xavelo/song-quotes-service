@@ -20,6 +20,8 @@ import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,13 +38,16 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     private final UpdateQuotePort updateQuotePort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
+    private final Counter quotesCreatedCounter;
+    private final Counter quotesServedCounter;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
                         UpdateQuotePort updateQuotePort,
-                        PublishQuoteCreatedPort publishQuoteCreatedPort) {
+                        PublishQuoteCreatedPort publishQuoteCreatedPort,
+                        MeterRegistry meterRegistry) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
@@ -52,6 +57,8 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
         this.updateQuotePort = updateQuotePort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
+        this.quotesCreatedCounter = meterRegistry.counter("quotes.created");
+        this.quotesServedCounter = meterRegistry.counter("quotes.served");
     }
 
     @Override
@@ -60,6 +67,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Long id = storeQuotePort.storeQuote(toStore);
         Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
+        quotesCreatedCounter.increment();
         return id;
     }
 
@@ -74,6 +82,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             Quote stored = QuoteHelper.withId(s, ids.get(i));
             publishQuoteCreatedPort.publishQuoteCreated(stored);
         }
+        quotesCreatedCounter.increment(ids.size());
         return ids;
     }
 
@@ -88,6 +97,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         if (quote != null) {
             incrementHitsPort.incrementHits(id);
             quote = QuoteHelper.incrementHits(quote);
+            quotesServedCounter.increment();
         }
         return quote;
     }
@@ -99,6 +109,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             // count how many times the quote has been served
             incrementPostsPort.incrementPosts(quote.id());
             quote = QuoteHelper.incrementPosts(quote);
+            quotesServedCounter.increment();
         }
         return quote;
     }
