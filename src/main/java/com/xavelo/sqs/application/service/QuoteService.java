@@ -18,6 +18,7 @@ import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,12 +34,14 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final IncrementHitsPort incrementHitsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     private final UpdateQuotePort updateQuotePort;
+    private final PublishQuoteCreatedPort publishQuoteCreatedPort;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
-                        UpdateQuotePort updateQuotePort) {
+                        UpdateQuotePort updateQuotePort,
+                        PublishQuoteCreatedPort publishQuoteCreatedPort) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
@@ -47,6 +50,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.incrementHitsPort = incrementHitsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
         this.updateQuotePort = updateQuotePort;
+        this.publishQuoteCreatedPort = publishQuoteCreatedPort;
     }
 
     @Override
@@ -61,7 +65,19 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                 0,
                 0
         );
-        return storeQuotePort.storeQuote(toStore);
+        Long id = storeQuotePort.storeQuote(toStore);
+        Quote stored = new Quote(
+                id,
+                toStore.quote(),
+                toStore.song(),
+                toStore.album(),
+                toStore.year(),
+                toStore.artist(),
+                toStore.posts(),
+                toStore.hits()
+        );
+        publishQuoteCreatedPort.publishQuoteCreated(stored);
+        return id;
     }
 
     @Override
@@ -78,7 +94,22 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         0
                 ))
                 .toList();
-        return storeQuotePort.storeQuotes(sanitized);
+        java.util.List<Long> ids = storeQuotePort.storeQuotes(sanitized);
+        for (int i = 0; i < ids.size(); i++) {
+            Quote s = sanitized.get(i);
+            Quote stored = new Quote(
+                    ids.get(i),
+                    s.quote(),
+                    s.song(),
+                    s.album(),
+                    s.year(),
+                    s.artist(),
+                    s.posts(),
+                    s.hits()
+            );
+            publishQuoteCreatedPort.publishQuoteCreated(stored);
+        }
+        return ids;
     }
 
     @Override

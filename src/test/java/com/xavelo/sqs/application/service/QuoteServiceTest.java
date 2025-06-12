@@ -37,6 +37,8 @@ class QuoteServiceTest {
     private LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     @Mock
     private UpdateQuotePort updateQuotePort;
+    @Mock
+    private PublishQuoteCreatedPort publishQuoteCreatedPort;
 
     @InjectMocks
     private QuoteService quoteService;
@@ -45,6 +47,8 @@ class QuoteServiceTest {
     private ArgumentCaptor<Quote> quoteCaptor;
     @Captor
     private ArgumentCaptor<List<Quote>> quoteListCaptor;
+    @Captor
+    private ArgumentCaptor<Quote> publishedQuoteCaptor;
 
     private Quote sampleQuote;
 
@@ -63,6 +67,10 @@ class QuoteServiceTest {
         Quote sent = quoteCaptor.getValue();
         assertEquals(0, sent.posts());
         assertEquals(0, sent.hits());
+        verify(publishQuoteCreatedPort).publishQuoteCreated(publishedQuoteCaptor.capture());
+        Quote published = publishedQuoteCaptor.getValue();
+        assertEquals(10L, published.id());
+        assertEquals(sent.quote(), published.quote());
         assertEquals(10L, id);
     }
 
@@ -80,6 +88,9 @@ class QuoteServiceTest {
             assertEquals(0, q.posts());
             assertEquals(0, q.hits());
         }
+        verify(publishQuoteCreatedPort, times(2)).publishQuoteCreated(publishedQuoteCaptor.capture());
+        List<Quote> published = publishedQuoteCaptor.getAllValues();
+        assertEquals(2, published.size());
         assertEquals(List.of(1L, 2L), ids);
     }
 
