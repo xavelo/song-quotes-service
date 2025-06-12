@@ -18,6 +18,7 @@ public class QuoteEntity {
     private String quote;
     private String song;
     private String album;
+    @Column(name = "quote_year")
     private Integer year;
     private String artist;
     @Column(nullable = false)
