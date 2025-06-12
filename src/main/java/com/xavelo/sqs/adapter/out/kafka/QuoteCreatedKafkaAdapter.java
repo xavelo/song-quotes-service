@@ -13,6 +13,8 @@ public class QuoteCreatedKafkaAdapter implements PublishQuoteCreatedPort {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
+    private static final String SONG_QUOTE_CREATED_TOPIC = "song-quote-created-topic";
+
     public QuoteCreatedKafkaAdapter(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
         this.objectMapper = objectMapper;
@@ -22,7 +24,7 @@ public class QuoteCreatedKafkaAdapter implements PublishQuoteCreatedPort {
     public void publishQuoteCreated(Quote quote) {
         try {
             String payload = objectMapper.writeValueAsString(quote);
-            kafkaTemplate.send("song-quote-created", payload);
+            kafkaTemplate.send(SONG_QUOTE_CREATED_TOPIC, payload);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize quote", e);
         }
