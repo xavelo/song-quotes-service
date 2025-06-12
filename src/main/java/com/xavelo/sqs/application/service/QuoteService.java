@@ -2,6 +2,7 @@ package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.application.service.QuoteHelper;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.GetQuotesUseCase;
@@ -55,27 +56,9 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
 
     @Override
     public Long storeQuote(Quote quote) {
-        Quote toStore = new Quote(
-                quote.id(),
-                quote.quote(),
-                quote.song(),
-                quote.album(),
-                quote.year(),
-                quote.artist(),
-                0,
-                0
-        );
+        Quote toStore = QuoteHelper.sanitize(quote);
         Long id = storeQuotePort.storeQuote(toStore);
-        Quote stored = new Quote(
-                id,
-                toStore.quote(),
-                toStore.song(),
-                toStore.album(),
-                toStore.year(),
-                toStore.artist(),
-                toStore.posts(),
-                toStore.hits()
-        );
+        Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
         return id;
     }
@@ -83,30 +66,12 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     @Override
     public java.util.List<Long> storeQuotes(List<Quote> quotes) {
         java.util.List<Quote> sanitized = quotes.stream()
-                .map(q -> new Quote(
-                        q.id(),
-                        q.quote(),
-                        q.song(),
-                        q.album(),
-                        q.year(),
-                        q.artist(),
-                        0,
-                        0
-                ))
+                .map(QuoteHelper::sanitize)
                 .toList();
         java.util.List<Long> ids = storeQuotePort.storeQuotes(sanitized);
         for (int i = 0; i < ids.size(); i++) {
             Quote s = sanitized.get(i);
-            Quote stored = new Quote(
-                    ids.get(i),
-                    s.quote(),
-                    s.song(),
-                    s.album(),
-                    s.year(),
-                    s.artist(),
-                    s.posts(),
-                    s.hits()
-            );
+            Quote stored = QuoteHelper.withId(s, ids.get(i));
             publishQuoteCreatedPort.publishQuoteCreated(stored);
         }
         return ids;
@@ -122,17 +87,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote quote = loadQuotePort.loadQuote(id);
         if (quote != null) {
             incrementHitsPort.incrementHits(id);
-            int hitsCurrent = quote.hits() != null ? quote.hits() : 0;
-            quote = new Quote(
-                    quote.id(),
-                    quote.quote(),
-                    quote.song(),
-                    quote.album(),
-                    quote.year(),
-                    quote.artist(),
-                    quote.posts(),
-                    hitsCurrent + 1
-            );
+            quote = QuoteHelper.incrementHits(quote);
         }
         return quote;
     }
@@ -143,17 +98,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         if (quote != null) {
             // count how many times the quote has been served
             incrementPostsPort.incrementPosts(quote.id());
-            int current = quote.posts() != null ? quote.posts() : 0;
-            quote = new Quote(
-                    quote.id(),
-                    quote.quote(),
-                    quote.song(),
-                    quote.album(),
-                    quote.year(),
-                    quote.artist(),
-                    current + 1,
-                    quote.hits()
-            );
+            quote = QuoteHelper.incrementPosts(quote);
         }
         return quote;
     }

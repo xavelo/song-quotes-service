@@ -1,6 +1,7 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
 import com.xavelo.sqs.application.domain.Quote;
+import com.xavelo.sqs.application.service.QuoteHelper;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.GetQuotesUseCase;
 import com.xavelo.sqs.port.in.GetQuoteUseCase;
@@ -90,9 +91,7 @@ public class QuoteController {
 
     @PutMapping("/quote/{id}")
     public ResponseEntity<Void> updateQuote(@PathVariable Long id, @RequestBody Quote quote) {
-        updateQuoteUseCase.updateQuote(
-                new Quote(id, quote.quote(), quote.song(), quote.album(), quote.year(), quote.artist(), quote.posts(), quote.hits())
-        );
+        updateQuoteUseCase.updateQuote(QuoteHelper.withId(quote, id));
         return ResponseEntity.noContent().build();
     }
 
