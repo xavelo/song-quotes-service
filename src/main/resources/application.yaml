@@ -20,6 +20,9 @@ spring:
     hibernate:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.MySQLDialect
+  flyway:
+    mysql:
+      future-version: true
 management:
   endpoints:
     web:
