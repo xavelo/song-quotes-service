@@ -31,3 +31,4 @@ management:
 logging:
   level:
     org.springframework.security: INFO
+    org.flyway: DEBUG
