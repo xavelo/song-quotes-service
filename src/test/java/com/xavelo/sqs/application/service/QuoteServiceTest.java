@@ -66,7 +66,7 @@ class QuoteServiceTest {
     @Test
     void storeQuote_sanitizesAndDelegates() {
         when(storeQuotePort.storeQuote(any(Quote.class))).thenReturn(10L);
-        when(metadataService.getArtistMetadata(anyString())).thenReturn(new Artist("id", "name", List.of(), 0, "url", "spotifyUrl"));
+        when(metadataService.getArtistMetadata(anyString())).thenReturn(new Artist("id", "name", List.of(), 0, "url", "spotifyUrl", List.of()));
 
         Long id = quoteService.storeQuote(sampleQuote);
 
