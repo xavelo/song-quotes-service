@@ -22,7 +22,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
   flyway:
     mysql:
-      enabled: false
+      enabled: true
 management:
   endpoints:
     web:
