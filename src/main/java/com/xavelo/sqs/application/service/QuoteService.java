@@ -1,5 +1,6 @@
 package com.xavelo.sqs.application.service;
 
+import com.xavelo.sqs.adapter.out.spotify.SpotifyAdapter;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.service.QuoteHelper;
@@ -27,12 +28,16 @@ import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.application.service.MetadataService;
 import com.xavelo.sqs.application.domain.Artist;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, DeleteQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTop10QuotesUseCase, PatchQuoteUseCase {
+
+    private static final Logger logger = LogManager.getLogger(QuoteService.class);
 
     private final StoreQuotePort storeQuotePort;
     private final LoadQuotePort loadQuotePort;
@@ -90,7 +95,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
         Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
-        System.out.println("Artist Metadata: " + artistMetadata.name() + " (ID: " + artistMetadata.id() + ")");
+        logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
         return id;
     }
 

@@ -14,8 +14,8 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     username: xavelo
     password: sqs
-  kafka:
-    bootstrap-servers: my-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092
+  #kafka:
+  #  bootstrap-servers: my-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092
   jpa:
     hibernate:
       ddl-auto: validate
@@ -40,4 +40,5 @@ management:
 logging:
   level:
     org.springframework.security: INFO
-    org.flyway: DEBUG
+    org.flyway: INFO
+    com.xavelo.sqs.application.service: DEBUG
