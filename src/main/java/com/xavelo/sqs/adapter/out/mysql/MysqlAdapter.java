@@ -11,13 +11,14 @@ import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.port.out.ExportQuotesPort;
 import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, ExportQuotesPort {
 
     private final QuoteRepository quoteRepository;
     private final QuoteMapper quoteMapper;
@@ -113,5 +114,25 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         return entities.stream()
                 .map(quoteMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public String exportQuotesAsSql() {
+        List<QuoteEntity> quotes = quoteRepository.findAll();
+        StringBuilder sqlBuilder = new StringBuilder();
+        for (QuoteEntity quote : quotes) {
+            sqlBuilder.append(String.format(
+                    "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (%d, '%s', '%s', '%s', %d, '%s', %d, %d);\n",
+                    quote.getId(),
+                    quote.getQuote().replace("'", "''"),
+                    quote.getSong().replace("'", "''"),
+                    quote.getAlbum().replace("'", "''"),
+                    quote.getYear(),
+                    quote.getArtist().replace("'", "''"),
+                    quote.getHits(),
+                    quote.getPosts()
+            ));
+        }
+        return sqlBuilder.toString();
     }
 }
