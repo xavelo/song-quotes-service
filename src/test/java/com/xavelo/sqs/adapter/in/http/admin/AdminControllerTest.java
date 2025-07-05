@@ -3,6 +3,7 @@ package com.xavelo.sqs.adapter.in.http.admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xavelo.sqs.application.service.AdminService;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
+import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
 import com.xavelo.sqs.application.domain.Quote;
@@ -14,10 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.http.MediaType;
@@ -33,9 +31,22 @@ class AdminControllerTest {
     @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;
     @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
     @MockBean private PatchQuoteUseCase patchQuoteUseCase;
+    @MockBean private StoreQuoteUseCase storeQuoteUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Test
+    void createQuote() throws Exception {
+        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 0, 0);
+        when(storeQuoteUseCase.storeQuote(quote)).thenReturn(1L);
+
+        mockMvc.perform(post("/admin/quote")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(quote)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
+    }
 
     @Test
     void exportQuotes() throws Exception {
@@ -76,4 +87,5 @@ class AdminControllerTest {
 
         verify(patchQuoteUseCase).patchQuote(1L, new Quote(null, "line", null, null, null, null, null, null));
     }
+
 }

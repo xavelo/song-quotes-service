@@ -2,18 +2,12 @@ package com.xavelo.sqs.adapter.in.http.admin;
 
 import com.xavelo.sqs.application.service.AdminService;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
+import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
 import com.xavelo.sqs.application.domain.Quote;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import com.xavelo.sqs.application.service.QuoteHelper;
 
 @RestController
@@ -21,24 +15,33 @@ import com.xavelo.sqs.application.service.QuoteHelper;
 public class AdminController {
 
     private final AdminService adminService;
+    private final StoreQuoteUseCase storeQuoteUseCase;
     private final DeleteQuoteUseCase deleteQuoteUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final PatchQuoteUseCase patchQuoteUseCase;
 
     public AdminController(AdminService adminService,
+                           StoreQuoteUseCase storeQuoteUseCase,
                            DeleteQuoteUseCase deleteQuoteUseCase,
                            UpdateQuoteUseCase updateQuoteUseCase,
                            PatchQuoteUseCase patchQuoteUseCase) {
         this.adminService = adminService;
+        this.storeQuoteUseCase = storeQuoteUseCase;
         this.deleteQuoteUseCase = deleteQuoteUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
         this.patchQuoteUseCase = patchQuoteUseCase;
     }
 
-    @GetMapping("/export")
-    public ResponseEntity<String> exportQuotes() {
-        String sql = adminService.exportQuotesAsSql();
-        return ResponseEntity.ok(sql);
+    @PostMapping("/quote")
+    public ResponseEntity<Long> createQuote(@RequestBody Quote quote) {
+        Long id = storeQuoteUseCase.storeQuote(quote);
+        return ResponseEntity.ok(id);
+    }
+
+    @PostMapping("/quotes")
+    public ResponseEntity<java.util.List<Long>> createQuotes(@RequestBody java.util.List<Quote> quotes) {
+        java.util.List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
+        return ResponseEntity.ok(ids);
     }
 
     @DeleteMapping("/quote/{id}")
@@ -58,4 +61,11 @@ public class AdminController {
         patchQuoteUseCase.patchQuote(id, quote);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/export")
+    public ResponseEntity<String> exportQuotes() {
+        String sql = adminService.exportQuotesAsSql();
+        return ResponseEntity.ok(sql);
+    }
+
 }

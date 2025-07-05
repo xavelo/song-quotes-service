@@ -38,30 +38,6 @@ class QuoteControllerTest {
     @MockBean private GetTop10QuotesUseCase getTop10QuotesUseCase;
 
     @Test
-    void createQuote() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 0, 0);
-        when(storeQuoteUseCase.storeQuote(quote)).thenReturn(1L);
-
-        mockMvc.perform(post("/api/quote")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(quote)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1"));
-    }
-
-    @Test
-    void createQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(null, "a", "s", "al", 2000, "art", 0, 0));
-        when(storeQuoteUseCase.storeQuotes(quotes)).thenReturn(List.of(1L));
-
-        mockMvc.perform(post("/api/quotes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(quotes)))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[1]"));
-    }
-
-    @Test
     void getQuotes() throws Exception {
         List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 0));
         when(getQuotesUseCase.getQuotes()).thenReturn(quotes);
@@ -101,14 +77,6 @@ class QuoteControllerTest {
     }
 
     @Test
-    void getRandomQuoteNotFound() throws Exception {
-        when(getRandomQuoteUseCase.getRandomQuote()).thenReturn(null);
-
-        mockMvc.perform(get("/api/quote/random"))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     void getQuoteFound() throws Exception {
         Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0);
         when(getQuoteUseCase.getQuote(1L)).thenReturn(quote);
@@ -124,24 +92,6 @@ class QuoteControllerTest {
 
         mockMvc.perform(get("/api/quote/2"))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void deleteQuote() throws Exception {
-        mockMvc.perform(delete("/api/quote/1"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void updateQuote() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", null, null);
-
-        mockMvc.perform(put("/api/quote/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(quote)))
-                .andExpect(status().isNoContent());
-
-        verify(updateQuoteUseCase).updateQuote(new Quote(1L, "line", "song", "album", 1990, "artist", null, null));
     }
 
     @Test

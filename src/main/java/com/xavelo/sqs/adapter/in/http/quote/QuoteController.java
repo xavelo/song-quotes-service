@@ -1,66 +1,38 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
-import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.application.service.QuoteHelper;
-import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
-import com.xavelo.sqs.port.in.GetQuotesUseCase;
-import com.xavelo.sqs.port.in.GetQuoteUseCase;
-import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
-import com.xavelo.sqs.port.in.GetTop10QuotesUseCase;
-import com.xavelo.sqs.port.in.StoreQuoteUseCase;
-import com.xavelo.sqs.port.in.CountQuotesUseCase;
-import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
-import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.application.domain.Quote;
+import com.xavelo.sqs.port.in.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
 @RequestMapping("/api")
 public class QuoteController {
 
-    private final StoreQuoteUseCase storeQuoteUseCase;
     private final GetQuotesUseCase getQuotesUseCase;
     private final GetQuoteUseCase getQuoteUseCase;
     private final GetRandomQuoteUseCase getRandomQuoteUseCase;
     private final CountQuotesUseCase countQuotesUseCase;
-    private final DeleteQuoteUseCase deleteQuoteUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
-    private final UpdateQuoteUseCase updateQuoteUseCase;
     private final GetTop10QuotesUseCase getTop10QuotesUseCase;
 
-    public QuoteController(StoreQuoteUseCase storeQuoteUseCase,
-                           GetQuotesUseCase getQuotesUseCase,
+    public QuoteController(GetQuotesUseCase getQuotesUseCase,
                            GetQuoteUseCase getQuoteUseCase,
-                           DeleteQuoteUseCase deleteQuoteUseCase,
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
                            GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase,
-                           UpdateQuoteUseCase updateQuoteUseCase,
                            GetTop10QuotesUseCase getTop10QuotesUseCase) {
-        this.storeQuoteUseCase = storeQuoteUseCase;
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
         this.getRandomQuoteUseCase = getRandomQuoteUseCase;
-        this.deleteQuoteUseCase = deleteQuoteUseCase;
         this.countQuotesUseCase = countQuotesUseCase;
         this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
-        this.updateQuoteUseCase = updateQuoteUseCase;
         this.getTop10QuotesUseCase = getTop10QuotesUseCase;
-    }
-
-    @PostMapping("/quote")
-    public ResponseEntity<Long> createQuote(@RequestBody Quote quote) {
-        Long id = storeQuoteUseCase.storeQuote(quote);
-        return ResponseEntity.ok(id);
-    }
-
-    @PostMapping("/quotes")
-    public ResponseEntity<java.util.List<Long>> createQuotes(@RequestBody java.util.List<Quote> quotes) {
-        java.util.List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
-        return ResponseEntity.ok(ids);
     }
 
     @GetMapping("/quotes")
@@ -91,18 +63,6 @@ public class QuoteController {
     public ResponseEntity<Quote> getQuote(@PathVariable Long id) {
         Quote quote = getQuoteUseCase.getQuote(id);
         return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
-    }
-
-    @PutMapping("/quote/{id}")
-    public ResponseEntity<Void> updateQuote(@PathVariable Long id, @RequestBody Quote quote) {
-        updateQuoteUseCase.updateQuote(QuoteHelper.withId(quote, id));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/quote/{id}")
-    public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
-        deleteQuoteUseCase.deleteQuote(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/quotes/top10")
