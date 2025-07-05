@@ -42,7 +42,8 @@ class QuoteServiceTest {
     private UpdateQuotePort updateQuotePort;
     @Mock
     private PublishQuoteCreatedPort publishQuoteCreatedPort;
-
+    @Mock
+    private MetadataService metadataService;
 
     @InjectMocks
     private QuoteService quoteService;
@@ -64,6 +65,7 @@ class QuoteServiceTest {
     @Test
     void storeQuote_sanitizesAndDelegates() {
         when(storeQuotePort.storeQuote(any(Quote.class))).thenReturn(10L);
+        when(metadataService.getArtistMetadata(anyString())).thenReturn("some metadata");
 
         Long id = quoteService.storeQuote(sampleQuote);
 

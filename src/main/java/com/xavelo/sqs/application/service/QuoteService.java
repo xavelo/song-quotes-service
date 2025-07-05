@@ -25,6 +25,7 @@ import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
+import com.xavelo.sqs.application.service.MetadataService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
+    private final MetadataService metadataService;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
@@ -53,7 +55,8 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         UpdateQuotePort updateQuotePort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
                         LoadTop10QuotesPort loadTop10QuotesPort,
-                        PatchQuotePort patchQuotePort) {
+                        PatchQuotePort patchQuotePort,
+                        MetadataService metadataService) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
@@ -66,6 +69,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
         this.patchQuotePort = patchQuotePort;
+        this.metadataService = metadataService;
     }
 
     @Override
@@ -84,6 +88,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Long id = storeQuotePort.storeQuote(toStore);
         Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
+        System.out.println("Artist Metadata: " + metadataService.getArtistMetadata(toStore.artist()));
         return id;
     }
 
