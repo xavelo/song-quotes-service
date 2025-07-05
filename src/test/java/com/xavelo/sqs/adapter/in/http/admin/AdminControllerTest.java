@@ -1,7 +1,7 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xavelo.sqs.port.in.ExportQuotesUseCase;
+import com.xavelo.sqs.application.service.AdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,12 +20,12 @@ class AdminControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ExportQuotesUseCase exportQuotesUseCase;
+    private AdminService adminService;
 
     @Test
     void exportQuotes() throws Exception {
         String expectedSql = "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (1, 'quote1', 'song1', 'album1', 2000, 'artist1', 0, 0);\n";
-        when(exportQuotesUseCase.exportQuotesAsSql()).thenReturn(expectedSql);
+        when(adminService.exportQuotesAsSql()).thenReturn(expectedSql);
 
         mockMvc.perform(get("/admin/quotes/export"))
                 .andExpect(status().isOk())
