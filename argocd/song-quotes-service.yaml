@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: song-quotes-service-service
+  name: song-quotes-service
 spec:
   type: NodePort
   ports:
@@ -9,4 +9,4 @@ spec:
       targetPort: 8080
       nodePort: 30015
   selector:
-    app: song-quotes-service
+    app: song-quotes

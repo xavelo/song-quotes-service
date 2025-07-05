@@ -1,12 +1,12 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: song-quotes-service-hpa
+  name: song-quotes-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: song-quotes-service-deployment
+    name: song-quotes-deployment
   minReplicas: 1
   maxReplicas: 2
   metrics:

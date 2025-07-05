@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: song-quotes-service-deployment
+  name: song-quotes-deployment
   annotations:
     commitID: "fff022252259d8d718ce0f8b29dfe8758a7edccb"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: song-quotes-service
+      app: song-quotes
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        app: song-quotes-service
+        app: song-quotes
     spec:
       containers:
         - name: song-quotes-service
