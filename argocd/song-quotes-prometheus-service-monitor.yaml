@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: song-quotes-prometheus-service-monitor
+  namespace: prometheus
+  labels:
+    release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app: song-quotes
+  namespaceSelector:
+    matchNames:
+      - argocd
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s
+      scheme: http
