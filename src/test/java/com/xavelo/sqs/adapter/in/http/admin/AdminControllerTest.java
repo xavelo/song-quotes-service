@@ -27,7 +27,7 @@ class AdminControllerTest {
         String expectedSql = "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (1, 'quote1', 'song1', 'album1', 2000, 'artist1', 0, 0);\n";
         when(adminService.exportQuotesAsSql()).thenReturn(expectedSql);
 
-        mockMvc.perform(get("/admin/quotes/export"))
+        mockMvc.perform(get("/admin/export"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(expectedSql));
     }
