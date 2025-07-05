@@ -23,6 +23,12 @@ spring:
   flyway:
     mysql:
       enabled: true
+spotify:
+  api:
+    url: https://api.spotify.com/v1
+    clientId: ${SPOTIFY_CLIENT_ID}
+    clientSecret: ${SPOTIFY_CLIENT_SECRET}
+
 management:
   endpoints:
     web:
