@@ -34,6 +34,9 @@ class AdminControllerTest {
     @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
     @MockBean private PatchQuoteUseCase patchQuoteUseCase;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void exportQuotes() throws Exception {
         String expectedSql = "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (1, 'quote1', 'song1', 'album1', 2000, 'artist1', 0, 0);\n";
