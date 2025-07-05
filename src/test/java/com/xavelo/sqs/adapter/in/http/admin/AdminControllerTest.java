@@ -15,7 +15,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.http.MediaType;
@@ -77,6 +84,18 @@ class AdminControllerTest {
     }
 
     @Test
+    void updateQuoteWithRestrictedFields() throws Exception {
+        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 1, 1);
+
+        mockMvc.perform(put("/admin/quote/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(quote)))
+                .andExpect(status().isBadRequest());
+
+        verify(updateQuoteUseCase, never()).updateQuote(any(Quote.class));
+    }
+
+    @Test
     void patchQuote() throws Exception {
         Quote quote = new Quote(null, "line", null, null, null, null, null, null);
 
@@ -88,4 +107,15 @@ class AdminControllerTest {
         verify(patchQuoteUseCase).patchQuote(1L, new Quote(null, "line", null, null, null, null, null, null));
     }
 
+    @Test
+    void patchQuoteWithRestrictedFields() throws Exception {
+        Quote quote = new Quote(null, null, null, null, null, null, 1, null);
+
+        mockMvc.perform(patch("/admin/quote/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(quote)))
+                .andExpect(status().isBadRequest());
+
+        verify(patchQuoteUseCase, never()).patchQuote(anyLong(), any(Quote.class));
+    }
 }

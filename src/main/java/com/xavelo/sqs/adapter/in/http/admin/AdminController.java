@@ -52,12 +52,22 @@ public class AdminController {
 
     @PutMapping("/quote/{id}")
     public ResponseEntity<Void> updateQuote(@PathVariable Long id, @RequestBody Quote quote) {
+        if (containsRestrictedFields(quote)) {
+            return ResponseEntity.badRequest().build();
+        }
         updateQuoteUseCase.updateQuote(QuoteHelper.withId(quote, id));
         return ResponseEntity.noContent().build();
     }
 
+    private boolean containsRestrictedFields(Quote quote) {
+        return quote.posts() != null || quote.hits() != null;
+    }
+
     @PatchMapping("/quote/{id}")
     public ResponseEntity<Void> patchQuote(@PathVariable Long id, @RequestBody Quote quote) {
+        if (containsRestrictedFields(quote)) {
+            return ResponseEntity.badRequest().build();
+        }
         patchQuoteUseCase.patchQuote(id, quote);
         return ResponseEntity.noContent().build();
     }
