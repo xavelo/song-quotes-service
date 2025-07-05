@@ -17,6 +17,7 @@ import com.xavelo.sqs.port.out.QuotesCountPort;
 import com.xavelo.sqs.port.out.StoreQuotePort;
 import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
+import com.xavelo.sqs.port.out.MetricsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
@@ -33,6 +34,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final DeleteQuotePort deleteQuotePort;
     private final IncrementPostsPort incrementPostsPort;
     private final IncrementHitsPort incrementHitsPort;
+    private final MetricsPort metricsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     private final UpdateQuotePort updateQuotePort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
@@ -40,6 +42,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
+                        MetricsPort metricsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
                         UpdateQuotePort updateQuotePort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort) {
@@ -49,6 +52,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.deleteQuotePort = deleteQuotePort;
         this.incrementPostsPort = incrementPostsPort;
         this.incrementHitsPort = incrementHitsPort;
+        this.metricsPort = metricsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
         this.updateQuotePort = updateQuotePort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
@@ -87,6 +91,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote quote = loadQuotePort.loadQuote(id);
         if (quote != null) {
             incrementHitsPort.incrementHits(id);
+            metricsPort.incrementHits();
             quote = QuoteHelper.incrementHits(quote);
         }
         return quote;
