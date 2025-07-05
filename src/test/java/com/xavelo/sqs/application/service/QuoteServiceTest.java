@@ -1,5 +1,6 @@
 package com.xavelo.sqs.application.service;
 
+import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.out.*;
@@ -65,7 +66,7 @@ class QuoteServiceTest {
     @Test
     void storeQuote_sanitizesAndDelegates() {
         when(storeQuotePort.storeQuote(any(Quote.class))).thenReturn(10L);
-        when(metadataService.getArtistMetadata(anyString())).thenReturn("some metadata");
+        when(metadataService.getArtistMetadata(anyString())).thenReturn(new Artist("id", "name", List.of(), 0, "url", "spotifyUrl"));
 
         Long id = quoteService.storeQuote(sampleQuote);
 

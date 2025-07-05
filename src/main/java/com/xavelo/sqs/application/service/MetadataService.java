@@ -1,5 +1,6 @@
 package com.xavelo.sqs.application.service;
 
+import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.port.ArtistMetadataPort;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public class MetadataService {
         this.artistMetadataPort = artistMetadataPort;
     }
 
-    public String getArtistMetadata(String artistName) {
+    public Artist getArtistMetadata(String artistName) {
         return artistMetadataPort.getArtistMetadata(artistName);
     }
 }
