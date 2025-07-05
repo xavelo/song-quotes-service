@@ -16,7 +16,7 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @GetMapping("/quotes/export")
+    @GetMapping("/export")
     public ResponseEntity<String> exportQuotes() {
         String sql = adminService.exportQuotesAsSql();
         return ResponseEntity.ok(sql);
