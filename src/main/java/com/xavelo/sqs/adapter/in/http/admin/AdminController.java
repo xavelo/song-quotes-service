@@ -16,7 +16,7 @@ public class AdminController {
         this.exportQuotesUseCase = exportQuotesUseCase;
     }
 
-    @GetMapping("/quotes/export")
+    @GetMapping("/export")
     public ResponseEntity<String> exportQuotes() {
         String sql = exportQuotesUseCase.exportQuotesAsSql();
         return ResponseEntity.ok(sql);
