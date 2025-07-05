@@ -22,5 +22,16 @@ spec:
       containers:
         - name: song-quotes-service
           image: 'xavelo/song-quotes-service:9d60ae6f3ba92fb949ee9f69db99422d3b8f1e41'
+          env:
+            - name: SPOTIFY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-api-secret
+                  key: clientId
+            - name: SPOTIFY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-api-secret
+                  key: clientSecret
           ports:
             - containerPort: 80
