@@ -6,6 +6,7 @@ import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.GetQuotesUseCase;
 import com.xavelo.sqs.port.in.GetQuoteUseCase;
 import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
+import com.xavelo.sqs.port.in.GetTop10QuotesUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
@@ -28,6 +29,7 @@ public class QuoteController {
     private final DeleteQuoteUseCase deleteQuoteUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
+    private final GetTop10QuotesUseCase getTop10QuotesUseCase;
 
     public QuoteController(StoreQuoteUseCase storeQuoteUseCase,
                            GetQuotesUseCase getQuotesUseCase,
@@ -36,7 +38,8 @@ public class QuoteController {
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
                            GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase,
-                           UpdateQuoteUseCase updateQuoteUseCase) {
+                           UpdateQuoteUseCase updateQuoteUseCase,
+                           GetTop10QuotesUseCase getTop10QuotesUseCase) {
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
@@ -45,6 +48,7 @@ public class QuoteController {
         this.countQuotesUseCase = countQuotesUseCase;
         this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
+        this.getTop10QuotesUseCase = getTop10QuotesUseCase;
     }
 
     @PostMapping("/quote")
@@ -99,5 +103,11 @@ public class QuoteController {
     public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
         deleteQuoteUseCase.deleteQuote(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/quotes/top10")
+    public ResponseEntity<java.util.List<Quote>> getTop10Quotes() {
+        java.util.List<Quote> quotes = getTop10QuotesUseCase.getTop10Quotes();
+        return ResponseEntity.ok(quotes);
     }
 }
