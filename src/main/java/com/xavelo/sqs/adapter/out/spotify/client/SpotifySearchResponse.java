@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record SpotifySearchResponse(
-    List<ArtistItem> artists
+    ArtistsWrapper artists
 ) {
+    public record ArtistsWrapper(
+        List<ArtistItem> items
+    ) {}
+
     public record ArtistItem(
         String id,
         String name,
