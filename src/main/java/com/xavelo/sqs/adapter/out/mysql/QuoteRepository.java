@@ -36,6 +36,6 @@ public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
     /**
      * Retrieve the top 10 quotes with the most hits.
      */
-    @Query("SELECT q FROM QuoteEntity q ORDER BY q.hits DESC")
+    @Query("SELECT q FROM QuoteEntity q WHERE q.hits > 0 ORDER BY q.hits DESC")
     List<QuoteEntity> findTop10ByOrderByHitsDesc();
 }
