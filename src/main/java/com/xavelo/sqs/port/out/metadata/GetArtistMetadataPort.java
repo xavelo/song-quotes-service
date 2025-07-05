@@ -1,5 +1,7 @@
 package com.xavelo.sqs.port.out.metadata;
 
+import com.xavelo.sqs.application.domain.Artist;
+
 public interface GetArtistMetadataPort {
-    String getArtistMetadata(String artistName);
+    Artist getArtistMetadata(String artistName);
 }
