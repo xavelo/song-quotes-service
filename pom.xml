@@ -28,11 +28,15 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	<dependencies>
+        <dependencies>
                 <!-- Spring Boot Web -->
                 <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-web</artifactId>
+                </dependency>
+                <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter-actuator</artifactId>
                 </dependency>
                 <dependency>
                         <groupId>org.springframework.kafka</groupId>
