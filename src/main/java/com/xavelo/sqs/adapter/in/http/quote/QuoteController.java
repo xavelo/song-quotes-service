@@ -11,6 +11,8 @@ import com.xavelo.sqs.port.in.CountQuotesUseCase;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,7 @@ public class QuoteController {
     private final DeleteQuoteUseCase deleteQuoteUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
+    private final Counter songQuotesHitsCounter;
 
     public QuoteController(StoreQuoteUseCase storeQuoteUseCase,
                            GetQuotesUseCase getQuotesUseCase,
@@ -36,7 +39,8 @@ public class QuoteController {
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
                            GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase,
-                           UpdateQuoteUseCase updateQuoteUseCase) {
+                           UpdateQuoteUseCase updateQuoteUseCase,
+                           MeterRegistry meterRegistry) {
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
@@ -45,6 +49,9 @@ public class QuoteController {
         this.countQuotesUseCase = countQuotesUseCase;
         this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
+        this.songQuotesHitsCounter = Counter.builder("song_quotes_hits")
+                .description("Number of times a random song quote has been requested")
+                .register(meterRegistry);
     }
 
     @PostMapping("/quote")
@@ -79,6 +86,7 @@ public class QuoteController {
 
     @GetMapping("/quote/random")
     public ResponseEntity<Quote> getRandomQuote() {
+        songQuotesHitsCounter.increment();
         Quote quote = getRandomQuoteUseCase.getRandomQuote();
         return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
     }
