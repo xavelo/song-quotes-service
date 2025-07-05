@@ -12,7 +12,6 @@ import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
 import com.xavelo.sqs.port.in.GetTop10QuotesUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
-import com.xavelo.sqs.port.in.ExportQuotesUseCase;
 import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
 import com.xavelo.sqs.port.out.QuotesCountPort;
@@ -24,13 +23,12 @@ import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
-import com.xavelo.sqs.port.out.ExportQuotesPort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, DeleteQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTop10QuotesUseCase, ExportQuotesUseCase {
+public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, DeleteQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTop10QuotesUseCase {
 
     private final StoreQuotePort storeQuotePort;
     private final LoadQuotePort loadQuotePort;
@@ -43,7 +41,6 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final UpdateQuotePort updateQuotePort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
-    private final ExportQuotesPort exportQuotesPort;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
@@ -52,8 +49,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
                         UpdateQuotePort updateQuotePort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
-                        LoadTop10QuotesPort loadTop10QuotesPort,
-                        ExportQuotesPort exportQuotesPort) {
+                        LoadTop10QuotesPort loadTop10QuotesPort) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
@@ -65,12 +61,6 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.updateQuotePort = updateQuotePort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
-        this.exportQuotesPort = exportQuotesPort;
-    }
-
-    @Override
-    public String exportQuotesAsSql() {
-        return exportQuotesPort.exportQuotesAsSql();
     }
 
     @Override
