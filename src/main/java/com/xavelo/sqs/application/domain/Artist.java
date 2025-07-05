@@ -8,5 +8,12 @@ public record Artist(
     List<String> genres,
     int popularity,
     String imageUrl,
-    String spotifyUrl
-) {}
+    String spotifyUrl,
+    List<Track> topTracks
+) {
+    public record Track(
+        String id,
+        String name,
+        String previewUrl
+    ) {}
+}
