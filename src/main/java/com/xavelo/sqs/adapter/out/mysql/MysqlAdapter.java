@@ -11,13 +11,14 @@ import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort {
 
     private final QuoteRepository quoteRepository;
     private final QuoteMapper quoteMapper;
@@ -113,5 +114,34 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         return entities.stream()
                 .map(quoteMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public void patchQuote(Long id, Quote quote) {
+        QuoteEntity entity = quoteRepository.findById(id).orElse(null);
+        if (entity != null) {
+            if (quote.quote() != null) {
+                entity.setQuote(quote.quote());
+            }
+            if (quote.song() != null) {
+                entity.setSong(quote.song());
+            }
+            if (quote.album() != null) {
+                entity.setAlbum(quote.album());
+            }
+            if (quote.year() != null) {
+                entity.setYear(quote.year());
+            }
+            if (quote.artist() != null) {
+                entity.setArtist(quote.artist());
+            }
+            if (quote.hits() != null) {
+                entity.setHits(quote.hits());
+            }
+            if (quote.posts() != null) {
+                entity.setPosts(quote.posts());
+            }
+            quoteRepository.save(entity);
+        }
     }
 }
