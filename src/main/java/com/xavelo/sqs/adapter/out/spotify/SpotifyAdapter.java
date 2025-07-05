@@ -17,8 +17,8 @@ public class SpotifyAdapter implements ArtistMetadataPort {
     @Override
     public String getArtistMetadata(String artistName) {
         SpotifySearchResponse response = spotifySearchClient.searchArtist(artistName);
-        if (response != null && response.artists() != null && !response.artists().isEmpty()) {
-            return response.artists().get(0).id();
+        if (response != null && response.artists() != null && response.artists().items() != null && !response.artists().items().isEmpty()) {
+            return response.artists().items().get(0).id();
         }
         return "Artist not found";
     }
