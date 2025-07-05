@@ -35,6 +35,7 @@ class QuoteControllerTest {
     @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;
     @MockBean private GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
+    @MockBean private GetTop10QuotesUseCase getTop10QuotesUseCase;
 
     @Test
     void createQuote() throws Exception {
@@ -141,5 +142,18 @@ class QuoteControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(updateQuoteUseCase).updateQuote(new Quote(1L, "line", "song", "album", 1990, "artist", null, null));
+    }
+
+    @Test
+    void getTop10Quotes() throws Exception {
+        List<Quote> quotes = List.of(
+                new Quote(1L, "q1", "s1", "a1", 2000, "art1", 100, 10),
+                new Quote(2L, "q2", "s2", "a2", 2001, "art2", 90, 9)
+        );
+        when(getTop10QuotesUseCase.getTop10Quotes()).thenReturn(quotes);
+
+        mockMvc.perform(get("/api/quotes/top10"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(quotes)));
     }
 }
