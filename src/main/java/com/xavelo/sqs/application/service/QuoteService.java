@@ -25,6 +25,7 @@ import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,15 +46,18 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
 
-    public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
-                        QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
-                        IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
+    public QuoteService(@Qualifier("mysqlAdapter") StoreQuotePort storeQuotePort,
+                        @Qualifier("mysqlAdapter") LoadQuotePort loadQuotePort,
+                        @Qualifier("mysqlAdapter") QuotesCountPort quotesCountPort,
+                        @Qualifier("mysqlAdapter") DeleteQuotePort deleteQuotePort,
+                        @Qualifier("mysqlAdapter") IncrementPostsPort incrementPostsPort,
+                        @Qualifier("mysqlAdapter") IncrementHitsPort incrementHitsPort,
                         MetricsPort metricsPort,
-                        LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
-                        UpdateQuotePort updateQuotePort,
+                        @Qualifier("mysqlAdapter") LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
+                        @Qualifier("mysqlAdapter") UpdateQuotePort updateQuotePort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
-                        LoadTop10QuotesPort loadTop10QuotesPort,
-                        PatchQuotePort patchQuotePort) {
+                        @Qualifier("mysqlAdapter") LoadTop10QuotesPort loadTop10QuotesPort,
+                        @Qualifier("mysqlAdapter") PatchQuotePort patchQuotePort) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;

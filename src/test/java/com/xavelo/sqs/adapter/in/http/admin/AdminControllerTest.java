@@ -28,6 +28,9 @@ class AdminControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private AdminService adminService;
     @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;

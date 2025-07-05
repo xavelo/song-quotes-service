@@ -14,10 +14,11 @@ import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
-@Component
+@Component("mysqlAdapter")
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort {
 
     private final QuoteRepository quoteRepository;
