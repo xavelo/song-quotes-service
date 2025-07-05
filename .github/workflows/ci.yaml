@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 env:
   GIT_REPO: 'song-quotes-service'
-  K8S_DEPLOYMENT: 'song-quotes-service-deployment.yaml'
+  K8S_DEPLOYMENT: 'song-quotes-deployment.yaml'
 
 on:
   push:
