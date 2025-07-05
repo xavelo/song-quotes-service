@@ -26,6 +26,7 @@ import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.application.service.MetadataService;
+import com.xavelo.sqs.application.domain.Artist;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -88,7 +89,8 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Long id = storeQuotePort.storeQuote(toStore);
         Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
-        System.out.println("Artist Metadata: " + metadataService.getArtistMetadata(toStore.artist()));
+        Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
+        System.out.println("Artist Metadata: " + artistMetadata.name() + " (ID: " + artistMetadata.id() + ")");
         return id;
     }
 
