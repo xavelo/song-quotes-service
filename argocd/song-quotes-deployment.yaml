@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: song-quotes-deployment
   annotations:
-    commitID: "15a183e27b0b4773a5a287c5375a9ab418df6746"
+    commitID: "9d60ae6f3ba92fb949ee9f69db99422d3b8f1e41"
 spec:
   replicas: 1
   selector:
@@ -21,6 +21,6 @@ spec:
     spec:
       containers:
         - name: song-quotes-service
-          image: 'xavelo/song-quotes-service:15a183e27b0b4773a5a287c5375a9ab418df6746'
+          image: 'xavelo/song-quotes-service:9d60ae6f3ba92fb949ee9f69db99422d3b8f1e41'
           ports:
             - containerPort: 80
