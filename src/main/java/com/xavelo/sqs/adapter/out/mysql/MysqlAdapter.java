@@ -11,25 +11,65 @@ import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
+import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
+import com.xavelo.sqs.application.domain.Artist;
+import com.xavelo.sqs.application.service.MetadataService;
+import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
+import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
+import com.xavelo.sqs.application.domain.Artist;
+import com.xavelo.sqs.application.service.MetadataService;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort {
 
     private final QuoteRepository quoteRepository;
     private final QuoteMapper quoteMapper;
+    private final SpotifyArtistMetadataRepository spotifyArtistMetadataRepository;
+    private final MetadataService metadataService;
+    private final ObjectMapper objectMapper;
 
-    public MysqlAdapter(QuoteRepository quoteRepository, QuoteMapper quoteMapper) {
+    public MysqlAdapter(QuoteRepository quoteRepository, QuoteMapper quoteMapper, SpotifyArtistMetadataRepository spotifyArtistMetadataRepository, MetadataService metadataService, ObjectMapper objectMapper) {
         this.quoteRepository = quoteRepository;
         this.quoteMapper = quoteMapper;
+        this.spotifyArtistMetadataRepository = spotifyArtistMetadataRepository;
+        this.metadataService = metadataService;
+        this.objectMapper = objectMapper;
     }
 
     public Long storeQuote(Quote quote) {
         QuoteEntity entity = quoteMapper.toEntity(quote);
+        Artist artistMetadata = metadataService.getArtistMetadata(quote.artist());
+        if (artistMetadata != null) {
+            entity.setSpotifyArtistId(artistMetadata.id());
+            Optional<SpotifyArtistMetadataEntity> existingMetadata = spotifyArtistMetadataRepository.findById(artistMetadata.id());
+            if (existingMetadata.isEmpty()) {
+                try {
+                    String genresJson = artistMetadata.genres() != null ? objectMapper.writeValueAsString(artistMetadata.genres()) : null;
+                    String topTracksJson = artistMetadata.topTracks() != null ? objectMapper.writeValueAsString(artistMetadata.topTracks()) : null;
+                    SpotifyArtistMetadataEntity metadataEntity = new SpotifyArtistMetadataEntity(
+                            artistMetadata.id(),
+                            artistMetadata.name(),
+                            genresJson,
+                            artistMetadata.popularity(),
+                            artistMetadata.imageUrl(),
+                            artistMetadata.spotifyUrl(),
+                            topTracksJson
+                    );
+                    spotifyArtistMetadataRepository.save(metadataEntity);
+                } catch (Exception e) {
+                    // Handle exception, e.g., log it
+                    e.printStackTrace();
+                }
+            }
+        }
         QuoteEntity saved = quoteRepository.save(entity);
         return saved.getId();
     }
