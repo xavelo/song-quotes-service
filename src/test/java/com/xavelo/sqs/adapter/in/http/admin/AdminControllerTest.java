@@ -2,7 +2,6 @@ package com.xavelo.sqs.adapter.in.http.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xavelo.sqs.application.service.AdminService;
-import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
@@ -35,7 +34,6 @@ class AdminControllerTest {
 
     @MockBean
     private AdminService adminService;
-    @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;
     @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
     @MockBean private PatchQuoteUseCase patchQuoteUseCase;
     @MockBean private StoreQuoteUseCase storeQuoteUseCase;
@@ -56,6 +54,18 @@ class AdminControllerTest {
     }
 
     @Test
+    void createQuotes() throws Exception {
+        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
+        when(storeQuoteUseCase.storeQuotes(any())).thenReturn(java.util.List.of(1L, 2L));
+
+        mockMvc.perform(post("/admin/quotes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(java.util.List.of(new Quote(null, "q", "s", "a", 2000, "artist", 5, 7, null), q2))))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[1,2]"));
+    }
+
+    @Test
     void exportQuotes() throws Exception {
         String expectedSql = "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (1, 'quote1', 'song1', 'album1', 2000, 'artist1', 0, 0);\n";
         when(adminService.exportQuotesAsSql()).thenReturn(expectedSql);
@@ -69,6 +79,7 @@ class AdminControllerTest {
     void deleteQuote() throws Exception {
         mockMvc.perform(delete("/admin/quote/1"))
                 .andExpect(status().isNoContent());
+        verify(adminService).deleteQuote(1L);
     }
 
     @Test

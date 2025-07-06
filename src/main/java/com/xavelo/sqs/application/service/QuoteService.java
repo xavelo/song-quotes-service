@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, DeleteQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTop10QuotesUseCase, PatchQuoteUseCase {
+public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTop10QuotesUseCase, PatchQuoteUseCase {
 
     private static final Logger logger = LogManager.getLogger(QuoteService.class);
 
@@ -145,10 +145,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         updateQuotePort.updateQuote(quote);
     }
 
-    @Override
-    public void deleteQuote(Long id) {
-        deleteQuotePort.deleteQuote(id);
-    }
+    
 
     @Override
     public Long countQuotes() {
