@@ -55,12 +55,12 @@ class AdminControllerTest {
 
     @Test
     void createQuotes() throws Exception {
-        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4);
+        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
         when(storeQuoteUseCase.storeQuotes(any())).thenReturn(java.util.List.of(1L, 2L));
 
         mockMvc.perform(post("/admin/quotes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(java.util.List.of(new Quote(null, "q", "s", "a", 2000, "artist", 5, 7), q2))))
+                        .content(objectMapper.writeValueAsString(java.util.List.of(new Quote(null, "q", "s", "a", 2000, "artist", 5, 7, null), q2))))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[1,2]"));
     }
