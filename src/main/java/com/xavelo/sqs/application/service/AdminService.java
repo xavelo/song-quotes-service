@@ -2,18 +2,22 @@ package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.in.ExportQuotesUseCase;
+import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
+import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class AdminService implements ExportQuotesUseCase {
+public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase {
 
     private final LoadQuotePort loadQuotePort;
+    private final DeleteQuotePort deleteQuotePort;
 
-    public AdminService(LoadQuotePort loadQuotePort) {
+    public AdminService(LoadQuotePort loadQuotePort, DeleteQuotePort deleteQuotePort) {
         this.loadQuotePort = loadQuotePort;
+        this.deleteQuotePort = deleteQuotePort;
     }
 
     @Override
@@ -34,5 +38,10 @@ public class AdminService implements ExportQuotesUseCase {
             ));
         }
         return sqlBuilder.toString();
+    }
+
+    @Override
+    public void deleteQuote(Long id) {
+        deleteQuotePort.deleteQuote(id);
     }
 }

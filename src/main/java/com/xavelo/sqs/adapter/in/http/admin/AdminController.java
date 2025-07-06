@@ -1,7 +1,6 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
 import com.xavelo.sqs.application.service.AdminService;
-import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
@@ -16,18 +15,15 @@ public class AdminController {
 
     private final AdminService adminService;
     private final StoreQuoteUseCase storeQuoteUseCase;
-    private final DeleteQuoteUseCase deleteQuoteUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final PatchQuoteUseCase patchQuoteUseCase;
 
     public AdminController(AdminService adminService,
                            StoreQuoteUseCase storeQuoteUseCase,
-                           DeleteQuoteUseCase deleteQuoteUseCase,
                            UpdateQuoteUseCase updateQuoteUseCase,
                            PatchQuoteUseCase patchQuoteUseCase) {
         this.adminService = adminService;
         this.storeQuoteUseCase = storeQuoteUseCase;
-        this.deleteQuoteUseCase = deleteQuoteUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
         this.patchQuoteUseCase = patchQuoteUseCase;
     }
@@ -46,7 +42,7 @@ public class AdminController {
 
     @DeleteMapping("/quote/{id}")
     public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
-        deleteQuoteUseCase.deleteQuote(id);
+        adminService.deleteQuote(id);
         return ResponseEntity.noContent().build();
     }
 

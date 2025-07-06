@@ -138,11 +138,7 @@ class QuoteServiceTest {
         assertEquals(sampleQuote.artist(), result.artist());
     }
 
-    @Test
-    void deleteQuote_delegatesToPort() {
-        quoteService.deleteQuote(5L);
-        verify(deleteQuotePort).deleteQuote(5L);
-    }
+    
 
     @Test
     void updateQuote_delegatesToPort() {
