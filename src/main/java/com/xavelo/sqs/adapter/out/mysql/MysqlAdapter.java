@@ -14,8 +14,6 @@ import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
 import com.xavelo.sqs.application.domain.Artist;
-import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
 import com.xavelo.sqs.port.out.StoreQuotePort;
@@ -55,29 +53,39 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         QuoteEntity entity = quoteMapper.toEntity(quote);
         if (artistMetadata != null) {
             entity.setSpotifyArtistId(artistMetadata.id());
-            Optional<SpotifyArtistMetadataEntity> existingMetadata = spotifyArtistMetadataRepository.findById(artistMetadata.id());
-            if (existingMetadata.isEmpty()) {
-                try {
-                    String genresJson = artistMetadata.genres() != null ? objectMapper.writeValueAsString(artistMetadata.genres()) : null;
-                    String topTracksJson = artistMetadata.topTracks() != null ? objectMapper.writeValueAsString(artistMetadata.topTracks()) : null;
-                    SpotifyArtistMetadataEntity metadataEntity = new SpotifyArtistMetadataEntity(
-                            artistMetadata.id(),
-                            artistMetadata.name(),
-                            genresJson,
-                            artistMetadata.popularity(),
-                            artistMetadata.imageUrl(),
-                            artistMetadata.spotifyUrl(),
-                            topTracksJson
-                    );
-                    spotifyArtistMetadataRepository.save(metadataEntity);
-                } catch (Exception e) {
-                    // Handle exception, e.g., log it
-                    e.printStackTrace();
-                }
-            }
+            saveArtistMetadataIfNotExists(artistMetadata);
         }
         QuoteEntity saved = quoteRepository.save(entity);
         return saved.getId();
+    }
+
+    private void saveArtistMetadataIfNotExists(Artist artist) {
+        if (spotifyArtistMetadataRepository.existsById(artist.id())) {
+            return;
+        }
+        try {
+            SpotifyArtistMetadataEntity metadataEntity = createMetadataEntity(artist);
+            spotifyArtistMetadataRepository.save(metadataEntity);
+        } catch (Exception e) {
+            // Log the error but don't fail the quote storage
+            // Consider using a proper logger in production code
+            e.printStackTrace();
+        }
+    }
+
+    private SpotifyArtistMetadataEntity createMetadataEntity(Artist artist) throws com.fasterxml.jackson.core.JsonProcessingException {
+        String genresJson = artist.genres() != null ? objectMapper.writeValueAsString(artist.genres()) : null;
+        String topTracksJson = artist.topTracks() != null ? objectMapper.writeValueAsString(artist.topTracks()) : null;
+        
+        return new SpotifyArtistMetadataEntity(
+                artist.id(),
+                artist.name(),
+                genresJson,
+                artist.popularity(),
+                artist.imageUrl(),
+                artist.spotifyUrl(),
+                topTracksJson
+        );
     }
 
     @Override
