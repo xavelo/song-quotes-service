@@ -91,10 +91,10 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     @Override
     public Long storeQuote(Quote quote) {
         Quote toStore = QuoteHelper.sanitize(quote);
-        Long id = storeQuotePort.storeQuote(toStore);
+        Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
+        Long id = storeQuotePort.storeQuote(toStore, artistMetadata);
         Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
-        Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
         logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
         return id;
     }

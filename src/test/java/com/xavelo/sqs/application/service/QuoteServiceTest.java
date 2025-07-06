@@ -65,12 +65,12 @@ class QuoteServiceTest {
 
     @Test
     void storeQuote_sanitizesAndDelegates() {
-        when(storeQuotePort.storeQuote(any(Quote.class))).thenReturn(10L);
+        when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn(10L);
         when(metadataService.getArtistMetadata(anyString())).thenReturn(new Artist("id", "name", List.of(), 0, "url", "spotifyUrl", List.of()));
 
         Long id = quoteService.storeQuote(sampleQuote);
 
-        verify(storeQuotePort).storeQuote(quoteCaptor.capture());
+        verify(storeQuotePort).storeQuote(quoteCaptor.capture(), any(Artist.class));
         Quote sent = quoteCaptor.getValue();
         assertEquals(0, sent.posts());
         assertEquals(0, sent.hits());

@@ -14,11 +14,20 @@ import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
 import com.xavelo.sqs.application.domain.Artist;
-import com.xavelo.sqs.application.service.MetadataService;
+import com.xavelo.sqs.application.domain.Quote;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.port.out.DeleteQuotePort;
+import com.xavelo.sqs.port.out.LoadQuotePort;
+import com.xavelo.sqs.port.out.StoreQuotePort;
+import com.xavelo.sqs.port.out.QuotesCountPort;
+import com.xavelo.sqs.port.out.IncrementPostsPort;
+import com.xavelo.sqs.port.out.IncrementHitsPort;
+import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
+import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
+import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
 import com.xavelo.sqs.application.domain.Artist;
-import com.xavelo.sqs.application.service.MetadataService;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
@@ -33,20 +42,17 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     private final QuoteRepository quoteRepository;
     private final QuoteMapper quoteMapper;
     private final SpotifyArtistMetadataRepository spotifyArtistMetadataRepository;
-    private final MetadataService metadataService;
     private final ObjectMapper objectMapper;
 
-    public MysqlAdapter(QuoteRepository quoteRepository, QuoteMapper quoteMapper, SpotifyArtistMetadataRepository spotifyArtistMetadataRepository, MetadataService metadataService, ObjectMapper objectMapper) {
+    public MysqlAdapter(QuoteRepository quoteRepository, QuoteMapper quoteMapper, SpotifyArtistMetadataRepository spotifyArtistMetadataRepository, ObjectMapper objectMapper) {
         this.quoteRepository = quoteRepository;
         this.quoteMapper = quoteMapper;
         this.spotifyArtistMetadataRepository = spotifyArtistMetadataRepository;
-        this.metadataService = metadataService;
         this.objectMapper = objectMapper;
     }
 
-    public Long storeQuote(Quote quote) {
+    public Long storeQuote(Quote quote, Artist artistMetadata) {
         QuoteEntity entity = quoteMapper.toEntity(quote);
-        Artist artistMetadata = metadataService.getArtistMetadata(quote.artist());
         if (artistMetadata != null) {
             entity.setSpotifyArtistId(artistMetadata.id());
             Optional<SpotifyArtistMetadataEntity> existingMetadata = spotifyArtistMetadataRepository.findById(artistMetadata.id());
