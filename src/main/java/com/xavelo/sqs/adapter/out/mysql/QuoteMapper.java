@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 public interface QuoteMapper {
     @Mapping(target = "posts", constant = "0")
     @Mapping(target = "hits", constant = "0")
+    @Mapping(target = "spotifyArtistId", source = "spotifyArtistId")
     QuoteEntity toEntity(Quote quote);
 
     Quote toDomain(QuoteEntity entity);

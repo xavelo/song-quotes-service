@@ -45,7 +45,7 @@ class AdminControllerTest {
 
     @Test
     void createQuote() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 0, 0);
+        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 0, 0, null);
         when(storeQuoteUseCase.storeQuote(quote)).thenReturn(1L);
 
         mockMvc.perform(post("/admin/quote")
@@ -73,19 +73,19 @@ class AdminControllerTest {
 
     @Test
     void updateQuote() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", null, null);
+        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", null, null, null);
 
         mockMvc.perform(put("/admin/quote/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(quote)))
                 .andExpect(status().isNoContent());
 
-        verify(updateQuoteUseCase).updateQuote(new Quote(1L, "line", "song", "album", 1990, "artist", null, null));
+        verify(updateQuoteUseCase).updateQuote(new Quote(1L, "line", "song", "album", 1990, "artist", null, null, null));
     }
 
     @Test
     void updateQuoteWithRestrictedFields() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 1, 1);
+        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 1, 1, null);
 
         mockMvc.perform(put("/admin/quote/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,19 +97,19 @@ class AdminControllerTest {
 
     @Test
     void patchQuote() throws Exception {
-        Quote quote = new Quote(null, "line", null, null, null, null, null, null);
+        Quote quote = new Quote(null, "line", null, null, null, null, null, null, null);
 
         mockMvc.perform(patch("/admin/quote/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(quote)))
                 .andExpect(status().isNoContent());
 
-        verify(patchQuoteUseCase).patchQuote(1L, new Quote(null, "line", null, null, null, null, null, null));
+        verify(patchQuoteUseCase).patchQuote(1L, new Quote(null, "line", null, null, null, null, null, null, null));
     }
 
     @Test
     void patchQuoteWithRestrictedFields() throws Exception {
-        Quote quote = new Quote(null, null, null, null, null, null, 1, null);
+        Quote quote = new Quote(null, null, null, null, null, null, 1, null, null);
 
         mockMvc.perform(patch("/admin/quote/1")
                         .contentType(MediaType.APPLICATION_JSON)

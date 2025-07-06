@@ -25,6 +25,8 @@ public class QuoteEntity {
     private Integer posts = 0;
     @Column(nullable = false)
     private Integer hits = 0;
+    @Column(name = "spotify_artist_id")
+    private String spotifyArtistId;
 
     public Long getId() {
         return id;
@@ -88,5 +90,13 @@ public class QuoteEntity {
 
     public void setHits(Integer hits) {
         this.hits = hits;
+    }
+
+    public String getSpotifyArtistId() {
+        return spotifyArtistId;
+    }
+
+    public void setSpotifyArtistId(String spotifyArtistId) {
+        this.spotifyArtistId = spotifyArtistId;
     }
 }

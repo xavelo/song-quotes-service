@@ -60,7 +60,7 @@ class QuoteServiceTest {
 
     @BeforeEach
     void setUp() {
-        sampleQuote = new Quote(1L, "q", "s", "a", 2000, "artist", 5, 7);
+        sampleQuote = new Quote(1L, "q", "s", "a", 2000, "artist", 5, 7, null);
     }
 
     @Test
@@ -85,7 +85,7 @@ class QuoteServiceTest {
     void storeQuotes_sanitizesAllQuotesAndDelegates() {
         when(storeQuotePort.storeQuotes(any())).thenReturn(List.of(1L, 2L));
 
-        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4);
+        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
         List<Long> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
 
         verify(storeQuotePort).storeQuotes(quoteListCaptor.capture());

@@ -39,7 +39,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 0));
+        List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null));
         when(getQuotesUseCase.getQuotes()).thenReturn(quotes);
 
         mockMvc.perform(get("/api/quotes"))
@@ -68,7 +68,7 @@ class QuoteControllerTest {
 
     @Test
     void getRandomQuoteFound() throws Exception {
-        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0);
+        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null);
         when(getRandomQuoteUseCase.getRandomQuote()).thenReturn(quote);
 
         mockMvc.perform(get("/api/quote/random"))
@@ -78,7 +78,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteFound() throws Exception {
-        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0);
+        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null);
         when(getQuoteUseCase.getQuote(1L)).thenReturn(quote);
 
         mockMvc.perform(get("/api/quote/1"))
@@ -97,8 +97,8 @@ class QuoteControllerTest {
     @Test
     void getTop10Quotes() throws Exception {
         List<Quote> quotes = List.of(
-                new Quote(1L, "q1", "s1", "a1", 2000, "art1", 100, 10),
-                new Quote(2L, "q2", "s2", "a2", 2001, "art2", 90, 9)
+                new Quote(1L, "q1", "s1", "a1", 2000, "art1", 100, 10, null),
+                new Quote(2L, "q2", "s2", "a2", 2001, "art2", 90, 9, null)
         );
         when(getTop10QuotesUseCase.getTop10Quotes()).thenReturn(quotes);
 

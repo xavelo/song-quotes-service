@@ -25,7 +25,8 @@ public final class QuoteHelper {
                 quote.year(),
                 quote.artist(),
                 0,
-                0
+                0,
+                null
         );
     }
 
@@ -44,7 +45,8 @@ public final class QuoteHelper {
                 quote.year(),
                 quote.artist(),
                 quote.posts(),
-                quote.hits()
+                quote.hits(),
+                quote.spotifyArtistId()
         );
     }
 
@@ -64,7 +66,8 @@ public final class QuoteHelper {
                 quote.year(),
                 quote.artist(),
                 current + 1,
-                quote.hits()
+                quote.hits(),
+                quote.spotifyArtistId()
         );
     }
 
@@ -84,7 +87,8 @@ public final class QuoteHelper {
                 quote.year(),
                 quote.artist(),
                 quote.posts(),
-                current + 1
+                current + 1,
+                quote.spotifyArtistId()
         );
     }
 }
