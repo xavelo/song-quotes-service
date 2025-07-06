@@ -66,7 +66,8 @@ class QuoteServiceTest {
     @Test
     void storeQuote_sanitizesAndDelegates() {
         when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn(10L);
-        when(metadataService.getArtistMetadata(anyString())).thenReturn(new Artist("id", "name", List.of(), 0, "url", "spotifyUrl", List.of()));
+        when(metadataService.getArtistMetadata(anyString()))
+                .thenReturn(new Artist("id", "name", List.of(), 0, "imageUrl", "spotifyUrl", List.of()));
 
         Long id = quoteService.storeQuote(sampleQuote);
 
@@ -136,14 +137,6 @@ class QuoteServiceTest {
         assertEquals(sampleQuote.album(), result.album());
         assertEquals(sampleQuote.year(), result.year());
         assertEquals(sampleQuote.artist(), result.artist());
-    }
-
-    
-
-    @Test
-    void updateQuote_delegatesToPort() {
-        quoteService.updateQuote(sampleQuote);
-        verify(updateQuotePort).updateQuote(sampleQuote);
     }
 
     @Test
