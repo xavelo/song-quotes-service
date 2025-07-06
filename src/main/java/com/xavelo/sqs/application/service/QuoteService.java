@@ -35,30 +35,27 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTop10QuotesUseCase, PatchQuoteUseCase {
+public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, GetTop10QuotesUseCase, PatchQuoteUseCase {
 
     private static final Logger logger = LogManager.getLogger(QuoteService.class);
 
     private final StoreQuotePort storeQuotePort;
     private final LoadQuotePort loadQuotePort;
     private final QuotesCountPort quotesCountPort;
-    private final DeleteQuotePort deleteQuotePort;
     private final IncrementPostsPort incrementPostsPort;
     private final IncrementHitsPort incrementHitsPort;
     private final MetricsPort metricsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
-    private final UpdateQuotePort updateQuotePort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
     private final MetadataService metadataService;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
-                        QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
+                        QuotesCountPort quotesCountPort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
                         MetricsPort metricsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
-                        UpdateQuotePort updateQuotePort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
                         LoadTop10QuotesPort loadTop10QuotesPort,
                         PatchQuotePort patchQuotePort,
@@ -66,12 +63,10 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
-        this.deleteQuotePort = deleteQuotePort;
         this.incrementPostsPort = incrementPostsPort;
         this.incrementHitsPort = incrementHitsPort;
         this.metricsPort = metricsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
-        this.updateQuotePort = updateQuotePort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
         this.patchQuotePort = patchQuotePort;
@@ -139,13 +134,6 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         }
         return quote;
     }
-
-    @Override
-    public void updateQuote(Quote quote) {
-        updateQuotePort.updateQuote(quote);
-    }
-
-    
 
     @Override
     public Long countQuotes() {
