@@ -1,41 +1,23 @@
 package com.xavelo.sqs.adapter.out.mysql;
 
-import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
-import com.xavelo.sqs.port.out.DeleteQuotePort;
-import com.xavelo.sqs.port.out.LoadQuotePort;
-import com.xavelo.sqs.port.out.StoreQuotePort;
-import com.xavelo.sqs.port.out.QuotesCountPort;
-import com.xavelo.sqs.port.out.IncrementPostsPort;
-import com.xavelo.sqs.port.out.IncrementHitsPort;
-import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
-import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
-import com.xavelo.sqs.port.out.UpdateQuotePort;
-import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
-import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
-import com.xavelo.sqs.application.domain.Artist;
-import com.xavelo.sqs.port.out.DeleteQuotePort;
-import com.xavelo.sqs.port.out.LoadQuotePort;
-import com.xavelo.sqs.port.out.StoreQuotePort;
-import com.xavelo.sqs.port.out.QuotesCountPort;
-import com.xavelo.sqs.port.out.IncrementPostsPort;
-import com.xavelo.sqs.port.out.IncrementHitsPort;
-import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
-import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
-import com.xavelo.sqs.port.out.UpdateQuotePort;
-import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
-import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
-import com.xavelo.sqs.application.domain.Artist;
-import com.xavelo.sqs.port.out.PatchQuotePort;
-import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
-import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
+import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
+import com.xavelo.sqs.application.domain.Artist;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.application.domain.Quote;
+import com.xavelo.sqs.application.service.QuoteService;
+import com.xavelo.sqs.port.out.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort {
+
+    private static final Logger logger = LogManager.getLogger(MysqlAdapter.class);
 
     private final QuoteRepository quoteRepository;
     private final QuoteMapper quoteMapper;
@@ -67,9 +49,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
             SpotifyArtistMetadataEntity metadataEntity = createMetadataEntity(artist);
             spotifyArtistMetadataRepository.save(metadataEntity);
         } catch (Exception e) {
-            // Log the error but don't fail the quote storage
-            // Consider using a proper logger in production code
-            e.printStackTrace();
+            logger.error("Error saving artist metadata: {}",e.getMessage(), e);
         }
     }
 
