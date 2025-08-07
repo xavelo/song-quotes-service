@@ -5,6 +5,10 @@ import com.xavelo.sqs.port.in.GetArtistUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtistController {
 
     private final GetArtistUseCase getArtistUseCase;
-
+    private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
+    
     public ArtistController(GetArtistUseCase getArtistUseCase) {
         this.getArtistUseCase = getArtistUseCase;
+        this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
     }
 
     @GetMapping("/artist/{id}")
@@ -23,5 +29,10 @@ public class ArtistController {
         Artist artist = getArtistUseCase.getArtist(id);
         return artist != null ? ResponseEntity.ok(artist) : ResponseEntity.notFound().build();
     }
-}
 
+    @GetMapping("/artists")
+    public ResponseEntity<java.util.List<ArtistQuoteCount>> getArtists() {
+        java.util.List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
+        return ResponseEntity.ok(artists);
+    }
+}

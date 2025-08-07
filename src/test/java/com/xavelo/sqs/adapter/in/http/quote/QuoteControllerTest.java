@@ -1,20 +1,17 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.in.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,7 +30,6 @@ class QuoteControllerTest {
     @MockBean private GetRandomQuoteUseCase getRandomQuoteUseCase;
     @MockBean private CountQuotesUseCase countQuotesUseCase;
     @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;
-    @MockBean private GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
     @MockBean private GetTop10QuotesUseCase getTop10QuotesUseCase;
 
@@ -45,16 +41,6 @@ class QuoteControllerTest {
         mockMvc.perform(get("/api/quotes"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(quotes)));
-    }
-
-    @Test
-    void getArtists() throws Exception {
-        List<ArtistQuoteCount> artists = List.of(new ArtistQuoteCount("art", 2L));
-        when(getArtistQuoteCountsUseCase.getArtistQuoteCounts()).thenReturn(artists);
-
-        mockMvc.perform(get("/api/artists"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(artists)));
     }
 
     @Test
