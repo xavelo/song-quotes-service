@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: song-quotes-deployment
   annotations:
-    commitID: "5129fe65ffc8b4ff4691046723ed58d102568d55"
+    commitID: "9e55dde801f9259fc0f9f0bb52edf527bc1b767c"
 spec:
   replicas: 1
   selector:
@@ -21,6 +21,17 @@ spec:
     spec:
       containers:
         - name: song-quotes-service
-          image: 'xavelo/song-quotes-service:5129fe65ffc8b4ff4691046723ed58d102568d55'
+          image: 'xavelo/song-quotes-service:9e55dde801f9259fc0f9f0bb52edf527bc1b767c'
+          env:
+            - name: SPOTIFY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-api-secret
+                  key: clientId
+            - name: SPOTIFY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: spotify-api-secret
+                  key: clientSecret
           ports:
             - containerPort: 80

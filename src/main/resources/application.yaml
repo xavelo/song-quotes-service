@@ -23,12 +23,22 @@ spring:
   flyway:
     mysql:
       enabled: true
+spotify:
+  api:
+    url: https://api.spotify.com/v1
+    clientId: ${SPOTIFY_CLIENT_ID}
+    clientSecret: ${SPOTIFY_CLIENT_SECRET}
+
 management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics"
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    prometheus:
+      enabled: true
 logging:
   level:
     org.springframework.security: INFO
-    org.flyway: DEBUG
+    org.flyway: INFO
+    com.xavelo.sqs.application.service: DEBUG

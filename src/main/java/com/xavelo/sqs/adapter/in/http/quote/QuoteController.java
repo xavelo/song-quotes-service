@@ -1,84 +1,40 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
 import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.application.service.QuoteHelper;
-import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
-import com.xavelo.sqs.port.in.GetQuotesUseCase;
-import com.xavelo.sqs.port.in.GetQuoteUseCase;
-import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
-import com.xavelo.sqs.port.in.StoreQuoteUseCase;
-import com.xavelo.sqs.port.in.CountQuotesUseCase;
-import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
-import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
-import com.xavelo.sqs.port.in.GetTopQuotesUseCase;
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.port.in.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
 @RequestMapping("/api")
 public class QuoteController {
 
-    private final StoreQuoteUseCase storeQuoteUseCase;
     private final GetQuotesUseCase getQuotesUseCase;
     private final GetQuoteUseCase getQuoteUseCase;
     private final GetRandomQuoteUseCase getRandomQuoteUseCase;
     private final CountQuotesUseCase countQuotesUseCase;
-    private final DeleteQuoteUseCase deleteQuoteUseCase;
-    private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
-    private final UpdateQuoteUseCase updateQuoteUseCase;
-    private final GetTopQuotesUseCase getTopQuotesUseCase;
+    private final GetTop10QuotesUseCase getTop10QuotesUseCase;
 
-    public QuoteController(StoreQuoteUseCase storeQuoteUseCase,
-                           GetQuotesUseCase getQuotesUseCase,
+    public QuoteController(GetQuotesUseCase getQuotesUseCase,
                            GetQuoteUseCase getQuoteUseCase,
-                           DeleteQuoteUseCase deleteQuoteUseCase,
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
-                           GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase,
-                           UpdateQuoteUseCase updateQuoteUseCase,
-                           GetTopQuotesUseCase getTopQuotesUseCase) {
-        this.storeQuoteUseCase = storeQuoteUseCase;
+                           GetTop10QuotesUseCase getTop10QuotesUseCase) {
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
         this.getRandomQuoteUseCase = getRandomQuoteUseCase;
-        this.deleteQuoteUseCase = deleteQuoteUseCase;
         this.countQuotesUseCase = countQuotesUseCase;
-        this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
-        this.updateQuoteUseCase = updateQuoteUseCase;
-        this.getTopQuotesUseCase = getTopQuotesUseCase;
-    }
-
-    @PostMapping("/quote")
-    public ResponseEntity<Long> createQuote(@RequestBody Quote quote) {
-        Long id = storeQuoteUseCase.storeQuote(quote);
-        return ResponseEntity.ok(id);
-    }
-
-    @PostMapping("/quotes")
-    public ResponseEntity<java.util.List<Long>> createQuotes(@RequestBody java.util.List<Quote> quotes) {
-        java.util.List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
-        return ResponseEntity.ok(ids);
+        this.getTop10QuotesUseCase = getTop10QuotesUseCase;
     }
 
     @GetMapping("/quotes")
     public ResponseEntity<java.util.List<Quote>> getQuotes() {
         java.util.List<Quote> quotes = getQuotesUseCase.getQuotes();
         return ResponseEntity.ok(quotes);
-    }
-
-    @GetMapping("/quotes/top")
-    public ResponseEntity<java.util.List<Quote>> getTopQuotes() {
-        java.util.List<Quote> quotes = getTopQuotesUseCase.getTopQuotes();
-        return ResponseEntity.ok(quotes);
-    }
-
-    @GetMapping("/artists")
-    public ResponseEntity<java.util.List<ArtistQuoteCount>> getArtists() {
-        java.util.List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
-        return ResponseEntity.ok(artists);
     }
 
     @GetMapping("/quotes/count")
@@ -99,15 +55,9 @@ public class QuoteController {
         return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/quote/{id}")
-    public ResponseEntity<Void> updateQuote(@PathVariable Long id, @RequestBody Quote quote) {
-        updateQuoteUseCase.updateQuote(QuoteHelper.withId(quote, id));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/quote/{id}")
-    public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
-        deleteQuoteUseCase.deleteQuote(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/quotes/top10")
+    public ResponseEntity<java.util.List<Quote>> getTop10Quotes() {
+        java.util.List<Quote> quotes = getTop10QuotesUseCase.getTop10Quotes();
+        return ResponseEntity.ok(quotes);
     }
 }

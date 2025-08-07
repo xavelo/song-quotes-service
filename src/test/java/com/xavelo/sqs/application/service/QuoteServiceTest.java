@@ -1,5 +1,6 @@
 package com.xavelo.sqs.application.service;
 
+import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.out.*;
@@ -43,8 +44,9 @@ class QuoteServiceTest {
     @Mock
     private PublishQuoteCreatedPort publishQuoteCreatedPort;
     @Mock
-    private LoadTopQuotesPort loadTopQuotesPort;
-
+    private LoadTop10QuotesPort loadTop10QuotesPort;
+    @Mock
+    private MetadataService metadataService;
 
     @InjectMocks
     private QuoteService quoteService;
@@ -60,16 +62,18 @@ class QuoteServiceTest {
 
     @BeforeEach
     void setUp() {
-        sampleQuote = new Quote(1L, "q", "s", "a", 2000, "artist", 5, 7);
+        sampleQuote = new Quote(1L, "q", "s", "a", 2000, "artist", 5, 7, null);
     }
 
     @Test
     void storeQuote_sanitizesAndDelegates() {
-        when(storeQuotePort.storeQuote(any(Quote.class))).thenReturn(10L);
+        when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn(10L);
+        when(metadataService.getArtistMetadata(anyString()))
+                .thenReturn(new Artist("id", "name", List.of(), 0, "imageUrl", "spotifyUrl", List.of()));
 
         Long id = quoteService.storeQuote(sampleQuote);
 
-        verify(storeQuotePort).storeQuote(quoteCaptor.capture());
+        verify(storeQuotePort).storeQuote(quoteCaptor.capture(), any(Artist.class));
         Quote sent = quoteCaptor.getValue();
         assertEquals(0, sent.posts());
         assertEquals(0, sent.hits());
@@ -84,7 +88,7 @@ class QuoteServiceTest {
     void storeQuotes_sanitizesAllQuotesAndDelegates() {
         when(storeQuotePort.storeQuotes(any())).thenReturn(List.of(1L, 2L));
 
-        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4);
+        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
         List<Long> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
 
         verify(storeQuotePort).storeQuotes(quoteListCaptor.capture());
@@ -138,18 +142,6 @@ class QuoteServiceTest {
     }
 
     @Test
-    void deleteQuote_delegatesToPort() {
-        quoteService.deleteQuote(5L);
-        verify(deleteQuotePort).deleteQuote(5L);
-    }
-
-    @Test
-    void updateQuote_delegatesToPort() {
-        quoteService.updateQuote(sampleQuote);
-        verify(updateQuotePort).updateQuote(sampleQuote);
-    }
-
-    @Test
     void countQuotes_delegatesToPort() {
         when(quotesCountPort.countQuotes()).thenReturn(3L);
         Long result = quoteService.countQuotes();
@@ -188,13 +180,13 @@ class QuoteServiceTest {
     }
 
     @Test
-    void getTopQuotes_delegatesToPort() {
+    void getTop10Quotes_delegatesToPort() {
         List<Quote> expected = List.of(sampleQuote);
-        when(loadTopQuotesPort.loadTopQuotes()).thenReturn(expected);
+        when(loadTop10QuotesPort.loadTop10Quotes()).thenReturn(expected);
 
-        List<Quote> result = quoteService.getTopQuotes();
+        List<Quote> result = quoteService.getTop10Quotes();
 
         assertEquals(expected, result);
-        verify(loadTopQuotesPort).loadTopQuotes();
+        verify(loadTop10QuotesPort).loadTop10Quotes();
     }
 }

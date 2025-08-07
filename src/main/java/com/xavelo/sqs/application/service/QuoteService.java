@@ -1,5 +1,6 @@
 package com.xavelo.sqs.application.service;
 
+import com.xavelo.sqs.adapter.out.spotify.SpotifyAdapter;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.service.QuoteHelper;
@@ -10,8 +11,9 @@ import com.xavelo.sqs.port.in.GetQuoteUseCase;
 import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
+import com.xavelo.sqs.port.in.GetTop10QuotesUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
-import com.xavelo.sqs.port.in.GetTopQuotesUseCase;
+import com.xavelo.sqs.port.in.PatchQuoteUseCase;
 import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
 import com.xavelo.sqs.port.out.QuotesCountPort;
@@ -21,54 +23,74 @@ import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.MetricsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
-import com.xavelo.sqs.port.out.LoadTopQuotesPort;
+import com.xavelo.sqs.port.out.PatchQuotePort;
+import com.xavelo.sqs.application.service.MetadataService;
+import com.xavelo.sqs.application.domain.Artist;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, DeleteQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, UpdateQuoteUseCase, GetTopQuotesUseCase {
+public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuoteUseCase, CountQuotesUseCase, GetRandomQuoteUseCase, GetArtistQuoteCountsUseCase, GetTop10QuotesUseCase, PatchQuoteUseCase {
+
+    private static final Logger logger = LogManager.getLogger(QuoteService.class);
 
     private final StoreQuotePort storeQuotePort;
     private final LoadQuotePort loadQuotePort;
     private final QuotesCountPort quotesCountPort;
-    private final DeleteQuotePort deleteQuotePort;
     private final IncrementPostsPort incrementPostsPort;
     private final IncrementHitsPort incrementHitsPort;
     private final MetricsPort metricsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
-    private final UpdateQuotePort updateQuotePort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
-    private final LoadTopQuotesPort loadTopQuotesPort;
+    private final LoadTop10QuotesPort loadTop10QuotesPort;
+    private final PatchQuotePort patchQuotePort;
+    private final MetadataService metadataService;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
-                        QuotesCountPort quotesCountPort, DeleteQuotePort deleteQuotePort,
+                        QuotesCountPort quotesCountPort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
                         MetricsPort metricsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
-                        UpdateQuotePort updateQuotePort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
-                        LoadTopQuotesPort loadTopQuotesPort) {
+                        LoadTop10QuotesPort loadTop10QuotesPort,
+                        PatchQuotePort patchQuotePort,
+                        MetadataService metadataService) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
-        this.deleteQuotePort = deleteQuotePort;
         this.incrementPostsPort = incrementPostsPort;
         this.incrementHitsPort = incrementHitsPort;
         this.metricsPort = metricsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
-        this.updateQuotePort = updateQuotePort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
-        this.loadTopQuotesPort = loadTopQuotesPort;
+        this.loadTop10QuotesPort = loadTop10QuotesPort;
+        this.patchQuotePort = patchQuotePort;
+        this.metadataService = metadataService;
+    }
+
+    @Override
+    public void patchQuote(Long id, Quote quote) {
+        patchQuotePort.patchQuote(id, quote);
+    }
+
+    @Override
+    public List<Quote> getTop10Quotes() {
+        return loadTop10QuotesPort.loadTop10Quotes();
     }
 
     @Override
     public Long storeQuote(Quote quote) {
         Quote toStore = QuoteHelper.sanitize(quote);
-        Long id = storeQuotePort.storeQuote(toStore);
+        Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
+        Long id = storeQuotePort.storeQuote(toStore, artistMetadata);
         Quote stored = QuoteHelper.withId(toStore, id);
         publishQuoteCreatedPort.publishQuoteCreated(stored);
+        logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
         return id;
     }
 
@@ -114,16 +136,6 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     }
 
     @Override
-    public void updateQuote(Quote quote) {
-        updateQuotePort.updateQuote(quote);
-    }
-
-    @Override
-    public void deleteQuote(Long id) {
-        deleteQuotePort.deleteQuote(id);
-    }
-
-    @Override
     public Long countQuotes() {
         return quotesCountPort.countQuotes();
     }
@@ -134,10 +146,5 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                 .stream()
                 .sorted(java.util.Comparator.comparing(ArtistQuoteCount::quotes).reversed())
                 .toList();
-    }
-
-    @Override
-    public java.util.List<Quote> getTopQuotes() {
-        return loadTopQuotesPort.loadTopQuotes();
     }
 }

@@ -8,5 +8,6 @@ public record Quote(
         Integer year,
         String artist,
         Integer posts,
-        Integer hits
+        Integer hits,
+        String spotifyArtistId
 ) {}

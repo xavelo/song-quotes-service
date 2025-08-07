@@ -1,20 +1,17 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.in.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -33,62 +30,17 @@ class QuoteControllerTest {
     @MockBean private GetRandomQuoteUseCase getRandomQuoteUseCase;
     @MockBean private CountQuotesUseCase countQuotesUseCase;
     @MockBean private DeleteQuoteUseCase deleteQuoteUseCase;
-    @MockBean private GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     @MockBean private UpdateQuoteUseCase updateQuoteUseCase;
-    @MockBean private GetTopQuotesUseCase getTopQuotesUseCase;
-
-    @Test
-    void createQuote() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", 0, 0);
-        when(storeQuoteUseCase.storeQuote(quote)).thenReturn(1L);
-
-        mockMvc.perform(post("/api/quote")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(quote)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1"));
-    }
-
-    @Test
-    void createQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(null, "a", "s", "al", 2000, "art", 0, 0));
-        when(storeQuoteUseCase.storeQuotes(quotes)).thenReturn(List.of(1L));
-
-        mockMvc.perform(post("/api/quotes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(quotes)))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[1]"));
-    }
+    @MockBean private GetTop10QuotesUseCase getTop10QuotesUseCase;
 
     @Test
     void getQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 0));
+        List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null));
         when(getQuotesUseCase.getQuotes()).thenReturn(quotes);
 
         mockMvc.perform(get("/api/quotes"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(quotes)));
-    }
-
-    @Test
-    void getTopQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 5));
-        when(getTopQuotesUseCase.getTopQuotes()).thenReturn(quotes);
-
-        mockMvc.perform(get("/api/quotes/top"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(quotes)));
-    }
-
-    @Test
-    void getArtists() throws Exception {
-        List<ArtistQuoteCount> artists = List.of(new ArtistQuoteCount("art", 2L));
-        when(getArtistQuoteCountsUseCase.getArtistQuoteCounts()).thenReturn(artists);
-
-        mockMvc.perform(get("/api/artists"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(artists)));
     }
 
     @Test
@@ -102,7 +54,7 @@ class QuoteControllerTest {
 
     @Test
     void getRandomQuoteFound() throws Exception {
-        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0);
+        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null);
         when(getRandomQuoteUseCase.getRandomQuote()).thenReturn(quote);
 
         mockMvc.perform(get("/api/quote/random"))
@@ -111,16 +63,8 @@ class QuoteControllerTest {
     }
 
     @Test
-    void getRandomQuoteNotFound() throws Exception {
-        when(getRandomQuoteUseCase.getRandomQuote()).thenReturn(null);
-
-        mockMvc.perform(get("/api/quote/random"))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     void getQuoteFound() throws Exception {
-        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0);
+        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null);
         when(getQuoteUseCase.getQuote(1L)).thenReturn(quote);
 
         mockMvc.perform(get("/api/quote/1"))
@@ -137,20 +81,15 @@ class QuoteControllerTest {
     }
 
     @Test
-    void deleteQuote() throws Exception {
-        mockMvc.perform(delete("/api/quote/1"))
-                .andExpect(status().isNoContent());
-    }
+    void getTop10Quotes() throws Exception {
+        List<Quote> quotes = List.of(
+                new Quote(1L, "q1", "s1", "a1", 2000, "art1", 100, 10, null),
+                new Quote(2L, "q2", "s2", "a2", 2001, "art2", 90, 9, null)
+        );
+        when(getTop10QuotesUseCase.getTop10Quotes()).thenReturn(quotes);
 
-    @Test
-    void updateQuote() throws Exception {
-        Quote quote = new Quote(null, "line", "song", "album", 1990, "artist", null, null);
-
-        mockMvc.perform(put("/api/quote/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(quote)))
-                .andExpect(status().isNoContent());
-
-        verify(updateQuoteUseCase).updateQuote(new Quote(1L, "line", "song", "album", 1990, "artist", null, null));
+        mockMvc.perform(get("/api/quotes/top10"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(quotes)));
     }
 }
