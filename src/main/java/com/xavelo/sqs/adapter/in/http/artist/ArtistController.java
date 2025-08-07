@@ -19,7 +19,7 @@ public class ArtistController {
     private final GetArtistUseCase getArtistUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     
-    public ArtistController(GetArtistUseCase getArtistUseCase) {
+    public ArtistController(GetArtistUseCase getArtistUseCase, GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase) {
         this.getArtistUseCase = getArtistUseCase;
         this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
     }
