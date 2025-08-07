@@ -1,6 +1,5 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.in.*;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +17,17 @@ public class QuoteController {
     private final GetQuoteUseCase getQuoteUseCase;
     private final GetRandomQuoteUseCase getRandomQuoteUseCase;
     private final CountQuotesUseCase countQuotesUseCase;
-    private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
     private final GetTop10QuotesUseCase getTop10QuotesUseCase;
 
     public QuoteController(GetQuotesUseCase getQuotesUseCase,
                            GetQuoteUseCase getQuoteUseCase,
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
-                           GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase,
                            GetTop10QuotesUseCase getTop10QuotesUseCase) {
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
         this.getRandomQuoteUseCase = getRandomQuoteUseCase;
         this.countQuotesUseCase = countQuotesUseCase;
-        this.getArtistQuoteCountsUseCase = getArtistQuoteCountsUseCase;
         this.getTop10QuotesUseCase = getTop10QuotesUseCase;
     }
 
@@ -39,12 +35,6 @@ public class QuoteController {
     public ResponseEntity<java.util.List<Quote>> getQuotes() {
         java.util.List<Quote> quotes = getQuotesUseCase.getQuotes();
         return ResponseEntity.ok(quotes);
-    }
-
-    @GetMapping("/artists")
-    public ResponseEntity<java.util.List<ArtistQuoteCount>> getArtists() {
-        java.util.List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
-        return ResponseEntity.ok(artists);
     }
 
     @GetMapping("/quotes/count")
