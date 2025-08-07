@@ -1,0 +1,19 @@
+name: Cleanup Merged Branches
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old merged branches
+        uses: beatlabs/delete-old-branches-action@v0.0.10
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          date: '7 days ago'
+          default_branches: master,main
+          exclude_open_pr_branches: true
+          dry_run: false
