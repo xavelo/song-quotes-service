@@ -42,6 +42,8 @@ class QuoteServiceTest {
     private UpdateQuotePort updateQuotePort;
     @Mock
     private PublishQuoteCreatedPort publishQuoteCreatedPort;
+    @Mock
+    private LoadTopQuotesPort loadTopQuotesPort;
 
 
     @InjectMocks
@@ -183,5 +185,16 @@ class QuoteServiceTest {
                 new ArtistQuoteCount("a", 1L)
         );
         assertEquals(expected, result);
+    }
+
+    @Test
+    void getTopQuotes_delegatesToPort() {
+        List<Quote> expected = List.of(sampleQuote);
+        when(loadTopQuotesPort.loadTopQuotes()).thenReturn(expected);
+
+        List<Quote> result = quoteService.getTopQuotes();
+
+        assertEquals(expected, result);
+        verify(loadTopQuotesPort).loadTopQuotes();
     }
 }

@@ -32,4 +32,9 @@ public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
      */
     @Query("SELECT q.artist as artist, COUNT(q) as quotes FROM QuoteEntity q GROUP BY q.artist ORDER BY COUNT(q) DESC")
     List<ArtistQuoteCountView> findArtistQuoteCounts();
+
+    /**
+     * Retrieve the top 10 quotes ordered by hits descending.
+     */
+    List<QuoteEntity> findTop10ByOrderByHitsDesc();
 }

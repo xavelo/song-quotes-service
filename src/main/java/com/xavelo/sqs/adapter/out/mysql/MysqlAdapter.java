@@ -10,13 +10,14 @@ import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
+import com.xavelo.sqs.port.out.LoadTopQuotesPort;
 import com.xavelo.sqs.adapter.out.mysql.QuoteMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTopQuotesPort {
 
     private final QuoteRepository quoteRepository;
     private final QuoteMapper quoteMapper;
@@ -104,5 +105,13 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
             entity.setArtist(quote.artist());
             quoteRepository.save(entity);
         }
+    }
+
+    @Override
+    public java.util.List<Quote> loadTopQuotes() {
+        java.util.List<QuoteEntity> entities = quoteRepository.findTop10ByOrderByHitsDesc();
+        return entities.stream()
+                .map(quoteMapper::toDomain)
+                .toList();
     }
 }
