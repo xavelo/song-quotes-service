@@ -1,6 +1,7 @@
 package com.xavelo.sqs.adapter.out.mysql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
 import com.xavelo.sqs.application.domain.Artist;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort {
 
     private static final Logger logger = LogManager.getLogger(MysqlAdapter.class);
 
@@ -177,5 +178,29 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
             }
             quoteRepository.save(entity);
         }
+    }
+
+    @Override
+    public Artist loadArtist(String id) {
+        return spotifyArtistMetadataRepository.findById(id)
+                .map(e -> {
+                    try {
+                        java.util.List<String> genres = e.getGenres() != null ? objectMapper.readValue(e.getGenres(), new TypeReference<java.util.List<String>>() {}) : null;
+                        java.util.List<Artist.Track> topTracks = e.getTopTracks() != null ? objectMapper.readValue(e.getTopTracks(), new TypeReference<java.util.List<Artist.Track>>() {}) : null;
+                        return new Artist(
+                                e.getSpotifyArtistId(),
+                                e.getName(),
+                                genres,
+                                e.getPopularity(),
+                                e.getImageUrl(),
+                                e.getSpotifyUrl(),
+                                topTracks
+                        );
+                    } catch (Exception ex) {
+                        logger.error("Error loading artist metadata: {}", ex.getMessage(), ex);
+                        return null;
+                    }
+                })
+                .orElse(null);
     }
 }
