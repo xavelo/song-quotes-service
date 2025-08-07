@@ -3,6 +3,7 @@ package com.xavelo.sqs.adapter.in.http.artist;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
+import com.xavelo.sqs.port.in.GetArtistUseCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +27,7 @@ class ArtistControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean private GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
+    @MockBean private GetArtistUseCase getArtistUseCase;
 
     @Test
     void getArtists() throws Exception {
