@@ -6,6 +6,7 @@ import com.xavelo.sqs.application.api.model.ArtistTrackDto;
 import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import org.mapstruct.Mapper;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.List;
 
@@ -19,4 +20,8 @@ public interface ArtistMapper {
     ArtistQuoteCountDto toQuoteCountDto(ArtistQuoteCount artistQuoteCount);
 
     List<ArtistQuoteCountDto> toQuoteCountDtos(List<ArtistQuoteCount> artists);
+
+    default JsonNullable<String> map(String value) {
+        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
+    }
 }
