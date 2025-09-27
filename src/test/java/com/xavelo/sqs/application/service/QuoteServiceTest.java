@@ -111,7 +111,8 @@ class QuoteServiceTest {
         Quote result = quoteService.getQuote(1L);
 
         verify(incrementHitsPort).incrementHits(1L);
-        verify(metricsPort).incrementHits();
+        verify(metricsPort).incrementTotalHits();
+        verify(metricsPort).incrementQuoteHits(1L);
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());

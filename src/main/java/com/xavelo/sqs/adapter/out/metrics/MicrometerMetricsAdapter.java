@@ -5,22 +5,49 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * Adapter using Micrometer to record metrics.
  */
 @Component
 public class MicrometerMetricsAdapter implements MetricsPort {
 
-    private final Counter hitsCounter;
+    private static final String TOTAL_HITS_METRIC_NAME = "quote_hits_total";
+    private static final String QUOTE_HITS_METRIC_NAME = "quote_hits_by_quote_total";
+
+    private final MeterRegistry meterRegistry;
+    private final Counter totalHitsCounter;
+    private final ConcurrentMap<Long, Counter> quoteHitsCounters = new ConcurrentHashMap<>();
 
     public MicrometerMetricsAdapter(MeterRegistry meterRegistry) {
-        this.hitsCounter = Counter.builder("quote_hits_total")
-                .description("Number of times a quote was requested by id")
+        this.meterRegistry = meterRegistry;
+        this.totalHitsCounter = Counter.builder(TOTAL_HITS_METRIC_NAME)
+                .description("Number of times a quote was requested")
                 .register(meterRegistry);
     }
 
     @Override
-    public void incrementHits() {
-        hitsCounter.increment();
+    public void incrementTotalHits() {
+        totalHitsCounter.increment();
+    }
+
+    @Override
+    public void incrementQuoteHits(Long quoteId) {
+        if (quoteId == null) {
+            return;
+        }
+
+        quoteHitsCounters
+                .computeIfAbsent(quoteId, this::createQuoteHitsCounter)
+                .increment();
+    }
+
+    private Counter createQuoteHitsCounter(Long quoteId) {
+        return Counter.builder(QUOTE_HITS_METRIC_NAME)
+                .description("Number of times a specific quote was requested")
+                .tag("quote_id", quoteId.toString())
+                .register(meterRegistry);
     }
 }
