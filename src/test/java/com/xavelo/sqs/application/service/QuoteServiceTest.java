@@ -45,6 +45,8 @@ class QuoteServiceTest {
     private PublishQuoteCreatedPort publishQuoteCreatedPort;
     @Mock
     private MetadataService metadataService;
+    @Mock
+    private SyncArtistMetadataPort syncArtistMetadataPort;
 
     @InjectMocks
     private QuoteService quoteService;
@@ -175,5 +177,22 @@ class QuoteServiceTest {
                 new ArtistQuoteCount("id-a", "a", 1L)
         );
         assertEquals(expected, result);
+    }
+
+    @Test
+    void getArtistQuoteCounts_fetchesMissingMetadata() {
+        List<ArtistQuoteCount> countsWithNullId = List.of(new ArtistQuoteCount(null, "ArtistA", 5L));
+        when(loadArtistQuoteCountsPort.loadArtistQuoteCounts()).thenReturn(countsWithNullId);
+
+        Artist metadata = new Artist("spotify-artist", "ArtistA", List.of("rock"), 10, "image", "url", List.of());
+        when(metadataService.getArtistMetadata("ArtistA")).thenReturn(metadata);
+
+        List<ArtistQuoteCount> result = quoteService.getArtistQuoteCounts();
+
+        assertEquals(1, result.size());
+        ArtistQuoteCount enriched = result.get(0);
+        assertEquals("spotify-artist", enriched.id());
+        assertEquals(5L, enriched.quotes());
+        verify(syncArtistMetadataPort).syncArtistMetadata("ArtistA", metadata);
     }
 }

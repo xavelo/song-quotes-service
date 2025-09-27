@@ -33,6 +33,11 @@ public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
     @Query("SELECT q.spotifyArtistId as id, q.artist as artist, COUNT(q) as quotes FROM QuoteEntity q GROUP BY q.spotifyArtistId, q.artist ORDER BY COUNT(q) DESC")
     List<ArtistQuoteCountView> findArtistQuoteCounts();
 
+    @Transactional
+    @Modifying
+    @Query("update QuoteEntity q set q.spotifyArtistId = :spotifyArtistId where q.artist = :artist and (q.spotifyArtistId is null or q.spotifyArtistId = '')")
+    void assignSpotifyArtistId(@Param("artist") String artist, @Param("spotifyArtistId") String spotifyArtistId);
+
     /**
      * Retrieve the top 10 quotes with the most hits.
      */
