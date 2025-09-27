@@ -147,7 +147,7 @@
                 <executions>
                     <execution>
                         <id>unpack-api-resources</id>
-                        <phase>process-resources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -162,6 +162,59 @@
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.5.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-application-openapi</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.build.directory}/dependency/openapi/song-quotes-service.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.build.directory}/generated-sources/openapi</output>
+                            <apiPackage>com.xavelo.sqs.application.api</apiPackage>
+                            <modelPackage>com.xavelo.sqs.application.api.model</modelPackage>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelDocumentation>false</generateModelDocumentation>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>false</generateSupportingFiles>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <library>spring-cloud</library>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>add-openapi-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
