@@ -1,14 +1,13 @@
 package com.xavelo.sqs.adapter.in.http.artist;
 
 import com.xavelo.sqs.adapter.in.http.artist.mapper.ArtistMapper;
-import com.xavelo.sqs.api.model.ArtistDto;
 import com.xavelo.sqs.api.model.ArtistQuoteCountDto;
+import com.xavelo.sqs.application.api.DefaultApi;
 import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
 import com.xavelo.sqs.port.in.GetArtistUseCase;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class ArtistController {
+public class ArtistController implements DefaultApi {
 
     private final GetArtistUseCase getArtistUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
@@ -30,13 +29,13 @@ public class ArtistController {
         this.artistMapper = artistMapper;
     }
 
-    @GetMapping("/artist/{id}")
-    public ResponseEntity<ArtistDto> getArtist(@PathVariable String id) {
+    @Override
+    public ResponseEntity<com.xavelo.sqs.application.api.model.Artist> getArtist(@PathVariable String id) {
         Artist artist = getArtistUseCase.getArtist(id);
-        return artist != null ? ResponseEntity.ok(artistMapper.toDto(artist)) : ResponseEntity.notFound().build();
+        return artist != null ? (ResponseEntity<com.xavelo.sqs.application.api.model.Artist>) ResponseEntity.ok() : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/artists")
+    @Override
     public ResponseEntity<List<ArtistQuoteCountDto>> getArtists() {
         List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
         return ResponseEntity.ok(artistMapper.toQuoteCountDtos(artists));
