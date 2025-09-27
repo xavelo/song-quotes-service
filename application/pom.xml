@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.xavelo</groupId>
-        <artifactId>sqs</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>com.xavelo.sqs</groupId>
+        <artifactId>song-quotes-service-parent</artifactId>
+        <version>TRUNK-SNAPSHOT</version>
     </parent>
 
     <artifactId>application</artifactId>
@@ -16,10 +16,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.xavelo</groupId>
+            <groupId>com.xavelo.sqs</groupId>
             <artifactId>api</artifactId>
+            <version>TRUNK-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
