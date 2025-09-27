@@ -5,7 +5,14 @@ package com.xavelo.sqs.port.out;
  */
 public interface MetricsPort {
     /**
-     * Increment the hits counter when a quote is served.
+     * Increment the global hits counter when any quote is served.
      */
-    void incrementHits();
+    void incrementTotalHits();
+
+    /**
+     * Increment the hits counter for a specific quote.
+     *
+     * @param quoteId the identifier of the quote that was served
+     */
+    void incrementQuoteHits(Long quoteId);
 }
