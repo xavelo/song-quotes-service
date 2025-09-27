@@ -188,6 +188,9 @@
                             <generateModelDocumentation>false</generateModelDocumentation>
                             <generateModelTests>false</generateModelTests>
                             <generateSupportingFiles>false</generateSupportingFiles>
+                            <additionalProperties>
+                                <additionalProperty>modelNameSuffix=Dto</additionalProperty>
+                            </additionalProperties>
                             <configOptions>
                                 <interfaceOnly>true</interfaceOnly>
                                 <skipDefaultInterface>true</skipDefaultInterface>

@@ -1,8 +1,8 @@
 package com.xavelo.sqs.adapter.in.http.artist.mapper;
 
-import com.xavelo.sqs.api.model.ArtistDto;
-import com.xavelo.sqs.api.model.ArtistQuoteCountDto;
-import com.xavelo.sqs.api.model.ArtistTrackDto;
+import com.xavelo.sqs.application.api.model.ArtistDto;
+import com.xavelo.sqs.application.api.model.ArtistQuoteCountDto;
+import com.xavelo.sqs.application.api.model.ArtistTrackDto;
 import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import org.mapstruct.Mapper;
@@ -19,6 +19,4 @@ public interface ArtistMapper {
     ArtistQuoteCountDto toQuoteCountDto(ArtistQuoteCount artistQuoteCount);
 
     List<ArtistQuoteCountDto> toQuoteCountDtos(List<ArtistQuoteCount> artists);
-
-    List<ArtistQuoteCountDto> toQuoteCountsModel(List<com.xavelo.sqs.application.domain.ArtistQuoteCount> artists);
 }

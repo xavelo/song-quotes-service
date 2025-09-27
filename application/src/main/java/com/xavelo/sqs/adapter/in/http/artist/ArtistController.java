@@ -1,10 +1,11 @@
 package com.xavelo.sqs.adapter.in.http.artist;
 
 import com.xavelo.sqs.adapter.in.http.artist.mapper.ArtistMapper;
-import com.xavelo.sqs.api.model.ArtistQuoteCountDto;
 import com.xavelo.sqs.application.api.DefaultApi;
-import com.xavelo.sqs.application.api.model.ArtistQuoteCount;
+import com.xavelo.sqs.application.api.model.ArtistDto;
+import com.xavelo.sqs.application.api.model.ArtistQuoteCountDto;
 import com.xavelo.sqs.application.domain.Artist;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
 import com.xavelo.sqs.port.in.GetArtistUseCase;
 import org.springframework.http.ResponseEntity;
@@ -30,20 +31,16 @@ public class ArtistController implements DefaultApi {
     }
 
     @Override
-    public ResponseEntity<com.xavelo.sqs.application.api.model.Artist> getArtist(@PathVariable String id) {
+    public ResponseEntity<ArtistDto> getArtist(@PathVariable String id) {
         Artist artist = getArtistUseCase.getArtist(id);
-        return artist != null ? (ResponseEntity<com.xavelo.sqs.application.api.model.Artist>) ResponseEntity.ok() : ResponseEntity.notFound().build();
+        return artist != null
+                ? ResponseEntity.ok(artistMapper.toDto(artist))
+                : ResponseEntity.notFound().build();
     }
 
-    @Override
-    public ResponseEntity<List<ArtistQuoteCount>> getArtists() {
-        return null;
-    }
-
-    /*
     @Override
     public ResponseEntity<List<ArtistQuoteCountDto>> getArtists() {
         List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
-        return ResponseEntity.ok(artistMapper.toQuoteCountsModel(artists));
-    }*/
+        return ResponseEntity.ok(artistMapper.toQuoteCountDtos(artists));
+    }
 }
