@@ -25,7 +25,10 @@ public class ArtistController {
     @GetMapping("/artist/{id}")
     public ResponseEntity<Artist> getArtist(@PathVariable String id) {
         Artist artist = getArtistUseCase.getArtist(id);
-        return artist != null ? ResponseEntity.ok(artist) : ResponseEntity.notFound().build();
+        if (artist == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(artist);
     }
 
     @GetMapping("/artists")
