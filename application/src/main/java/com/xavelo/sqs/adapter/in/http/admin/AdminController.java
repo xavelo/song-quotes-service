@@ -1,53 +1,66 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
+import com.xavelo.sqs.adapter.in.http.admin.mapper.AdminQuoteMapper;
+import com.xavelo.sqs.application.api.AdminApi;
+import com.xavelo.sqs.application.api.model.QuoteDto;
+import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.service.AdminService;
+import com.xavelo.sqs.application.service.QuoteHelper;
+import com.xavelo.sqs.port.in.PatchQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
-import com.xavelo.sqs.port.in.PatchQuoteUseCase;
-import com.xavelo.sqs.application.domain.Quote;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.xavelo.sqs.application.service.QuoteHelper;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/admin")
-public class AdminController {
+public class AdminController implements AdminApi {
 
     private final AdminService adminService;
     private final StoreQuoteUseCase storeQuoteUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final PatchQuoteUseCase patchQuoteUseCase;
+    private final AdminQuoteMapper quoteMapper;
 
     public AdminController(AdminService adminService,
                            StoreQuoteUseCase storeQuoteUseCase,
                            UpdateQuoteUseCase updateQuoteUseCase,
-                           PatchQuoteUseCase patchQuoteUseCase) {
+                           PatchQuoteUseCase patchQuoteUseCase,
+                           AdminQuoteMapper quoteMapper) {
         this.adminService = adminService;
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
         this.patchQuoteUseCase = patchQuoteUseCase;
+        this.quoteMapper = quoteMapper;
     }
 
-    @PostMapping("/quote")
-    public ResponseEntity<Long> createQuote(@RequestBody Quote quote) {
+    @Override
+    public ResponseEntity<Long> createQuote(@Valid @RequestBody QuoteDto quoteDto) {
+        Quote quote = quoteMapper.toDomain(quoteDto);
         Long id = storeQuoteUseCase.storeQuote(quote);
         return ResponseEntity.ok(id);
     }
 
-    @PostMapping("/quotes")
-    public ResponseEntity<java.util.List<Long>> createQuotes(@RequestBody java.util.List<Quote> quotes) {
-        java.util.List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
+    @Override
+    public ResponseEntity<List<Long>> createQuotes(@Valid @RequestBody List<@Valid QuoteDto> quoteDtos) {
+        List<Quote> quotes = quoteMapper.toDomain(quoteDtos);
+        List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
         return ResponseEntity.ok(ids);
     }
 
-    @DeleteMapping("/quote/{id}")
+    @Override
     public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
         adminService.deleteQuote(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/quote/{id}")
-    public ResponseEntity<Void> updateQuote(@PathVariable Long id, @RequestBody Quote quote) {
+    @Override
+    public ResponseEntity<Void> updateQuote(@PathVariable Long id, @Valid @RequestBody QuoteDto quoteDto) {
+        Quote quote = quoteMapper.toDomain(quoteDto);
         if (containsRestrictedFields(quote)) {
             return ResponseEntity.badRequest().build();
         }
@@ -59,8 +72,9 @@ public class AdminController {
         return quote.posts() != null || quote.hits() != null;
     }
 
-    @PatchMapping("/quote/{id}")
-    public ResponseEntity<Void> patchQuote(@PathVariable Long id, @RequestBody Quote quote) {
+    @Override
+    public ResponseEntity<Void> patchQuote(@PathVariable Long id, @Valid @RequestBody QuoteDto quoteDto) {
+        Quote quote = quoteMapper.toDomain(quoteDto);
         if (containsRestrictedFields(quote)) {
             return ResponseEntity.badRequest().build();
         }
@@ -68,7 +82,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/export")
+    @Override
     public ResponseEntity<String> exportQuotes() {
         String sql = adminService.exportQuotesAsSql();
         return ResponseEntity.ok(sql);
