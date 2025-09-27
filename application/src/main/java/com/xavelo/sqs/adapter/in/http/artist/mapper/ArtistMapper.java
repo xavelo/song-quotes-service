@@ -19,4 +19,6 @@ public interface ArtistMapper {
     ArtistQuoteCountDto toQuoteCountDto(ArtistQuoteCount artistQuoteCount);
 
     List<ArtistQuoteCountDto> toQuoteCountDtos(List<ArtistQuoteCount> artists);
+
+    List<ArtistQuoteCountDto> toQuoteCountsModel(List<com.xavelo.sqs.application.domain.ArtistQuoteCount> artists);
 }
