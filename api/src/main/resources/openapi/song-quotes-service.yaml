@@ -9,6 +9,8 @@ servers:
 paths:
   /artist/{id}:
     get:
+      tags:
+        - Artist
       summary: Get artist details
       operationId: getArtist
       parameters:
@@ -28,6 +30,8 @@ paths:
           description: Artist not found
   /artists:
     get:
+      tags:
+        - Artist
       summary: Get artists with quote counts
       operationId: getArtists
       responses:
