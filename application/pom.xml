@@ -17,11 +17,13 @@
     </properties>
 
     <dependencies>
+        <!--
         <dependency>
             <groupId>com.xavelo.sqs</groupId>
             <artifactId>song-quotes-service-api</artifactId>
             <type>zip</type>
         </dependency>
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -137,6 +139,31 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>unpack-api-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <artifactId>song-quotes-service-api</artifactId>
+                                    <groupId>com.xavelo.sqs</groupId>
+                                    <version>TRUNK-SNAPSHOT</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
