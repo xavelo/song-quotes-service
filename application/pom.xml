@@ -10,11 +10,18 @@
         <version>TRUNK-SNAPSHOT</version>
     </parent>
 
-    <artifactId>application</artifactId>
-    <name>song-quotes-service-application</name>
-    <description>Song Quotes Service Spring Boot application</description>
+    <artifactId>song-quotes-service-application</artifactId>
+
+    <properties>
+        <main-class>com.xavelo.sqs.SongQuotesServiceApplication</main-class>
+    </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.xavelo.sqs</groupId>
+            <artifactId>song-quotes-service-api</artifactId>
+            <type>zip</type>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
