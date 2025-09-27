@@ -61,8 +61,8 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
             return;
         }
 
-        quoteRepository.assignSpotifyArtistId(artistName, artistMetadata.id());
         saveArtistMetadataIfNotExists(artistMetadata);
+        quoteRepository.assignSpotifyArtistId(artistName, artistMetadata.id());
     }
 
     private SpotifyArtistMetadataEntity createMetadataEntity(Artist artist) throws com.fasterxml.jackson.core.JsonProcessingException {
