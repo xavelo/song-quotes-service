@@ -148,11 +148,13 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         return artistQuoteCount;
                     }
 
+                    logger.debug("getting metadata for artist {}", artistQuoteCount.artist());
                     Artist artistMetadata = metadataService.getArtistMetadata(artistQuoteCount.artist());
                     if (artistMetadata == null || artistMetadata.id() == null) {
                         return artistQuoteCount;
                     }
 
+                    logger.debug("syncing metadata for artist {} - {}", artistQuoteCount.artist(), artistMetadata.id());
                     syncArtistMetadataPort.syncArtistMetadata(artistQuoteCount.artist(), artistMetadata);
                     return new ArtistQuoteCount(artistMetadata.id(), artistQuoteCount.artist(), artistQuoteCount.quotes());
                 })
