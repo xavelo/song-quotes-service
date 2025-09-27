@@ -31,7 +31,7 @@ class ArtistControllerTest {
 
     @Test
     void getArtists() throws Exception {
-        List<ArtistQuoteCount> artists = List.of(new ArtistQuoteCount("art", 2L));
+        List<ArtistQuoteCount> artists = List.of(new ArtistQuoteCount("id", "art", 2L));
         when(getArtistQuoteCountsUseCase.getArtistQuoteCounts()).thenReturn(artists);
 
         mockMvc.perform(get("/api/artists"))

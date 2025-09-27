@@ -126,7 +126,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     public java.util.List<ArtistQuoteCount> loadArtistQuoteCounts() {
         java.util.List<ArtistQuoteCountView> views = quoteRepository.findArtistQuoteCounts();
         return views.stream()
-                .map(v -> new ArtistQuoteCount(v.getArtist(), v.getQuotes()))
+                .map(v -> new ArtistQuoteCount(v.getId(), v.getArtist(), v.getQuotes()))
                 .toList();
     }
 

@@ -149,7 +149,7 @@ class QuoteServiceTest {
 
     @Test
     void getArtistQuoteCounts_delegatesToPort() {
-        List<ArtistQuoteCount> expected = List.of(new ArtistQuoteCount("a", 2L));
+        List<ArtistQuoteCount> expected = List.of(new ArtistQuoteCount("id-a", "a", 2L));
         when(loadArtistQuoteCountsPort.loadArtistQuoteCounts()).thenReturn(expected);
 
         List<ArtistQuoteCount> result = quoteService.getArtistQuoteCounts();
@@ -161,18 +161,18 @@ class QuoteServiceTest {
     @Test
     void getArtistQuoteCounts_sortsByQuotesDescending() {
         List<ArtistQuoteCount> unsorted = List.of(
-                new ArtistQuoteCount("a", 1L),
-                new ArtistQuoteCount("b", 3L),
-                new ArtistQuoteCount("c", 2L)
+                new ArtistQuoteCount("id-a", "a", 1L),
+                new ArtistQuoteCount("id-b", "b", 3L),
+                new ArtistQuoteCount("id-c", "c", 2L)
         );
         when(loadArtistQuoteCountsPort.loadArtistQuoteCounts()).thenReturn(unsorted);
 
         List<ArtistQuoteCount> result = quoteService.getArtistQuoteCounts();
 
         List<ArtistQuoteCount> expected = List.of(
-                new ArtistQuoteCount("b", 3L),
-                new ArtistQuoteCount("c", 2L),
-                new ArtistQuoteCount("a", 1L)
+                new ArtistQuoteCount("id-b", "b", 3L),
+                new ArtistQuoteCount("id-c", "c", 2L),
+                new ArtistQuoteCount("id-a", "a", 1L)
         );
         assertEquals(expected, result);
     }
