@@ -17,13 +17,11 @@
     </properties>
 
     <dependencies>
-        <!--
         <dependency>
             <groupId>com.xavelo.sqs</groupId>
             <artifactId>song-quotes-service-api</artifactId>
-            <type>zip</type>
+            <version>${project.version}</version>
         </dependency>
-        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -158,8 +156,9 @@
                                 <artifactItem>
                                     <artifactId>song-quotes-service-api</artifactId>
                                     <groupId>com.xavelo.sqs</groupId>
-                                    <version>TRUNK-SNAPSHOT</version>
+                                    <version>${project.version}</version>
                                     <type>zip</type>
+                                    <classifier>zip</classifier>
                                     <overWrite>true</overWrite>
                                 </artifactItem>
                             </artifactItems>
