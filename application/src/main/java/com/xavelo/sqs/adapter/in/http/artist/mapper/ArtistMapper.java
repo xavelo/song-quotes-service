@@ -1,11 +1,12 @@
 package com.xavelo.sqs.adapter.in.http.artist.mapper;
 
-import com.xavelo.sqs.api.model.ArtistDto;
-import com.xavelo.sqs.api.model.ArtistQuoteCountDto;
-import com.xavelo.sqs.api.model.ArtistTrackDto;
+import com.xavelo.sqs.application.api.model.ArtistDto;
+import com.xavelo.sqs.application.api.model.ArtistQuoteCountDto;
+import com.xavelo.sqs.application.api.model.ArtistTrackDto;
 import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import org.mapstruct.Mapper;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.List;
 
@@ -20,5 +21,7 @@ public interface ArtistMapper {
 
     List<ArtistQuoteCountDto> toQuoteCountDtos(List<ArtistQuoteCount> artists);
 
-    List<ArtistQuoteCountDto> toQuoteCountsModel(List<com.xavelo.sqs.application.domain.ArtistQuoteCount> artists);
+    default JsonNullable<String> map(String value) {
+        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
+    }
 }
