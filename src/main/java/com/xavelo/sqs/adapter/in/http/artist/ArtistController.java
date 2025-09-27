@@ -1,14 +1,12 @@
 package com.xavelo.sqs.adapter.in.http.artist;
 
 import com.xavelo.sqs.application.domain.Artist;
+import com.xavelo.sqs.application.domain.ArtistQuoteCount;
+import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
 import com.xavelo.sqs.port.in.GetArtistUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.xavelo.sqs.application.domain.ArtistQuoteCount;
-import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,20 +1,16 @@
 package com.xavelo.sqs.application.service;
 
-import com.xavelo.sqs.adapter.out.spotify.SpotifyAdapter;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.service.QuoteHelper;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
-import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
 import com.xavelo.sqs.port.in.GetQuotesUseCase;
 import com.xavelo.sqs.port.in.GetQuoteUseCase;
 import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.GetArtistQuoteCountsUseCase;
 import com.xavelo.sqs.port.in.GetTop10QuotesUseCase;
-import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
-import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
 import com.xavelo.sqs.port.out.QuotesCountPort;
 import com.xavelo.sqs.port.out.StoreQuotePort;
@@ -22,7 +18,6 @@ import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.MetricsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
-import com.xavelo.sqs.port.out.UpdateQuotePort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
