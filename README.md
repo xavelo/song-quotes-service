@@ -12,18 +12,18 @@ browsing and managing memorable song quotes. Quotes are stored in MySQL, are
 served through a clean Hexagonal architecture, and integrate with Spotify to
 fetch artist metadata and top tracks. Kafka is used to publish events whenever a
 new quote is created, while Micrometer provides application metrics that can be
-scraped by Prometheus for observability.【F:src/main/java/com/xavelo/sqs/adapter/out/kafka/QuoteCreatedKafkaAdapter.java†L1-L68】【F:src/main/java/com/xavelo/sqs/adapter/out/metrics/MicrometerMetricsAdapter.java†L1-L61】【F:src/main/java/com/xavelo/sqs/adapter/out/spotify/SpotifyAdapter.java†L1-L124】
+scraped by Prometheus for observability.
 
 ## Architecture highlights
 
 * **Hexagonal ports & adapters** – Core use cases and domain models live in the
   `application` and `port` packages, while infrastructure concerns such as MySQL
-  persistence, Kafka, metrics, and Spotify live in dedicated adapters.【F:src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L1-L145】【F:src/main/java/com/xavelo/sqs/port/in/GetQuotesUseCase.java†L1-L13】
+  persistence, Kafka, metrics, and Spotify live in dedicated adapters.
 * **Secure-by-default** – The service is configured as an OAuth2 resource server
   that expects JWT bearer tokens. Public quote and artist APIs are open, while
-  authenticated scopes can be applied to protected endpoints such as `/api/secure`.【F:src/main/java/com/xavelo/sqs/configuration/SecurityConfig.java†L1-L24】【F:src/main/java/com/xavelo/sqs/adapter/in/http/secure/SecurePingController.java†L1-L32】
+  authenticated scopes can be applied to protected endpoints such as `/api/secure`.
 * **Database migrations** – Flyway migrations version and evolve the MySQL
-  schema, ensuring reproducible environments.【F:src/main/resources/db/migration/V1__create_quotes_table.sql†L1-L49】【F:src/main/resources/db/migration/V2__add_spotify_artist_metadata.sql†L1-L36】
+  schema, ensuring reproducible environments.
 
 ## Prerequisites
 
@@ -68,7 +68,7 @@ available at runtime.
 ## Configuration
 
 The default configuration is defined in `application.yaml` and can be overridden
-per environment.【F:src/main/resources/application.yaml†L1-L38】
+per environment.
 
 | Property | Description |
 | --- | --- |
@@ -89,7 +89,7 @@ export SPOTIFY_CLIENT_SECRET=<your-client-secret>
 
 Flyway manages database structure. `V1__create_quotes_table.sql` creates the core
 `quote` table and aggregates, while `V2__add_spotify_artist_metadata.sql` stores
-Spotify artist metadata used by the enrichment adapter.【F:src/main/resources/db/migration/V1__create_quotes_table.sql†L1-L49】【F:src/main/resources/db/migration/V2__add_spotify_artist_metadata.sql†L1-L36】
+Spotify artist metadata used by the enrichment adapter.
 
 ## REST API
 
@@ -97,27 +97,27 @@ All endpoints default to JSON and are served on port `8080`.
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `/api/ping` | Liveness probe returning the serving pod/host name.【F:src/main/java/com/xavelo/sqs/adapter/in/http/ping/PingController.java†L17-L35】 |
-| `GET` | `/api/quote/random` | Returns a random quote, or `404` when no quotes exist.【F:src/main/java/com/xavelo/sqs/adapter/in/http/quote/QuoteController.java†L36-L44】 |
-| `GET` | `/api/quote/{id}` | Fetch a single quote by id.【F:src/main/java/com/xavelo/sqs/adapter/in/http/quote/QuoteController.java†L46-L52】 |
-| `GET` | `/api/quotes` | Retrieve all quotes.【F:src/main/java/com/xavelo/sqs/adapter/in/http/quote/QuoteController.java†L28-L34】 |
-| `GET` | `/api/quotes/count` | Count all quotes in storage.【F:src/main/java/com/xavelo/sqs/adapter/in/http/quote/QuoteController.java†L30-L41】 |
-| `GET` | `/api/quotes/top10` | Return the ten most-viewed quotes.【F:src/main/java/com/xavelo/sqs/adapter/in/http/quote/QuoteController.java†L54-L59】 |
-| `GET` | `/api/artist/{id}` | Fetch a single artist enriched with Spotify metadata.【F:src/main/java/com/xavelo/sqs/adapter/in/http/artist/ArtistController.java†L25-L32】 |
-| `GET` | `/api/artists` | List artists with the number of quotes available for each.【F:src/main/java/com/xavelo/sqs/adapter/in/http/artist/ArtistController.java†L34-L38】 |
-| `GET` | `/api/secure/ping` | Ping endpoint requiring a valid JWT, useful for smoke-testing auth flows.【F:src/main/java/com/xavelo/sqs/adapter/in/http/secure/SecurePingController.java†L14-L26】 |
-| `POST` | `/admin/quote` | Create a single quote and return the new id.【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L29-L35】 |
-| `POST` | `/admin/quotes` | Bulk-create quotes and return generated ids.【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L37-L42】 |
-| `PUT` | `/admin/quote/{id}` | Replace a quote (excluding restricted counters).【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L44-L62】 |
-| `PATCH` | `/admin/quote/{id}` | Partially update a quote (excluding restricted counters).【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L66-L74】 |
-| `DELETE` | `/admin/quote/{id}` | Delete a quote by id.【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L39-L43】 |
-| `GET` | `/admin/export` | Export all quotes as SQL insert statements for backup or migration purposes.【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L76-L80】 |
+| `GET` | `/api/ping` | Liveness probe returning the serving pod/host name. |
+| `GET` | `/api/quote/random` | Returns a random quote, or `404` when no quotes exist. |
+| `GET` | `/api/quote/{id}` | Fetch a single quote by id. |
+| `GET` | `/api/quotes` | Retrieve all quotes. |
+| `GET` | `/api/quotes/count` | Count all quotes in storage. |
+| `GET` | `/api/quotes/top10` | Return the ten most-viewed quotes. |
+| `GET` | `/api/artist/{id}` | Fetch a single artist enriched with Spotify metadata. |
+| `GET` | `/api/artists` | List artists with the number of quotes available for each. |
+| `GET` | `/api/secure/ping` | Ping endpoint requiring a valid JWT, useful for smoke-testing auth flows. |
+| `POST` | `/admin/quote` | Create a single quote and return the new id. |
+| `POST` | `/admin/quotes` | Bulk-create quotes and return generated ids. |
+| `PUT` | `/admin/quote/{id}` | Replace a quote (excluding restricted counters). |
+| `PATCH` | `/admin/quote/{id}` | Partially update a quote (excluding restricted counters). |
+| `DELETE` | `/admin/quote/{id}` | Delete a quote by id. |
+| `GET` | `/admin/export` | Export all quotes as SQL insert statements for backup or migration purposes. |
 
 ## Observability
 
 Micrometer metrics are emitted via Spring Boot Actuator. With the provided
 configuration, Prometheus can scrape `/actuator/prometheus` and standard health
-information is available under `/actuator/health` and `/actuator/info`.【F:src/main/resources/application.yaml†L28-L38】【F:src/main/java/com/xavelo/sqs/adapter/out/metrics/MicrometerMetricsAdapter.java†L1-L61】
+information is available under `/actuator/health` and `/actuator/info`.
 
 ## Testing & quality
 
