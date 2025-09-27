@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort, SyncArtistMetadataPort {
 
     private static final Logger logger = LogManager.getLogger(MysqlAdapter.class);
 
@@ -52,6 +52,17 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         } catch (Exception e) {
             logger.error("Error saving artist metadata: {}",e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void syncArtistMetadata(String artistName, Artist artistMetadata) {
+        if (artistMetadata == null || artistMetadata.id() == null) {
+            logger.warn("Cannot sync metadata for artist {} due to missing Spotify id", artistName);
+            return;
+        }
+
+        quoteRepository.assignSpotifyArtistId(artistName, artistMetadata.id());
+        saveArtistMetadataIfNotExists(artistMetadata);
     }
 
     private SpotifyArtistMetadataEntity createMetadataEntity(Artist artist) throws com.fasterxml.jackson.core.JsonProcessingException {

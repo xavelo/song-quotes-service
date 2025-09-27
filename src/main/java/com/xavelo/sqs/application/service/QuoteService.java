@@ -21,6 +21,7 @@ import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
+import com.xavelo.sqs.port.out.SyncArtistMetadataPort;
 import com.xavelo.sqs.application.service.MetadataService;
 import com.xavelo.sqs.application.domain.Artist;
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +45,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
+    private final SyncArtistMetadataPort syncArtistMetadataPort;
     private final MetadataService metadataService;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
@@ -54,6 +56,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
                         LoadTop10QuotesPort loadTop10QuotesPort,
                         PatchQuotePort patchQuotePort,
+                        SyncArtistMetadataPort syncArtistMetadataPort,
                         MetadataService metadataService) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
@@ -65,6 +68,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
         this.patchQuotePort = patchQuotePort;
+        this.syncArtistMetadataPort = syncArtistMetadataPort;
         this.metadataService = metadataService;
     }
 
@@ -139,6 +143,19 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     public java.util.List<ArtistQuoteCount> getArtistQuoteCounts() {
         return loadArtistQuoteCountsPort.loadArtistQuoteCounts()
                 .stream()
+                .map(artistQuoteCount -> {
+                    if (artistQuoteCount.id() != null) {
+                        return artistQuoteCount;
+                    }
+
+                    Artist artistMetadata = metadataService.getArtistMetadata(artistQuoteCount.artist());
+                    if (artistMetadata == null || artistMetadata.id() == null) {
+                        return artistQuoteCount;
+                    }
+
+                    syncArtistMetadataPort.syncArtistMetadata(artistQuoteCount.artist(), artistMetadata);
+                    return new ArtistQuoteCount(artistMetadata.id(), artistQuoteCount.artist(), artistQuoteCount.quotes());
+                })
                 .sorted(java.util.Comparator.comparing(ArtistQuoteCount::quotes).reversed())
                 .toList();
     }
