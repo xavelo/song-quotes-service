@@ -1,7 +1,7 @@
 package com.xavelo.sqs.adapter.in.http.artist;
 
 import com.xavelo.sqs.adapter.in.http.artist.mapper.ArtistMapper;
-import com.xavelo.sqs.application.api.DefaultApi;
+import com.xavelo.sqs.application.api.ArtistApi;
 import com.xavelo.sqs.application.api.model.ArtistDto;
 import com.xavelo.sqs.application.api.model.ArtistQuoteCountDto;
 import com.xavelo.sqs.application.domain.Artist;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class ArtistController implements DefaultApi {
+public class ArtistController implements ArtistApi {
 
     private final GetArtistUseCase getArtistUseCase;
     private final GetArtistQuoteCountsUseCase getArtistQuoteCountsUseCase;
