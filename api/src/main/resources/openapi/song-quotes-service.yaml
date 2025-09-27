@@ -1,0 +1,112 @@
+openapi: 3.0.3
+info:
+  title: Song Quotes Service API
+  version: 1.0.0
+  description: |
+    OpenAPI definition for the Song Quotes Service artist endpoints.
+servers:
+  - url: /api
+paths:
+  /artist/{id}:
+    get:
+      summary: Get artist details
+      operationId: getArtist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Artist found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '404':
+          description: Artist not found
+  /artists:
+    get:
+      summary: Get artists with quote counts
+      operationId: getArtists
+      responses:
+        '200':
+          description: List of artists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArtistQuoteCount'
+components:
+  schemas:
+    Artist:
+      type: object
+      required:
+        - id
+        - name
+        - genres
+        - popularity
+        - spotifyUrl
+        - topTracks
+      properties:
+        id:
+          type: string
+          description: Spotify identifier of the artist
+        name:
+          type: string
+          description: Name of the artist
+        genres:
+          type: array
+          description: Genres associated with the artist
+          items:
+            type: string
+        popularity:
+          type: integer
+          format: int32
+          description: Popularity score assigned by Spotify
+        imageUrl:
+          type: string
+          description: URL pointing to an image of the artist
+        spotifyUrl:
+          type: string
+          description: Spotify URL of the artist
+        topTracks:
+          type: array
+          description: Top Spotify tracks for the artist
+          items:
+            $ref: '#/components/schemas/ArtistTrack'
+    ArtistTrack:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Spotify identifier of the track
+        name:
+          type: string
+          description: Track name
+        previewUrl:
+          type: string
+          nullable: true
+          description: Preview URL for the track
+    ArtistQuoteCount:
+      type: object
+      required:
+        - id
+        - artist
+        - quotes
+      properties:
+        id:
+          type: string
+          description: Spotify identifier of the artist
+        artist:
+          type: string
+          description: Name of the artist
+        quotes:
+          type: integer
+          format: int64
+          description: Number of quotes stored for the artist
