@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class QuoteEventRelayWorker {
@@ -23,7 +24,7 @@ public class QuoteEventRelayWorker {
     private final QuoteEventOutboxPort quoteEventOutboxPort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
     private final PublishQuoteHitPort publishQuoteHitPort;
-    private final int batchSize;
+    private final AtomicInteger batchSize;
     private final Duration retryDelay;
 
     public QuoteEventRelayWorker(
@@ -35,13 +36,14 @@ public class QuoteEventRelayWorker {
         this.quoteEventOutboxPort = quoteEventOutboxPort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
         this.publishQuoteHitPort = publishQuoteHitPort;
-        this.batchSize = batchSize;
+        this.batchSize = new AtomicInteger(batchSize);
         this.retryDelay = retryDelay;
     }
 
     @Scheduled(fixedDelayString = "${quote-events.outbox.worker.delay:5000}")
     public void relayOutbox() {
-        List<QuoteEvent> events = quoteEventOutboxPort.fetchPendingEvents(batchSize);
+        int currentBatchSize = batchSize.get();
+        List<QuoteEvent> events = quoteEventOutboxPort.fetchPendingEvents(currentBatchSize);
         for (QuoteEvent event : events) {
             try {
                 publishEvent(event);
@@ -51,6 +53,10 @@ public class QuoteEventRelayWorker {
                 quoteEventOutboxPort.markEventFailed(event.id(), ex.getMessage(), retryDelay);
             }
         }
+    }
+
+    public void updateBatchSize(int newBatchSize) {
+        batchSize.set(newBatchSize);
     }
 
     private void publishEvent(QuoteEvent event) {

@@ -21,6 +21,8 @@ paths:
     $ref: './admin-api.yaml#/paths/~1admin~1quotes~1reset-posts'
   /admin/quote/{id}:
     $ref: './admin-api.yaml#/paths/~1admin~1quote~1{id}'
+  /admin/outbox/worker/batch-size:
+    $ref: './admin-api.yaml#/paths/~1admin~1outbox~1worker~1batch-size'
   /admin/export:
     $ref: './admin-api.yaml#/paths/~1admin~1export'
   /quotes:
@@ -47,3 +49,5 @@ components:
       $ref: './components/schemas.yaml#/components/schemas/ArtistTrack'
     ArtistQuoteCount:
       $ref: './components/schemas.yaml#/components/schemas/ArtistQuoteCount'
+    UpdateOutboxBatchSizeRequest:
+      $ref: './components/schemas.yaml#/components/schemas/UpdateOutboxBatchSizeRequest'
