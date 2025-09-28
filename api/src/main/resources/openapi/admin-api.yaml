@@ -110,6 +110,15 @@ paths:
       responses:
         '204':
           description: Hits successfully reset
+  /admin/quotes/reset-posts:
+    post:
+      tags:
+        - Admin
+      summary: Reset posts for all quotes
+      operationId: resetQuotePosts
+      responses:
+        '204':
+          description: Posts successfully reset
   /admin/export:
     get:
       tags:
