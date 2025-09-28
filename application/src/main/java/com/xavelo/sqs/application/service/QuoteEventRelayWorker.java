@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -40,6 +41,7 @@ public class QuoteEventRelayWorker {
 
     @Scheduled(fixedDelayString = "${quote-events.outbox.worker.delay:5000}")
     public void relayOutbox() {
+        logger.debug("relayOutbox run {}", Instant.now());
         List<QuoteEvent> events = quoteEventOutboxPort.fetchPendingEvents(batchSize);
         for (QuoteEvent event : events) {
             try {
