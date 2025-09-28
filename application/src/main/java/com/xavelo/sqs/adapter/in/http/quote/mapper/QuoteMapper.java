@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", implementationName = "QuoteHttpMapperImpl")
 public interface QuoteMapper {
 
     QuoteDto toDto(Quote quote);
