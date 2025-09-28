@@ -23,17 +23,20 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     private final UpdateQuotePort updateQuotePort;
     private final ResetQuoteHitsPort resetQuoteHitsPort;
     private final ResetQuotePostsPort resetQuotePostsPort;
+    private final QuoteEventRelayWorker quoteEventRelayWorker;
 
     public AdminService(LoadQuotePort loadQuotePort,
                         DeleteQuotePort deleteQuotePort,
                         UpdateQuotePort updateQuotePort,
                         ResetQuoteHitsPort resetQuoteHitsPort,
-                        ResetQuotePostsPort resetQuotePostsPort) {
+                        ResetQuotePostsPort resetQuotePostsPort,
+                        QuoteEventRelayWorker quoteEventRelayWorker) {
         this.loadQuotePort = loadQuotePort;
         this.deleteQuotePort = deleteQuotePort;
         this.updateQuotePort = updateQuotePort;
         this.resetQuoteHitsPort = resetQuoteHitsPort;
         this.resetQuotePostsPort = resetQuotePostsPort;
+        this.quoteEventRelayWorker = quoteEventRelayWorker;
     }
 
     @Override
@@ -74,5 +77,9 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     @Override
     public void resetQuotePosts() {
         resetQuotePostsPort.resetQuotePosts();
+    }
+
+    public void updateOutboxWorkerBatchSize(int batchSize) {
+        quoteEventRelayWorker.updateBatchSize(batchSize);
     }
 }

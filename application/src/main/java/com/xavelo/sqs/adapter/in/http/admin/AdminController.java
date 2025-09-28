@@ -3,6 +3,7 @@ package com.xavelo.sqs.adapter.in.http.admin;
 import com.xavelo.sqs.adapter.in.http.admin.mapper.AdminQuoteMapper;
 import com.xavelo.sqs.application.api.AdminApi;
 import com.xavelo.sqs.application.api.model.QuoteDto;
+import com.xavelo.sqs.application.api.model.UpdateOutboxBatchSizeRequestDto;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.service.AdminService;
 import com.xavelo.sqs.application.service.QuoteHelper;
@@ -87,6 +88,13 @@ public class AdminController implements AdminApi {
             return ResponseEntity.badRequest().build();
         }
         patchQuoteUseCase.patchQuote(id, quote);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateOutboxWorkerBatchSize(@Valid @RequestBody UpdateOutboxBatchSizeRequestDto updateOutboxBatchSizeRequestDto) {
+        int batchSize = updateOutboxBatchSizeRequestDto.getBatchSize();
+        adminService.updateOutboxWorkerBatchSize(batchSize);
         return ResponseEntity.noContent().build();
     }
 
