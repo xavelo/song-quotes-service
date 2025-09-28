@@ -51,6 +51,26 @@ public final class QuoteHelper {
     }
 
     /**
+     * Returns a copy of the given quote with the supplied id and spotify artist id
+     */
+    public static Quote withSpotifyArtistId(Quote quote, Long id, String spotifyArtistId) {
+        if (quote == null) {
+            return null;
+        }
+        return new Quote(
+                id,
+                quote.quote(),
+                quote.song(),
+                quote.album(),
+                quote.year(),
+                quote.artist(),
+                quote.posts(),
+                quote.hits(),
+                spotifyArtistId
+        );
+    }
+
+    /**
      * Returns a copy of the quote with the posts counter incremented by one.
      */
     public static Quote incrementPosts(Quote quote) {

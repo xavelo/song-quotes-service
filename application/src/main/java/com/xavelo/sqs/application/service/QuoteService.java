@@ -87,7 +87,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote toStore = QuoteHelper.sanitize(quote);
         Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
         Long id = storeQuotePort.storeQuote(toStore, artistMetadata);
-        Quote stored = QuoteHelper.withId(toStore, id);
+        Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, artistMetadata.id());
         publishQuoteCreatedPort.publishQuoteCreated(stored);
         logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
         return id;
