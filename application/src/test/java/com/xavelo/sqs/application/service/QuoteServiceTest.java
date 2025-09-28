@@ -135,8 +135,8 @@ class QuoteServiceTest {
 
         verify(incrementHitsPort).incrementHits(sampleQuote.id());
         assertNotNull(result);
-        assertEquals(Integer.valueOf(sampleQuote.posts() + 1), result.posts());
-        assertEquals(sampleQuote.hits(), result.hits());
+        assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
+        assertEquals(sampleQuote.posts(), result.posts());
         assertEquals(sampleQuote.id(), result.id());
         assertEquals(sampleQuote.quote(), result.quote());
         assertEquals(sampleQuote.song(), result.song());
