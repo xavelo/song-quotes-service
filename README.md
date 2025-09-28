@@ -25,6 +25,22 @@ scraped by Prometheus for observability.
 * **Database migrations** – Flyway migrations version and evolve the MySQL
   schema, ensuring reproducible environments.
 
+## Module layout
+
+Song Quotes Service is built as a Maven multi-module project to keep the API
+contract independent from the runtime implementation.
+
+* **`api` module** – Owns the OpenAPI definition under
+  `api/src/main/resources/openapi/song-quotes-service.yaml` and generates DTOs
+  that can be shared with clients. The module also publishes the raw contract as
+  a ZIP so consumers can download the exact specification that the application
+  implements.
+* **`application` module** – The Spring Boot service that depends on the
+  generated API interfaces. During the build it unpacks the OpenAPI resources
+  from the `api` module, generates controller interfaces with OpenAPI Generator,
+  and provides the adapters, persistence, and security layers described in the
+  architecture section above.
+
 ## Prerequisites
 
 * Java 17+
