@@ -43,6 +43,87 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ArtistQuoteCount'
+  /quotes:
+    get:
+      tags:
+        - Quote
+      summary: Get all quotes
+      operationId: getQuotes
+      responses:
+        '200':
+          description: List of quotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quote'
+  /quotes/count:
+    get:
+      tags:
+        - Quote
+      summary: Get total number of quotes
+      operationId: getQuotesCount
+      responses:
+        '200':
+          description: Total number of quotes
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+  /quote/random:
+    get:
+      tags:
+        - Quote
+      summary: Get a random quote
+      operationId: getRandomQuote
+      responses:
+        '200':
+          description: Random quote found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: No quote found
+  /quote/{id}:
+    get:
+      tags:
+        - Quote
+      summary: Get a quote by identifier
+      operationId: getQuote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Quote found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: Quote not found
+  /quotes/top10:
+    get:
+      tags:
+        - Quote
+      summary: Get the ten most popular quotes
+      operationId: getTop10Quotes
+      responses:
+        '200':
+          description: List of top quotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quote'
   /admin/quote:
     post:
       tags:

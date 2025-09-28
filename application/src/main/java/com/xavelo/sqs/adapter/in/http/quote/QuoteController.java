@@ -1,63 +1,77 @@
 package com.xavelo.sqs.adapter.in.http.quote;
 
+import com.xavelo.sqs.adapter.in.http.quote.mapper.QuoteMapper;
+import com.xavelo.sqs.application.api.QuoteApi;
+import com.xavelo.sqs.application.api.model.QuoteDto;
 import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.port.in.*;
+import com.xavelo.sqs.port.in.CountQuotesUseCase;
+import com.xavelo.sqs.port.in.GetQuoteUseCase;
+import com.xavelo.sqs.port.in.GetQuotesUseCase;
+import com.xavelo.sqs.port.in.GetRandomQuoteUseCase;
+import com.xavelo.sqs.port.in.GetTop10QuotesUseCase;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class QuoteController {
+public class QuoteController implements QuoteApi {
 
     private final GetQuotesUseCase getQuotesUseCase;
     private final GetQuoteUseCase getQuoteUseCase;
     private final GetRandomQuoteUseCase getRandomQuoteUseCase;
     private final CountQuotesUseCase countQuotesUseCase;
     private final GetTop10QuotesUseCase getTop10QuotesUseCase;
+    private final QuoteMapper quoteMapper;
 
     public QuoteController(GetQuotesUseCase getQuotesUseCase,
                            GetQuoteUseCase getQuoteUseCase,
                            CountQuotesUseCase countQuotesUseCase,
                            GetRandomQuoteUseCase getRandomQuoteUseCase,
-                           GetTop10QuotesUseCase getTop10QuotesUseCase) {
+                           GetTop10QuotesUseCase getTop10QuotesUseCase,
+                           QuoteMapper quoteMapper) {
         this.getQuotesUseCase = getQuotesUseCase;
         this.getQuoteUseCase = getQuoteUseCase;
         this.getRandomQuoteUseCase = getRandomQuoteUseCase;
         this.countQuotesUseCase = countQuotesUseCase;
         this.getTop10QuotesUseCase = getTop10QuotesUseCase;
+        this.quoteMapper = quoteMapper;
     }
 
-    @GetMapping("/quotes")
-    public ResponseEntity<java.util.List<Quote>> getQuotes() {
-        java.util.List<Quote> quotes = getQuotesUseCase.getQuotes();
-        return ResponseEntity.ok(quotes);
+    @Override
+    public ResponseEntity<List<QuoteDto>> getQuotes() {
+        List<Quote> quotes = getQuotesUseCase.getQuotes();
+        return ResponseEntity.ok(quoteMapper.toDtos(quotes));
     }
 
-    @GetMapping("/quotes/count")
+    @Override
     public ResponseEntity<Long> getQuotesCount() {
         Long count = countQuotesUseCase.countQuotes();
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/quote/random")
-    public ResponseEntity<Quote> getRandomQuote() {
+    @Override
+    public ResponseEntity<QuoteDto> getRandomQuote() {
         Quote quote = getRandomQuoteUseCase.getRandomQuote();
-        return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
+        return quote != null
+                ? ResponseEntity.ok(quoteMapper.toDto(quote))
+                : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/quote/{id}")
-    public ResponseEntity<Quote> getQuote(@PathVariable Long id) {
+    @Override
+    public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") Long id) {
         Quote quote = getQuoteUseCase.getQuote(id);
-        return quote != null ? ResponseEntity.ok(quote) : ResponseEntity.notFound().build();
+        return quote != null
+                ? ResponseEntity.ok(quoteMapper.toDto(quote))
+                : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/quotes/top10")
-    public ResponseEntity<java.util.List<Quote>> getTop10Quotes() {
-        java.util.List<Quote> quotes = getTop10QuotesUseCase.getTop10Quotes();
-        return ResponseEntity.ok(quotes);
+    @Override
+    public ResponseEntity<List<QuoteDto>> getTop10Quotes() {
+        List<Quote> quotes = getTop10QuotesUseCase.getTop10Quotes();
+        return ResponseEntity.ok(quoteMapper.toDtos(quotes));
     }
 }
