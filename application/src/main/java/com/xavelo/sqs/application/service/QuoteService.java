@@ -20,6 +20,7 @@ import com.xavelo.sqs.port.out.MetricsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
+import com.xavelo.sqs.port.out.PublishQuoteHitPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.port.out.SyncArtistMetadataPort;
 import com.xavelo.sqs.application.service.MetadataService;
@@ -43,6 +44,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final MetricsPort metricsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
+    private final PublishQuoteHitPort publishQuoteHitPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
     private final SyncArtistMetadataPort syncArtistMetadataPort;
@@ -54,6 +56,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         MetricsPort metricsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
                         PublishQuoteCreatedPort publishQuoteCreatedPort,
+                        PublishQuoteHitPort publishQuoteHitPort,
                         LoadTop10QuotesPort loadTop10QuotesPort,
                         PatchQuotePort patchQuotePort,
                         SyncArtistMetadataPort syncArtistMetadataPort,
@@ -66,6 +69,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.metricsPort = metricsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
+        this.publishQuoteHitPort = publishQuoteHitPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
         this.patchQuotePort = patchQuotePort;
         this.syncArtistMetadataPort = syncArtistMetadataPort;
@@ -120,6 +124,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             metricsPort.incrementTotalHits();
             metricsPort.incrementQuoteHits(id);
             quote = QuoteHelper.incrementHits(quote);
+            publishQuoteHitPort.publishQuoteHit(quote);
         }
         return quote;
     }

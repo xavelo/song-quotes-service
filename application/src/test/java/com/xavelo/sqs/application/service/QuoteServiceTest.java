@@ -44,6 +44,8 @@ class QuoteServiceTest {
     @Mock
     private PublishQuoteCreatedPort publishQuoteCreatedPort;
     @Mock
+    private PublishQuoteHitPort publishQuoteHitPort;
+    @Mock
     private MetadataService metadataService;
     @Mock
     private SyncArtistMetadataPort syncArtistMetadataPort;
@@ -113,6 +115,7 @@ class QuoteServiceTest {
         verify(incrementHitsPort).incrementHits(1L);
         verify(metricsPort).incrementTotalHits();
         verify(metricsPort).incrementQuoteHits(1L);
+        verify(publishQuoteHitPort).publishQuoteHit(result);
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());
