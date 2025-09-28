@@ -121,9 +121,9 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote quote = loadQuotePort.loadQuote(id);
         if (quote != null) {
             incrementHitsPort.incrementHits(id);
+            quote = QuoteHelper.incrementHits(quote);
             metricsPort.incrementTotalHits();
             metricsPort.incrementQuoteHits(id);
-            quote = QuoteHelper.incrementHits(quote);
             publishQuoteHitPort.publishQuoteHit(quote);
         }
         return quote;
@@ -136,6 +136,8 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             // count how many times the quote has been served
             incrementPostsPort.incrementPosts(quote.id());
             quote = QuoteHelper.incrementPosts(quote);
+            metricsPort.incrementTotalHits();
+            metricsPort.incrementQuoteHits(quote.id());
             publishQuoteHitPort.publishQuoteHit(quote);
         }
         return quote;
