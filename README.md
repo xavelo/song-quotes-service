@@ -135,6 +135,20 @@ Micrometer metrics are emitted via Spring Boot Actuator. With the provided
 configuration, Prometheus can scrape `/actuator/prometheus` and standard health
 information is available under `/actuator/health` and `/actuator/info`.
 
+Outbox relay visibility is exposed through dedicated gauges:
+
+| Metric | Description |
+| --- | --- |
+| `quote_outbox_ready_events` | Outbox entries with status `PENDING` and `available_at` in the past—these represent the current publish lag. |
+| `quote_outbox_delayed_events` | Pending entries that are waiting for their retry `available_at` timestamp (e.g., after a failure). |
+| `quote_outbox_processing_events` | Entries the relay worker is currently delivering. |
+
+In Grafana, add a Prometheus data source panel with a PromQL query such as
+`quote_outbox_ready_events` to display the live backlog size. Combine it with
+alert rules like `max_over_time(quote_outbox_ready_events[5m]) > 0` to trigger
+notifications if the lag persists, and overlay `quote_outbox_processing_events`
+to visualize in-flight publishing.
+
 ## Testing & quality
 
 Run the full verification suite (unit tests, integration tests, and coverage)
