@@ -14,4 +14,10 @@ public interface QuoteEventOutboxRepository extends JpaRepository<QuoteEventEnti
     List<QuoteEventEntity> findPendingEvents(@Param("status") QuoteEventStatus status,
                                              @Param("availableAt") LocalDateTime availableAt,
                                              Pageable pageable);
+
+    long countByStatus(QuoteEventStatus status);
+
+    long countByStatusAndAvailableAtLessThanEqual(QuoteEventStatus status, LocalDateTime availableAt);
+
+    long countByStatusAndAvailableAtAfter(QuoteEventStatus status, LocalDateTime availableAt);
 }
