@@ -128,6 +128,24 @@ All endpoints default to JSON and are served on port `8080`.
 | `PATCH` | `/admin/quote/{id}` | Partially update a quote (excluding restricted counters). |
 | `DELETE` | `/admin/quote/{id}` | Delete a quote by id. |
 | `GET` | `/admin/export` | Export all quotes as SQL insert statements for backup or migration purposes. |
+| `PATCH` | `/admin/outbox/worker/batch-size` | Override the outbox relay worker batch size without restarting the service. |
+
+### Updating the outbox relay batch size at runtime
+
+Operators can adjust the number of outbox events processed per polling cycle without
+redeploying the service. Submit an authenticated `PATCH` request to
+`/api/admin/outbox/worker/batch-size` providing the desired batch size:
+
+```bash
+curl -X PATCH "https://song-quotes.example.com/api/admin/outbox/worker/batch-size" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"batchSize": 50}'
+```
+
+The worker immediately begins using the new value and the setting is persisted in the
+application environment so that subsequent refresh events continue honoring the override
+until explicitly changed again.
 
 ## Observability
 

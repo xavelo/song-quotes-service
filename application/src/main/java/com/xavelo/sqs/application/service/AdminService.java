@@ -1,8 +1,8 @@
 package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.port.in.ExportQuotesUseCase;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
+import com.xavelo.sqs.port.in.ExportQuotesUseCase;
 import com.xavelo.sqs.port.in.ResetQuoteHitsUseCase;
 import com.xavelo.sqs.port.in.ResetQuotePostsUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
@@ -23,17 +23,20 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     private final UpdateQuotePort updateQuotePort;
     private final ResetQuoteHitsPort resetQuoteHitsPort;
     private final ResetQuotePostsPort resetQuotePostsPort;
+    private final DynamicQuoteOutboxWorkerSettings dynamicQuoteOutboxWorkerSettings;
 
     public AdminService(LoadQuotePort loadQuotePort,
                         DeleteQuotePort deleteQuotePort,
                         UpdateQuotePort updateQuotePort,
                         ResetQuoteHitsPort resetQuoteHitsPort,
-                        ResetQuotePostsPort resetQuotePostsPort) {
+                        ResetQuotePostsPort resetQuotePostsPort,
+                        DynamicQuoteOutboxWorkerSettings dynamicQuoteOutboxWorkerSettings) {
         this.loadQuotePort = loadQuotePort;
         this.deleteQuotePort = deleteQuotePort;
         this.updateQuotePort = updateQuotePort;
         this.resetQuoteHitsPort = resetQuoteHitsPort;
         this.resetQuotePostsPort = resetQuotePostsPort;
+        this.dynamicQuoteOutboxWorkerSettings = dynamicQuoteOutboxWorkerSettings;
     }
 
     @Override
@@ -74,5 +77,9 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     @Override
     public void resetQuotePosts() {
         resetQuotePostsPort.resetQuotePosts();
+    }
+
+    public void updateOutboxWorkerBatchSize(int batchSize) {
+        dynamicQuoteOutboxWorkerSettings.updateBatchSize(batchSize);
     }
 }

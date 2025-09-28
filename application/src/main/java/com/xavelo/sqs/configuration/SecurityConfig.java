@@ -14,6 +14,7 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/api/admin/outbox/worker/batch-size").authenticated()
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().permitAll()
                 )

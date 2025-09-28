@@ -119,6 +119,21 @@ paths:
       responses:
         '204':
           description: Posts successfully reset
+  /admin/outbox/worker/batch-size:
+    patch:
+      tags:
+        - Admin
+      summary: Update the outbox worker batch size
+      operationId: updateOutboxWorkerBatchSize
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yaml#/components/schemas/UpdateOutboxBatchSizeRequest'
+      responses:
+        '202':
+          description: Batch size update accepted
   /admin/export:
     get:
       tags:
