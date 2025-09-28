@@ -134,7 +134,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Quote quote = loadQuotePort.loadRandomQuote();
         if (quote != null) {
             incrementHitsPort.incrementHits(quote.id());
-            quote = QuoteHelper.incrementPosts(quote);
+            quote = QuoteHelper.incrementHits(quote);
             metricsPort.incrementTotalHits();
             metricsPort.incrementQuoteHits(quote.id());
             publishQuoteHitPort.publishQuoteHit(quote);
