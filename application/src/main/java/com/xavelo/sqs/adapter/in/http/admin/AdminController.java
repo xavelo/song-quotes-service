@@ -8,6 +8,7 @@ import com.xavelo.sqs.application.service.AdminService;
 import com.xavelo.sqs.application.service.QuoteHelper;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
 import com.xavelo.sqs.port.in.ResetQuoteHitsUseCase;
+import com.xavelo.sqs.port.in.ResetQuotePostsUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ public class AdminController implements AdminApi {
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final PatchQuoteUseCase patchQuoteUseCase;
     private final ResetQuoteHitsUseCase resetQuoteHitsUseCase;
+    private final ResetQuotePostsUseCase resetQuotePostsUseCase;
     private final AdminQuoteMapper quoteMapper;
 
     public AdminController(AdminService adminService,
@@ -33,12 +35,14 @@ public class AdminController implements AdminApi {
                            UpdateQuoteUseCase updateQuoteUseCase,
                            PatchQuoteUseCase patchQuoteUseCase,
                            ResetQuoteHitsUseCase resetQuoteHitsUseCase,
+                           ResetQuotePostsUseCase resetQuotePostsUseCase,
                            AdminQuoteMapper quoteMapper) {
         this.adminService = adminService;
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
         this.patchQuoteUseCase = patchQuoteUseCase;
         this.resetQuoteHitsUseCase = resetQuoteHitsUseCase;
+        this.resetQuotePostsUseCase = resetQuotePostsUseCase;
         this.quoteMapper = quoteMapper;
     }
 
@@ -95,6 +99,12 @@ public class AdminController implements AdminApi {
     @Override
     public ResponseEntity<Void> resetQuoteHits() {
         resetQuoteHitsUseCase.resetQuoteHits();
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> resetQuotePosts() {
+        resetQuotePostsUseCase.resetQuotePosts();
         return ResponseEntity.noContent().build();
     }
 

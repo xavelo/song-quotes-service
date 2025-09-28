@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort, SyncArtistMetadataPort, ResetQuoteHitsPort {
+public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort, SyncArtistMetadataPort, ResetQuoteHitsPort, ResetQuotePostsPort {
 
     private static final Logger logger = LogManager.getLogger(MysqlAdapter.class);
 
@@ -136,6 +136,11 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     @Override
     public void resetQuoteHits() {
         quoteRepository.resetHits();
+    }
+
+    @Override
+    public void resetQuotePosts() {
+        quoteRepository.resetPosts();
     }
 
     @Override

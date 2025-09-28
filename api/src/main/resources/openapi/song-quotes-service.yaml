@@ -17,6 +17,8 @@ paths:
     $ref: './admin-api.yaml#/paths/~1admin~1quotes'
   /admin/quotes/reset-hits:
     $ref: './admin-api.yaml#/paths/~1admin~1quotes~1reset-hits'
+  /admin/quotes/reset-posts:
+    $ref: './admin-api.yaml#/paths/~1admin~1quotes~1reset-posts'
   /admin/quote/{id}:
     $ref: './admin-api.yaml#/paths/~1admin~1quote~1{id}'
   /admin/export:
