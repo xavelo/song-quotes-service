@@ -146,3 +146,26 @@ with Maven:
 
 JaCoCo reports are written to `target/site/jacoco/index.html` and can be opened
 in a browser for local inspection.
+
+## Load testing
+
+The `load-testing/random-quote-load-test.js` script defines a [k6](https://k6.io)
+scenario that exercises the `GET /api/quote/random` endpoint exposed at
+`http://192.168.1.139:30015` and validates basic latency and error-rate
+thresholds that can be visualized in Grafana.
+
+Run the script by pointing it at a deployed instance of the service:
+
+```bash
+ENDPOINT_URL=https://song-quotes.example.com/api/quote/random \
+VUS=10 \
+DURATION=5m \
+SLEEP=0.5 \
+k6 run load-testing/random-quote-load-test.js
+```
+
+You can adjust the virtual users (`VUS`), test `DURATION`, per-iteration delay
+(`SLEEP`), or override the `ENDPOINT_URL` to target different environments. The
+script exposes custom metrics (`random_quote_request_rate` and
+`random_quote_request_duration`) that can be scraped by Prometheus and plotted
+in Grafana dashboards alongside built-in k6 metrics.
