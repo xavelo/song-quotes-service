@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Song Quotes Public Quote API
+  version: 1.0.0
+  description: Public endpoints for retrieving quotes.
+servers:
+  - url: /api
+tags:
+  - name: Quote
+    description: Quote retrieval operations.
+paths:
+  /quotes:
+    get:
+      tags:
+        - Quote
+      summary: Get quotes
+      operationId: getQuotes
+      responses:
+        '200':
+          description: List of quotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quote'
+  /quotes/count:
+    get:
+      tags:
+        - Quote
+      summary: Get number of quotes
+      operationId: getQuotesCount
+      responses:
+        '200':
+          description: Number of quotes available
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+  /quote/random:
+    get:
+      tags:
+        - Quote
+      summary: Get a random quote
+      operationId: getRandomQuote
+      responses:
+        '200':
+          description: Random quote found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: No quote available
+  /quote/{id}:
+    get:
+      tags:
+        - Quote
+      summary: Get quote by identifier
+      operationId: getQuote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Quote found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quote'
+        '404':
+          description: Quote not found
+  /quotes/top10:
+    get:
+      tags:
+        - Quote
+      summary: Get top 10 quotes
+      operationId: getTop10Quotes
+      responses:
+        '200':
+          description: Top quotes ranked by popularity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quote'
+components:
+  schemas:
+    Quote:
+      $ref: './components/schemas.yaml#/Quote'

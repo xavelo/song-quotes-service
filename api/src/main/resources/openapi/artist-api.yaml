@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: Song Quotes Artist API
+  version: 1.0.0
+  description: Artist discovery endpoints for the Song Quotes Service.
+servers:
+  - url: /api
+tags:
+  - name: Artist
+    description: Artist information and quote statistics.
+paths:
+  /artist/{id}:
+    get:
+      tags:
+        - Artist
+      summary: Get artist details
+      operationId: getArtist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Artist found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '404':
+          description: Artist not found
+  /artists:
+    get:
+      tags:
+        - Artist
+      summary: Get artists with quote counts
+      operationId: getArtists
+      responses:
+        '200':
+          description: List of artists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArtistQuoteCount'
+components:
+  schemas:
+    Artist:
+      $ref: './components/schemas.yaml#/Artist'
+    ArtistTrack:
+      $ref: './components/schemas.yaml#/ArtistTrack'
+    ArtistQuoteCount:
+      $ref: './components/schemas.yaml#/ArtistQuoteCount'

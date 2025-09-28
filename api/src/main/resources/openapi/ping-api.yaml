@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: Song Quotes Ping API
+  version: 1.0.0
+  description: Health check endpoints.
+servers:
+  - url: /api
+tags:
+  - name: Ping
+    description: Health check endpoints.
+paths:
+  /ping:
+    get:
+      tags:
+        - Ping
+      summary: Ping the service
+      operationId: ping
+      responses:
+        '200':
+          description: Successful ping
+          content:
+            text/plain:
+              schema:
+                type: string
+  /secure/ping:
+    get:
+      tags:
+        - Ping
+      summary: Ping the service via the secured endpoint
+      operationId: securePing
+      responses:
+        '200':
+          description: Successful ping
+          content:
+            text/plain:
+              schema:
+                type: string
