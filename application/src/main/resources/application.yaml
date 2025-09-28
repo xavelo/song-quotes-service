@@ -32,7 +32,7 @@ spotify:
 quote-events:
   outbox:
     worker:
-      batch-size: 100
+      batch-size: 50
 
 management:
   endpoints:
