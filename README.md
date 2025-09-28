@@ -43,7 +43,7 @@ contract independent from the runtime implementation.
 
 ## Prerequisites
 
-* Java 17+
+* Java 21
 * Maven 3.9+ (or the included `mvnw` wrapper)
 * Access to a MySQL 8 database
 * Access to a Kafka broker (for quote-created events)
