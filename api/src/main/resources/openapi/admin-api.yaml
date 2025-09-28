@@ -101,6 +101,15 @@ paths:
           description: Quote successfully updated
         '400':
           description: Quote contains restricted fields
+  /admin/quotes/reset-hits:
+    post:
+      tags:
+        - Admin
+      summary: Reset hits for all quotes
+      operationId: resetQuoteHits
+      responses:
+        '204':
+          description: Hits successfully reset
   /admin/export:
     get:
       tags:
