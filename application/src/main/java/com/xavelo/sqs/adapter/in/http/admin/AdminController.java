@@ -1,5 +1,6 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
+import com.xavelo.sqs.adapter.in.http.admin.dto.UpdateOutboxBatchSizeRequest;
 import com.xavelo.sqs.adapter.in.http.admin.mapper.AdminQuoteMapper;
 import com.xavelo.sqs.application.api.AdminApi;
 import com.xavelo.sqs.application.api.model.QuoteDto;
@@ -13,6 +14,7 @@ import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -106,6 +108,12 @@ public class AdminController implements AdminApi {
     public ResponseEntity<Void> resetQuotePosts() {
         resetQuotePostsUseCase.resetQuotePosts();
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/api/admin/outbox/worker/batch-size")
+    public ResponseEntity<Void> updateOutboxWorkerBatchSize(@Valid @RequestBody UpdateOutboxBatchSizeRequest request) {
+        adminService.updateOutboxWorkerBatchSize(request.batchSize());
+        return ResponseEntity.accepted().build();
     }
 
 }

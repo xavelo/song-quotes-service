@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -23,24 +22,25 @@ public class QuoteEventRelayWorker {
     private final QuoteEventOutboxPort quoteEventOutboxPort;
     private final PublishQuoteCreatedPort publishQuoteCreatedPort;
     private final PublishQuoteHitPort publishQuoteHitPort;
-    private final int batchSize;
+    private final DynamicQuoteOutboxWorkerSettings outboxWorkerSettings;
     private final Duration retryDelay;
 
     public QuoteEventRelayWorker(
             QuoteEventOutboxPort quoteEventOutboxPort,
             PublishQuoteCreatedPort publishQuoteCreatedPort,
             PublishQuoteHitPort publishQuoteHitPort,
-            @Value("${quote-events.outbox.worker.batch-size:25}") int batchSize,
+            DynamicQuoteOutboxWorkerSettings outboxWorkerSettings,
             @Value("${quote-events.outbox.worker.retry-delay:PT30S}") Duration retryDelay) {
         this.quoteEventOutboxPort = quoteEventOutboxPort;
         this.publishQuoteCreatedPort = publishQuoteCreatedPort;
         this.publishQuoteHitPort = publishQuoteHitPort;
-        this.batchSize = batchSize;
+        this.outboxWorkerSettings = outboxWorkerSettings;
         this.retryDelay = retryDelay;
     }
 
     @Scheduled(fixedDelayString = "${quote-events.outbox.worker.delay:5000}")
     public void relayOutbox() {
+        int batchSize = outboxWorkerSettings.getBatchSize();
         List<QuoteEvent> events = quoteEventOutboxPort.fetchPendingEvents(batchSize);
         for (QuoteEvent event : events) {
             try {
