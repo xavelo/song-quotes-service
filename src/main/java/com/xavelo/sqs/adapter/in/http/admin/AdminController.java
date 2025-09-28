@@ -4,6 +4,7 @@ import com.xavelo.sqs.application.service.AdminService;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
+import com.xavelo.sqs.port.in.ResetQuoteHitsUseCase;
 import com.xavelo.sqs.application.domain.Quote;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,18 @@ public class AdminController {
     private final StoreQuoteUseCase storeQuoteUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final PatchQuoteUseCase patchQuoteUseCase;
+    private final ResetQuoteHitsUseCase resetQuoteHitsUseCase;
 
     public AdminController(AdminService adminService,
                            StoreQuoteUseCase storeQuoteUseCase,
                            UpdateQuoteUseCase updateQuoteUseCase,
-                           PatchQuoteUseCase patchQuoteUseCase) {
+                           PatchQuoteUseCase patchQuoteUseCase,
+                           ResetQuoteHitsUseCase resetQuoteHitsUseCase) {
         this.adminService = adminService;
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
         this.patchQuoteUseCase = patchQuoteUseCase;
+        this.resetQuoteHitsUseCase = resetQuoteHitsUseCase;
     }
 
     @PostMapping("/quote")
@@ -72,6 +76,12 @@ public class AdminController {
     public ResponseEntity<String> exportQuotes() {
         String sql = adminService.exportQuotesAsSql();
         return ResponseEntity.ok(sql);
+    }
+
+    @PostMapping("/quotes/reset-hits")
+    public ResponseEntity<Void> resetQuoteHits() {
+        resetQuoteHitsUseCase.resetAllQuoteHits();
+        return ResponseEntity.noContent().build();
     }
 
 }
