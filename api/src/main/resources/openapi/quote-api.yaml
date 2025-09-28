@@ -23,7 +23,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Quote'
+                  $ref: './components/schemas.yaml#/components/schemas/Quote'
   /quotes/count:
     get:
       tags:
@@ -50,7 +50,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
+                $ref: './components/schemas.yaml#/components/schemas/Quote'
         '404':
           description: No quote available
   /quote/{id}:
@@ -72,7 +72,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Quote'
+                $ref: './components/schemas.yaml#/components/schemas/Quote'
         '404':
           description: Quote not found
   /quotes/top10:
@@ -89,8 +89,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Quote'
+                  $ref: './components/schemas.yaml#/components/schemas/Quote'
 components:
   schemas:
     Quote:
-      $ref: './components/schemas.yaml#/Quote'
+      $ref: './components/schemas.yaml#/components/schemas/Quote'

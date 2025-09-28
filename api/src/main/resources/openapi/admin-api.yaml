@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Quote'
+              $ref: './components/schemas.yaml#/components/schemas/Quote'
       responses:
         '200':
           description: Quote successfully created
@@ -42,7 +42,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/Quote'
+                $ref: './components/schemas.yaml#/components/schemas/Quote'
       responses:
         '200':
           description: Quotes successfully created
@@ -79,7 +79,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Quote'
+              $ref: './components/schemas.yaml#/components/schemas/Quote'
       responses:
         '204':
           description: Quote successfully updated
@@ -95,7 +95,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Quote'
+              $ref: './components/schemas.yaml#/components/schemas/Quote'
       responses:
         '204':
           description: Quote successfully updated
@@ -117,4 +117,4 @@ paths:
 components:
   schemas:
     Quote:
-      $ref: './components/schemas.yaml#/Quote'
+      $ref: './components/schemas.yaml#/components/schemas/Quote'

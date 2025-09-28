@@ -36,10 +36,10 @@ paths:
 components:
   schemas:
     Quote:
-      $ref: './components/schemas.yaml#/Quote'
+      $ref: './components/schemas.yaml#/components/schemas/Quote'
     Artist:
-      $ref: './components/schemas.yaml#/Artist'
+      $ref: './components/schemas.yaml#/components/schemas/Artist'
     ArtistTrack:
-      $ref: './components/schemas.yaml#/ArtistTrack'
+      $ref: './components/schemas.yaml#/components/schemas/ArtistTrack'
     ArtistQuoteCount:
-      $ref: './components/schemas.yaml#/ArtistQuoteCount'
+      $ref: './components/schemas.yaml#/components/schemas/ArtistQuoteCount'
