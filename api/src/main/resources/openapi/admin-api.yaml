@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: Song Quotes Admin API
+  version: 1.0.0
+  description: Administrative endpoints for managing quotes.
+servers:
+  - url: /
+tags:
+  - name: Admin
+    description: Administrative quote management operations.
+paths:
+  /admin/quote:
+    post:
+      tags:
+        - Admin
+      summary: Create a new quote
+      operationId: createQuote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yaml#/components/schemas/Quote'
+      responses:
+        '200':
+          description: Quote successfully created
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+  /admin/quotes:
+    post:
+      tags:
+        - Admin
+      summary: Create multiple quotes
+      operationId: createQuotes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: './components/schemas.yaml#/components/schemas/Quote'
+      responses:
+        '200':
+          description: Quotes successfully created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+  /admin/quote/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    delete:
+      tags:
+        - Admin
+      summary: Delete an existing quote
+      operationId: deleteQuote
+      responses:
+        '204':
+          description: Quote successfully deleted
+    put:
+      tags:
+        - Admin
+      summary: Replace an existing quote
+      operationId: updateQuote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yaml#/components/schemas/Quote'
+      responses:
+        '204':
+          description: Quote successfully updated
+        '400':
+          description: Quote contains restricted fields
+    patch:
+      tags:
+        - Admin
+      summary: Partially update an existing quote
+      operationId: patchQuote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas.yaml#/components/schemas/Quote'
+      responses:
+        '204':
+          description: Quote successfully updated
+        '400':
+          description: Quote contains restricted fields
+  /admin/export:
+    get:
+      tags:
+        - Admin
+      summary: Export all quotes as SQL statements
+      operationId: exportQuotes
+      responses:
+        '200':
+          description: SQL export of all quotes
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  schemas:
+    Quote:
+      $ref: './components/schemas.yaml#/components/schemas/Quote'

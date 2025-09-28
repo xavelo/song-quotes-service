@@ -2,349 +2,44 @@ openapi: 3.0.3
 info:
   title: Song Quotes Service API
   version: 1.0.0
-  description: |
-    OpenAPI definition for the Song Quotes Service artist endpoints.
+  description: Aggregated OpenAPI definition for the Song Quotes Service endpoints.
 servers:
   - url: /api
+  - url: /
 paths:
   /artist/{id}:
-    get:
-      tags:
-        - Artist
-      summary: Get artist details
-      operationId: getArtist
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Artist found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Artist'
-        '404':
-          description: Artist not found
+    $ref: './artist-api.yaml#/paths/~1artist~1{id}'
   /artists:
-    get:
-      tags:
-        - Artist
-      summary: Get artists with quote counts
-      operationId: getArtists
-      responses:
-        '200':
-          description: List of artists
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ArtistQuoteCount'
-  /quotes:
-    get:
-      tags:
-        - Quote
-      summary: Get all quotes
-      operationId: getQuotes
-      responses:
-        '200':
-          description: List of quotes
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Quote'
-  /quotes/count:
-    get:
-      tags:
-        - Quote
-      summary: Get total number of quotes
-      operationId: getQuotesCount
-      responses:
-        '200':
-          description: Total number of quotes
-          content:
-            application/json:
-              schema:
-                type: integer
-                format: int64
-  /quote/random:
-    get:
-      tags:
-        - Quote
-      summary: Get a random quote
-      operationId: getRandomQuote
-      responses:
-        '200':
-          description: Random quote found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Quote'
-        '404':
-          description: No quote found
-  /quote/{id}:
-    get:
-      tags:
-        - Quote
-      summary: Get a quote by identifier
-      operationId: getQuote
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Quote found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Quote'
-        '404':
-          description: Quote not found
-  /quotes/top10:
-    get:
-      tags:
-        - Quote
-      summary: Get the ten most popular quotes
-      operationId: getTop10Quotes
-      responses:
-        '200':
-          description: List of top quotes
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Quote'
+    $ref: './artist-api.yaml#/paths/~1artists'
   /admin/quote:
-    post:
-      tags:
-        - Admin
-      summary: Create a new quote
-      operationId: createQuote
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Quote'
-      responses:
-        '200':
-          description: Quote successfully created
-          content:
-            application/json:
-              schema:
-                type: integer
-                format: int64
+    $ref: './admin-api.yaml#/paths/~1admin~1quote'
   /admin/quotes:
-    post:
-      tags:
-        - Admin
-      summary: Create multiple quotes
-      operationId: createQuotes
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Quote'
-      responses:
-        '200':
-          description: Quotes successfully created
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: integer
-                  format: int64
+    $ref: './admin-api.yaml#/paths/~1admin~1quotes'
   /admin/quote/{id}:
-    delete:
-      tags:
-        - Admin
-      summary: Delete an existing quote
-      operationId: deleteQuote
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '204':
-          description: Quote successfully deleted
-    put:
-      tags:
-        - Admin
-      summary: Replace an existing quote
-      operationId: updateQuote
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Quote'
-      responses:
-        '204':
-          description: Quote successfully updated
-        '400':
-          description: Quote contains restricted fields
-    patch:
-      tags:
-        - Admin
-      summary: Partially update an existing quote
-      operationId: patchQuote
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Quote'
-      responses:
-        '204':
-          description: Quote successfully updated
-        '400':
-          description: Quote contains restricted fields
+    $ref: './admin-api.yaml#/paths/~1admin~1quote~1{id}'
   /admin/export:
-    get:
-      tags:
-        - Admin
-      summary: Export all quotes as SQL statements
-      operationId: exportQuotes
-      responses:
-        '200':
-          description: SQL export of all quotes
-          content:
-            text/plain:
-              schema:
-                type: string
+    $ref: './admin-api.yaml#/paths/~1admin~1export'
+  /quotes:
+    $ref: './quote-api.yaml#/paths/~1quotes'
+  /quotes/count:
+    $ref: './quote-api.yaml#/paths/~1quotes~1count'
+  /quote/random:
+    $ref: './quote-api.yaml#/paths/~1quote~1random'
+  /quote/{id}:
+    $ref: './quote-api.yaml#/paths/~1quote~1{id}'
+  /quotes/top10:
+    $ref: './quote-api.yaml#/paths/~1quotes~1top10'
+  /ping:
+    $ref: './ping-api.yaml#/paths/~1ping'
+  /secure/ping:
+    $ref: './ping-api.yaml#/paths/~1secure~1ping'
 components:
   schemas:
     Quote:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: Identifier of the quote
-        quote:
-          type: string
-          description: Text content of the quote
-        song:
-          type: string
-          description: Name of the song the quote belongs to
-        album:
-          type: string
-          description: Album that contains the song
-        year:
-          type: integer
-          format: int32
-          description: Release year of the song
-        artist:
-          type: string
-          description: Artist attributed to the quote
-        posts:
-          type: integer
-          format: int32
-          description: Number of times the quote has been posted
-        hits:
-          type: integer
-          format: int32
-          description: Number of times the quote has been viewed
-        spotifyArtistId:
-          type: string
-          description: Spotify identifier of the artist
+      $ref: './components/schemas.yaml#/components/schemas/Quote'
     Artist:
-      type: object
-      required:
-        - id
-        - name
-        - genres
-        - popularity
-        - spotifyUrl
-        - topTracks
-      properties:
-        id:
-          type: string
-          description: Spotify identifier of the artist
-        name:
-          type: string
-          description: Name of the artist
-        genres:
-          type: array
-          description: Genres associated with the artist
-          items:
-            type: string
-        popularity:
-          type: integer
-          format: int32
-          description: Popularity score assigned by Spotify
-        imageUrl:
-          type: string
-          description: URL pointing to an image of the artist
-        spotifyUrl:
-          type: string
-          description: Spotify URL of the artist
-        topTracks:
-          type: array
-          description: Top Spotify tracks for the artist
-          items:
-            $ref: '#/components/schemas/ArtistTrack'
+      $ref: './components/schemas.yaml#/components/schemas/Artist'
     ArtistTrack:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          type: string
-          description: Spotify identifier of the track
-        name:
-          type: string
-          description: Track name
-        previewUrl:
-          type: string
-          nullable: true
-          description: Preview URL for the track
+      $ref: './components/schemas.yaml#/components/schemas/ArtistTrack'
     ArtistQuoteCount:
-      type: object
-      required:
-        - id
-        - artist
-        - quotes
-      properties:
-        id:
-          type: string
-          description: Spotify identifier of the artist
-        artist:
-          type: string
-          description: Name of the artist
-        quotes:
-          type: integer
-          format: int64
-          description: Number of quotes stored for the artist
+      $ref: './components/schemas.yaml#/components/schemas/ArtistQuoteCount'
