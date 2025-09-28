@@ -128,12 +128,12 @@ class QuoteServiceTest {
     }
 
     @Test
-    void getRandomQuote_incrementsPostsAndReturnsUpdatedQuote() {
+    void getRandomQuote_incrementsHitsAndReturnsUpdatedQuote() {
         when(loadQuotePort.loadRandomQuote()).thenReturn(sampleQuote);
 
         Quote result = quoteService.getRandomQuote();
 
-        verify(incrementPostsPort).incrementPosts(sampleQuote.id());
+        verify(incrementHitsPort).incrementHits(sampleQuote.id());
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.posts() + 1), result.posts());
         assertEquals(sampleQuote.hits(), result.hits());
