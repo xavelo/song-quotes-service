@@ -10,6 +10,11 @@ public interface MetricsPort {
     void incrementTotalHits();
 
     /**
+     * Increment the global counter when a quote is stored.
+     */
+    void incrementStoredQuotes();
+
+    /**
      * Increment the hits counter for a specific quote.
      *
      * @param quoteId the identifier of the quote that was served

@@ -3,6 +3,8 @@ package com.xavelo.sqs.application.service;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.service.QuoteHelper;
+import com.xavelo.sqs.application.service.event.QuoteHitEvent;
+import com.xavelo.sqs.application.service.event.QuoteStoredEvent;
 import com.xavelo.sqs.port.in.CountQuotesUseCase;
 import com.xavelo.sqs.port.in.GetQuotesUseCase;
 import com.xavelo.sqs.port.in.GetQuoteUseCase;
@@ -16,7 +18,6 @@ import com.xavelo.sqs.port.out.QuotesCountPort;
 import com.xavelo.sqs.port.out.StoreQuotePort;
 import com.xavelo.sqs.port.out.IncrementPostsPort;
 import com.xavelo.sqs.port.out.IncrementHitsPort;
-import com.xavelo.sqs.port.out.MetricsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
 import com.xavelo.sqs.port.out.QuoteEventOutboxPort;
@@ -24,6 +25,7 @@ import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.port.out.SyncArtistMetadataPort;
 import com.xavelo.sqs.application.service.MetadataService;
 import com.xavelo.sqs.application.domain.Artist;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,36 +43,36 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final QuotesCountPort quotesCountPort;
     private final IncrementPostsPort incrementPostsPort;
     private final IncrementHitsPort incrementHitsPort;
-    private final MetricsPort metricsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     private final QuoteEventOutboxPort quoteEventOutboxPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
     private final SyncArtistMetadataPort syncArtistMetadataPort;
     private final MetadataService metadataService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public QuoteService(StoreQuotePort storeQuotePort, LoadQuotePort loadQuotePort,
                         QuotesCountPort quotesCountPort,
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
-                        MetricsPort metricsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
                         QuoteEventOutboxPort quoteEventOutboxPort,
                         LoadTop10QuotesPort loadTop10QuotesPort,
                         PatchQuotePort patchQuotePort,
                         SyncArtistMetadataPort syncArtistMetadataPort,
-                        MetadataService metadataService) {
+                        MetadataService metadataService,
+                        ApplicationEventPublisher applicationEventPublisher) {
         this.storeQuotePort = storeQuotePort;
         this.loadQuotePort = loadQuotePort;
         this.quotesCountPort = quotesCountPort;
         this.incrementPostsPort = incrementPostsPort;
         this.incrementHitsPort = incrementHitsPort;
-        this.metricsPort = metricsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
         this.quoteEventOutboxPort = quoteEventOutboxPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
         this.patchQuotePort = patchQuotePort;
         this.syncArtistMetadataPort = syncArtistMetadataPort;
         this.metadataService = metadataService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -91,6 +93,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         Long id = storeQuotePort.storeQuote(toStore, artistMetadata);
         Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, artistMetadata.id());
         quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
+        applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
         logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
         return id;
     }
@@ -106,6 +109,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             Quote s = sanitized.get(i);
             Quote stored = QuoteHelper.withId(s, ids.get(i));
             quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
+            applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
         }
         return ids;
     }
@@ -122,9 +126,8 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         if (quote != null) {
             incrementHitsPort.incrementHits(id);
             quote = QuoteHelper.incrementHits(quote);
-            metricsPort.incrementTotalHits();
-            metricsPort.incrementQuoteHits(id);
             quoteEventOutboxPort.recordQuoteHitEvent(quote);
+            applicationEventPublisher.publishEvent(new QuoteHitEvent(quote));
         }
         return quote;
     }
@@ -136,9 +139,8 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         if (quote != null) {
             incrementHitsPort.incrementHits(quote.id());
             quote = QuoteHelper.incrementHits(quote);
-            metricsPort.incrementTotalHits();
-            metricsPort.incrementQuoteHits(quote.id());
             quoteEventOutboxPort.recordQuoteHitEvent(quote);
+            applicationEventPublisher.publishEvent(new QuoteHitEvent(quote));
         }
         return quote;
     }

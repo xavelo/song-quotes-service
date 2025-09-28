@@ -3,6 +3,8 @@ package com.xavelo.sqs.application.service;
 import com.xavelo.sqs.application.domain.Artist;
 import com.xavelo.sqs.application.domain.ArtistQuoteCount;
 import com.xavelo.sqs.application.domain.Quote;
+import com.xavelo.sqs.application.service.event.QuoteHitEvent;
+import com.xavelo.sqs.application.service.event.QuoteStoredEvent;
 import com.xavelo.sqs.port.out.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 
@@ -36,8 +39,6 @@ class QuoteServiceTest {
     @Mock
     private IncrementHitsPort incrementHitsPort;
     @Mock
-    private MetricsPort metricsPort;
-    @Mock
     private LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
     @Mock
     private UpdateQuotePort updateQuotePort;
@@ -47,6 +48,8 @@ class QuoteServiceTest {
     private MetadataService metadataService;
     @Mock
     private SyncArtistMetadataPort syncArtistMetadataPort;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private QuoteService quoteService;
@@ -57,6 +60,8 @@ class QuoteServiceTest {
     private ArgumentCaptor<List<Quote>> quoteListCaptor;
     @Captor
     private ArgumentCaptor<Quote> publishedQuoteCaptor;
+    @Captor
+    private ArgumentCaptor<Object> eventCaptor;
 
     private Quote sampleQuote;
 
@@ -82,6 +87,10 @@ class QuoteServiceTest {
         assertEquals(10L, published.id());
         assertEquals(sent.quote(), published.quote());
         assertEquals(10L, id);
+        verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
+        Object event = eventCaptor.getValue();
+        assertTrue(event instanceof QuoteStoredEvent);
+        assertEquals(10L, ((QuoteStoredEvent) event).quote().id());
     }
 
     @Test
@@ -102,6 +111,10 @@ class QuoteServiceTest {
         List<Quote> published = publishedQuoteCaptor.getAllValues();
         assertEquals(2, published.size());
         assertEquals(List.of(1L, 2L), ids);
+        verify(applicationEventPublisher, times(2)).publishEvent(eventCaptor.capture());
+        List<Object> events = eventCaptor.getAllValues();
+        assertEquals(2, events.size());
+        assertTrue(events.stream().allMatch(QuoteStoredEvent.class::isInstance));
     }
 
     @Test
@@ -111,9 +124,11 @@ class QuoteServiceTest {
         Quote result = quoteService.getQuote(1L);
 
         verify(incrementHitsPort).incrementHits(1L);
-        verify(metricsPort).incrementTotalHits();
-        verify(metricsPort).incrementQuoteHits(1L);
         verify(quoteEventOutboxPort).recordQuoteHitEvent(result);
+        verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
+        Object event = eventCaptor.getValue();
+        assertTrue(event instanceof QuoteHitEvent);
+        assertEquals(1L, ((QuoteHitEvent) event).quote().id());
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());
@@ -133,6 +148,10 @@ class QuoteServiceTest {
 
         verify(incrementHitsPort).incrementHits(sampleQuote.id());
         verify(quoteEventOutboxPort).recordQuoteHitEvent(result);
+        verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
+        Object event = eventCaptor.getValue();
+        assertTrue(event instanceof QuoteHitEvent);
+        assertEquals(sampleQuote.id(), ((QuoteHitEvent) event).quote().id());
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());
