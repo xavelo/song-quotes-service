@@ -42,9 +42,7 @@ class QuoteServiceTest {
     @Mock
     private UpdateQuotePort updateQuotePort;
     @Mock
-    private PublishQuoteCreatedPort publishQuoteCreatedPort;
-    @Mock
-    private PublishQuoteHitPort publishQuoteHitPort;
+    private QuoteEventOutboxPort quoteEventOutboxPort;
     @Mock
     private MetadataService metadataService;
     @Mock
@@ -79,7 +77,7 @@ class QuoteServiceTest {
         Quote sent = quoteCaptor.getValue();
         assertEquals(0, sent.posts());
         assertEquals(0, sent.hits());
-        verify(publishQuoteCreatedPort).publishQuoteCreated(publishedQuoteCaptor.capture());
+        verify(quoteEventOutboxPort).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         Quote published = publishedQuoteCaptor.getValue();
         assertEquals(10L, published.id());
         assertEquals(sent.quote(), published.quote());
@@ -100,7 +98,7 @@ class QuoteServiceTest {
             assertEquals(0, q.posts());
             assertEquals(0, q.hits());
         }
-        verify(publishQuoteCreatedPort, times(2)).publishQuoteCreated(publishedQuoteCaptor.capture());
+        verify(quoteEventOutboxPort, times(2)).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         List<Quote> published = publishedQuoteCaptor.getAllValues();
         assertEquals(2, published.size());
         assertEquals(List.of(1L, 2L), ids);
@@ -115,7 +113,7 @@ class QuoteServiceTest {
         verify(incrementHitsPort).incrementHits(1L);
         verify(metricsPort).incrementTotalHits();
         verify(metricsPort).incrementQuoteHits(1L);
-        verify(publishQuoteHitPort).publishQuoteHit(result);
+        verify(quoteEventOutboxPort).recordQuoteHitEvent(result);
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());
@@ -134,6 +132,7 @@ class QuoteServiceTest {
         Quote result = quoteService.getRandomQuote();
 
         verify(incrementHitsPort).incrementHits(sampleQuote.id());
+        verify(quoteEventOutboxPort).recordQuoteHitEvent(result);
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());

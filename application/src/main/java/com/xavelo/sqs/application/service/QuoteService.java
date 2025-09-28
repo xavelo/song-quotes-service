@@ -19,12 +19,12 @@ import com.xavelo.sqs.port.out.IncrementHitsPort;
 import com.xavelo.sqs.port.out.MetricsPort;
 import com.xavelo.sqs.port.out.LoadArtistQuoteCountsPort;
 import com.xavelo.sqs.port.out.LoadTop10QuotesPort;
-import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
-import com.xavelo.sqs.port.out.PublishQuoteHitPort;
+import com.xavelo.sqs.port.out.QuoteEventOutboxPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.port.out.SyncArtistMetadataPort;
 import com.xavelo.sqs.application.service.MetadataService;
 import com.xavelo.sqs.application.domain.Artist;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -43,8 +43,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     private final IncrementHitsPort incrementHitsPort;
     private final MetricsPort metricsPort;
     private final LoadArtistQuoteCountsPort loadArtistQuoteCountsPort;
-    private final PublishQuoteCreatedPort publishQuoteCreatedPort;
-    private final PublishQuoteHitPort publishQuoteHitPort;
+    private final QuoteEventOutboxPort quoteEventOutboxPort;
     private final LoadTop10QuotesPort loadTop10QuotesPort;
     private final PatchQuotePort patchQuotePort;
     private final SyncArtistMetadataPort syncArtistMetadataPort;
@@ -55,8 +54,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                         IncrementPostsPort incrementPostsPort, IncrementHitsPort incrementHitsPort,
                         MetricsPort metricsPort,
                         LoadArtistQuoteCountsPort loadArtistQuoteCountsPort,
-                        PublishQuoteCreatedPort publishQuoteCreatedPort,
-                        PublishQuoteHitPort publishQuoteHitPort,
+                        QuoteEventOutboxPort quoteEventOutboxPort,
                         LoadTop10QuotesPort loadTop10QuotesPort,
                         PatchQuotePort patchQuotePort,
                         SyncArtistMetadataPort syncArtistMetadataPort,
@@ -68,8 +66,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         this.incrementHitsPort = incrementHitsPort;
         this.metricsPort = metricsPort;
         this.loadArtistQuoteCountsPort = loadArtistQuoteCountsPort;
-        this.publishQuoteCreatedPort = publishQuoteCreatedPort;
-        this.publishQuoteHitPort = publishQuoteHitPort;
+        this.quoteEventOutboxPort = quoteEventOutboxPort;
         this.loadTop10QuotesPort = loadTop10QuotesPort;
         this.patchQuotePort = patchQuotePort;
         this.syncArtistMetadataPort = syncArtistMetadataPort;
@@ -87,17 +84,19 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     }
 
     @Override
+    @Transactional
     public Long storeQuote(Quote quote) {
         Quote toStore = QuoteHelper.sanitize(quote);
         Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
         Long id = storeQuotePort.storeQuote(toStore, artistMetadata);
         Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, artistMetadata.id());
-        publishQuoteCreatedPort.publishQuoteCreated(stored);
+        quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
         logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
         return id;
     }
 
     @Override
+    @Transactional
     public java.util.List<Long> storeQuotes(List<Quote> quotes) {
         java.util.List<Quote> sanitized = quotes.stream()
                 .map(QuoteHelper::sanitize)
@@ -106,7 +105,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         for (int i = 0; i < ids.size(); i++) {
             Quote s = sanitized.get(i);
             Quote stored = QuoteHelper.withId(s, ids.get(i));
-            publishQuoteCreatedPort.publishQuoteCreated(stored);
+            quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
         }
         return ids;
     }
@@ -117,6 +116,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     }
 
     @Override
+    @Transactional
     public Quote getQuote(Long id) {
         Quote quote = loadQuotePort.loadQuote(id);
         if (quote != null) {
@@ -124,12 +124,13 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             quote = QuoteHelper.incrementHits(quote);
             metricsPort.incrementTotalHits();
             metricsPort.incrementQuoteHits(id);
-            publishQuoteHitPort.publishQuoteHit(quote);
+            quoteEventOutboxPort.recordQuoteHitEvent(quote);
         }
         return quote;
     }
 
     @Override
+    @Transactional
     public Quote getRandomQuote() {
         Quote quote = loadQuotePort.loadRandomQuote();
         if (quote != null) {
@@ -137,7 +138,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
             quote = QuoteHelper.incrementHits(quote);
             metricsPort.incrementTotalHits();
             metricsPort.incrementQuoteHits(quote.id());
-            publishQuoteHitPort.publishQuoteHit(quote);
+            quoteEventOutboxPort.recordQuoteHitEvent(quote);
         }
         return quote;
     }

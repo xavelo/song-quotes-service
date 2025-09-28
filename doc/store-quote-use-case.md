@@ -30,14 +30,17 @@ flowchart LR
         helper[QuoteHelper]
         metadataSvc[MetadataService]
         portStore[StoreQuotePort]
-        portPublish[PublishQuoteCreatedPort]
+        portOutbox[QuoteEventOutboxPort]
         portMetadata[GetArtistMetadataPort]
+        worker[QuoteEventRelayWorker]
     end
 
     subgraph Persistence[MySQL Infrastructure]
         mysqlAdapter[MysqlAdapter]
         repo[QuoteRepository]
+        outboxAdapter[QuoteEventOutboxAdapter]
         db[(Quote & Artist Tables)]
+        outbox[(quote_events Outbox)]
     end
 
     subgraph Messaging[Kafka Infrastructure]
@@ -61,8 +64,11 @@ flowchart LR
     portStore --> mysqlAdapter
     mysqlAdapter --> repo
     repo --> db
-    service --> portPublish
-    portPublish --> kafkaAdapter
+    service --> portOutbox
+    portOutbox --> outboxAdapter
+    outboxAdapter --> outbox
+    worker --> portOutbox
+    worker --> kafkaAdapter
     kafkaAdapter --> kafka
 ```
 
@@ -73,8 +79,9 @@ flowchart LR
 3. `QuoteService` sanitizes the payload through `QuoteHelper.sanitize`, ensuring blank fields are normalized and trimming whitespace. The sanitized quote is retained for downstream operations.【F:src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L69-L84】【F:src/main/java/com/xavelo/sqs/application/service/QuoteHelper.java†L16-L35】
 4. The service asks `MetadataService` to enrich the quote with artist metadata. `MetadataService` invokes the `GetArtistMetadataPort`, which is implemented by `SpotifyAdapter`. The adapter performs a search, fetches the artist profile, and loads top tracks from the Spotify Web API. If metadata cannot be resolved, `null` is returned and the process continues without enrichment.【F:src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L80-L83】【F:src/main/java/com/xavelo/sqs/application/service/MetadataService.java†L17-L23】【F:src/main/java/com/xavelo/sqs/adapter/out/spotify/SpotifyAdapter.java†L27-L58】
 5. `QuoteService` passes the sanitized quote and optional metadata to the `StoreQuotePort`. `MysqlAdapter` implements the port by mapping the domain object to a JPA entity and saving it through `QuoteRepository`. When artist metadata is available, it is stored alongside the quote and cached in the Spotify metadata tables.【F:src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L81-L84】【F:src/main/java/com/xavelo/sqs/adapter/out/mysql/MysqlAdapter.java†L31-L73】
-6. `MysqlAdapter` returns the generated quote identifier. `QuoteService` composes a domain `Quote` with the new ID and emits a `publishQuoteCreated` call to the Kafka adapter via the `PublishQuoteCreatedPort`. The adapter serializes the quote to JSON and publishes it to the `song-quote-created-topic` topic for other services to consume.【F:src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L84-L93】【F:src/main/java/com/xavelo/sqs/adapter/out/kafka/QuoteCreatedKafkaAdapter.java†L12-L29】
-7. Finally, `QuoteService` returns the quote ID to `AdminController`, which responds to the client with the identifier in the HTTP response body.【F:src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L84-L93】【F:src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L32-L41】
+6. `MysqlAdapter` returns the generated quote identifier. `QuoteService` composes a domain `Quote` with the new ID and records a `CREATED` entry in the outbox through `QuoteEventOutboxPort`, ensuring the database write and event intent are persisted atomically in the same transaction.【F:application/src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L76-L108】【F:application/src/main/java/com/xavelo/sqs/adapter/out/mysql/outbox/QuoteEventOutboxAdapter.java†L34-L62】
+7. The asynchronous `QuoteEventRelayWorker` polls pending outbox entries, publishes them through the Kafka adapter, and marks the events as delivered or schedules a retry on failure.【F:application/src/main/java/com/xavelo/sqs/application/service/QuoteEventRelayWorker.java†L17-L58】【F:application/src/main/java/com/xavelo/sqs/adapter/out/mysql/outbox/QuoteEventOutboxAdapter.java†L64-L91】【F:application/src/main/java/com/xavelo/sqs/adapter/out/kafka/QuoteCreatedKafkaAdapter.java†L12-L29】
+8. Finally, `QuoteService` returns the quote ID to `AdminController`, which responds to the client with the identifier in the HTTP response body.【F:application/src/main/java/com/xavelo/sqs/application/service/QuoteService.java†L104-L108】【F:application/src/main/java/com/xavelo/sqs/adapter/in/http/admin/AdminController.java†L32-L41】
 
 ## Detailed sequence diagram
 
@@ -90,6 +97,9 @@ sequenceDiagram
     participant SpotifyAdapter
     participant MysqlAdapter
     participant QuoteRepository
+    participant QuoteEventOutboxAdapter
+    participant QuoteEventOutboxRepository
+    participant QuoteEventRelayWorker
     participant QuoteCreatedKafkaAdapter
     participant Kafka
 
@@ -109,8 +119,20 @@ sequenceDiagram
     MysqlAdapter->>QuoteRepository: save(QuoteEntity)
     QuoteRepository-->>MysqlAdapter: QuoteEntity (id)
     MysqlAdapter-->>QuoteService: id
-    QuoteService->>QuoteCreatedKafkaAdapter: publishQuoteCreated(Quote with id)
-    QuoteCreatedKafkaAdapter->>Kafka: send(topic, payload)
+    QuoteService->>QuoteEventOutboxAdapter: recordQuoteCreated(Quote with id)
+    QuoteEventOutboxAdapter->>QuoteEventOutboxRepository: save(outbox entry)
+    QuoteEventOutboxRepository-->>QuoteEventOutboxAdapter: stored event
+    QuoteEventOutboxAdapter-->>QuoteService: ack
+    par Async worker
+        QuoteEventRelayWorker->>QuoteEventOutboxAdapter: fetchPendingEvents()
+        QuoteEventOutboxAdapter->>QuoteEventOutboxRepository: findPending()
+        QuoteEventOutboxRepository-->>QuoteEventOutboxAdapter: pending events
+        QuoteEventOutboxAdapter-->>QuoteEventRelayWorker: events
+        QuoteEventRelayWorker->>QuoteCreatedKafkaAdapter: publishQuoteCreated(Quote)
+        QuoteCreatedKafkaAdapter->>Kafka: send(topic, payload)
+        QuoteEventRelayWorker->>QuoteEventOutboxAdapter: markEventPublished(id)
+        QuoteEventOutboxAdapter->>QuoteEventOutboxRepository: update status
+    end
     QuoteService-->>AdminController: id
     AdminController-->>AdminClient: 200 OK (id)
 ```
@@ -118,7 +140,7 @@ sequenceDiagram
 ## Error handling considerations
 
 - If the Spotify API is unreachable or returns malformed data, `SpotifyAdapter` logs the error and returns `null`. The quote is still stored without enriched metadata, keeping the use case resilient.【F:src/main/java/com/xavelo/sqs/adapter/out/mysql/MysqlAdapter.java†L49-L73】【F:src/main/java/com/xavelo/sqs/adapter/out/spotify/SpotifyAdapter.java†L27-L58】
-- Should Kafka serialization fail, the adapter throws a runtime exception, allowing standard Spring exception handling and retry policies to surface the problem to operators.【F:src/main/java/com/xavelo/sqs/adapter/out/kafka/QuoteCreatedKafkaAdapter.java†L22-L29】
+- Should Kafka serialization fail during relay, the worker logs the error and reschedules the outbox entry, guaranteeing that the event is retried without losing the mutation.【F:application/src/main/java/com/xavelo/sqs/application/service/QuoteEventRelayWorker.java†L38-L53】【F:application/src/main/java/com/xavelo/sqs/adapter/out/mysql/outbox/QuoteEventOutboxAdapter.java†L76-L91】
 
 ## Result
 
