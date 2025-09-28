@@ -1,27 +1,34 @@
 package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.Quote;
-import com.xavelo.sqs.port.in.ExportQuotesUseCase;
 import com.xavelo.sqs.port.in.DeleteQuoteUseCase;
+import com.xavelo.sqs.port.in.ExportQuotesUseCase;
+import com.xavelo.sqs.port.in.ResetQuoteHitsUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import com.xavelo.sqs.port.out.DeleteQuotePort;
 import com.xavelo.sqs.port.out.LoadQuotePort;
+import com.xavelo.sqs.port.out.ResetQuoteHitsPort;
 import com.xavelo.sqs.port.out.UpdateQuotePort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, UpdateQuoteUseCase {
+public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, UpdateQuoteUseCase, ResetQuoteHitsUseCase {
 
     private final LoadQuotePort loadQuotePort;
     private final DeleteQuotePort deleteQuotePort;
     private final UpdateQuotePort updateQuotePort;
+    private final ResetQuoteHitsPort resetQuoteHitsPort;
 
-    public AdminService(LoadQuotePort loadQuotePort, DeleteQuotePort deleteQuotePort, UpdateQuotePort updateQuotePort) {
+    public AdminService(LoadQuotePort loadQuotePort,
+                        DeleteQuotePort deleteQuotePort,
+                        UpdateQuotePort updateQuotePort,
+                        ResetQuoteHitsPort resetQuoteHitsPort) {
         this.loadQuotePort = loadQuotePort;
         this.deleteQuotePort = deleteQuotePort;
         this.updateQuotePort = updateQuotePort;
+        this.resetQuoteHitsPort = resetQuoteHitsPort;
     }
 
     @Override
@@ -52,5 +59,10 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     @Override
     public void updateQuote(Quote quote) {
         updateQuotePort.updateQuote(quote);
+    }
+
+    @Override
+    public void resetAllQuoteHits() {
+        resetQuoteHitsPort.resetAllQuoteHits();
     }
 }

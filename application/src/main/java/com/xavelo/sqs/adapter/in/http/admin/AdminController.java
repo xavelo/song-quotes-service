@@ -7,6 +7,7 @@ import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.service.AdminService;
 import com.xavelo.sqs.application.service.QuoteHelper;
 import com.xavelo.sqs.port.in.PatchQuoteUseCase;
+import com.xavelo.sqs.port.in.ResetQuoteHitsUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import jakarta.validation.Valid;
@@ -24,17 +25,20 @@ public class AdminController implements AdminApi {
     private final StoreQuoteUseCase storeQuoteUseCase;
     private final UpdateQuoteUseCase updateQuoteUseCase;
     private final PatchQuoteUseCase patchQuoteUseCase;
+    private final ResetQuoteHitsUseCase resetQuoteHitsUseCase;
     private final AdminQuoteMapper quoteMapper;
 
     public AdminController(AdminService adminService,
                            StoreQuoteUseCase storeQuoteUseCase,
                            UpdateQuoteUseCase updateQuoteUseCase,
                            PatchQuoteUseCase patchQuoteUseCase,
+                           ResetQuoteHitsUseCase resetQuoteHitsUseCase,
                            AdminQuoteMapper quoteMapper) {
         this.adminService = adminService;
         this.storeQuoteUseCase = storeQuoteUseCase;
         this.updateQuoteUseCase = updateQuoteUseCase;
         this.patchQuoteUseCase = patchQuoteUseCase;
+        this.resetQuoteHitsUseCase = resetQuoteHitsUseCase;
         this.quoteMapper = quoteMapper;
     }
 
@@ -86,6 +90,12 @@ public class AdminController implements AdminApi {
     public ResponseEntity<String> exportQuotes() {
         String sql = adminService.exportQuotesAsSql();
         return ResponseEntity.ok(sql);
+    }
+
+    @Override
+    public ResponseEntity<Void> resetQuoteHits() {
+        resetQuoteHitsUseCase.resetAllQuoteHits();
+        return ResponseEntity.noContent().build();
     }
 
 }

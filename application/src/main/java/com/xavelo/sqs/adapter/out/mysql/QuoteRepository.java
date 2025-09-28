@@ -27,6 +27,11 @@ public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
     @Query("update QuoteEntity q set q.hits = q.hits + 1 where q.id = :id")
     void incrementHits(@Param("id") Long id);
 
+    @Transactional
+    @Modifying
+    @Query("update QuoteEntity q set q.hits = 0")
+    void resetAllHits();
+
     /**
      * Retrieve the number of quotes for each artist.
      */

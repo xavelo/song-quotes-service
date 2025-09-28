@@ -114,6 +114,15 @@ paths:
             text/plain:
               schema:
                 type: string
+  /admin/quotes/reset-hits:
+    post:
+      tags:
+        - Admin
+      summary: Reset hit counters for all quotes
+      operationId: resetQuoteHits
+      responses:
+        '204':
+          description: Quote hits successfully reset
 components:
   schemas:
     Quote:
