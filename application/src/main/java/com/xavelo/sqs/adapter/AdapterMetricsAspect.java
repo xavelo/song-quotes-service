@@ -25,9 +25,9 @@ public class AdapterMetricsAspect {
             Object proceed = joinPoint.proceed();
             count(annotation, Result.SUCCESS);
             return proceed;
-        } catch (Exception e) {
+        } catch (Throwable t) {
             count(annotation, Result.ERROR);
-            throw e;
+            throw t;
         } finally {
             time(annotation, start, Instant.now());
         }
