@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: song-quotes-deployment
   annotations:
-    commitID: "7ffbeb0f142b79c7eacbf9577279ef1bb695ffaf"
+    commitID: "c0a8ddf295581c7f4d1fb2a6030c73d746c215e1"
 spec:
   replicas: 1
   selector:
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: song-quotes-service
-          image: 'xavelo/song-quotes-service:7ffbeb0f142b79c7eacbf9577279ef1bb695ffaf'
+          image: 'xavelo/song-quotes-service:c0a8ddf295581c7f4d1fb2a6030c73d746c215e1'
           env:
             - name: SPOTIFY_CLIENT_ID
               valueFrom:
