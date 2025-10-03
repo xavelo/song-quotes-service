@@ -29,7 +29,7 @@ public class AdapterMetricsAspect {
             count(annotation, Result.ERROR);
             throw e;
         } finally {
-            time(annotation, start, Instant.now());
+            //time(annotation, start, Instant.now());
         }
 
     }
