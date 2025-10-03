@@ -47,4 +47,4 @@ logging:
     org.springframework.security: INFO
     org.flyway: INFO
     com.xavelo.sqs.application.service: DEBUG
-    com.xavelo.sqs.application.adapter: DEBUG
+    com.xavelo.sqs.adapter: DEBUG
