@@ -35,11 +35,18 @@ public class AdapterMetrics {
         try {
             timeAdapterDuration(metricName, type, direction, Duration.between(start, end));
         } catch (DateTimeException | ArithmeticException e) {
-            logger.error("Exception");
+            logger.error("Failed to compute adapter duration for {} - {} - {}", metricName, type, direction, e);
         }
     }
 
     public static void timeAdapterDuration(String adapterName, Type type, Direction direction, Duration duration) {
+        logger.info(
+            "adapter duration: {} - {} - {} -> {} ms",
+            adapterName,
+            type.name(),
+            direction.name(),
+            duration.toMillis()
+        );
         Timer.builder("adapter.duration")
             .tags(of(
                     Tag.of("name", adapterName),
