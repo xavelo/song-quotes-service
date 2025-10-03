@@ -11,11 +11,11 @@ import com.xavelo.sqs.application.service.QuoteService;
 import com.xavelo.sqs.port.out.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
+import com.xavelo.sqs.adapter.Adapter;
 
 import java.util.List;
 
-@Component
+@Adapter
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort, SyncArtistMetadataPort, ResetQuoteHitsPort, ResetQuotePostsPort {
 
     private static final Logger logger = LogManager.getLogger(MysqlAdapter.class);

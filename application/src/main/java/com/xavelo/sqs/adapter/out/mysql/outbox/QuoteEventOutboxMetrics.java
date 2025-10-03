@@ -2,7 +2,7 @@ package com.xavelo.sqs.adapter.out.mysql.outbox;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.stereotype.Component;
+import com.xavelo.sqs.adapter.Adapter;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * Prometheus and visualized in Grafana to monitor the relay lag and
  * inflight deliveries.</p>
  */
-@Component
+@Adapter
 public class QuoteEventOutboxMetrics {
 
     static final String OUTBOX_READY_METRIC = "quote_outbox_ready_events";

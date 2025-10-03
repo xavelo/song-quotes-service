@@ -7,14 +7,14 @@ import com.xavelo.sqs.application.domain.QuoteEvent;
 import com.xavelo.sqs.application.domain.QuoteEventType;
 import com.xavelo.sqs.port.out.QuoteEventOutboxPort;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
+import com.xavelo.sqs.adapter.Adapter;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
+@Adapter
 public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {
 
     private final QuoteEventOutboxRepository repository;

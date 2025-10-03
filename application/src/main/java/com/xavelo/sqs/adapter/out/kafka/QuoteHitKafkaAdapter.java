@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.out.PublishQuoteHitPort;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
+import com.xavelo.sqs.adapter.Adapter;
 
-@Component
+@Adapter
 public class QuoteHitKafkaAdapter implements PublishQuoteHitPort {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
