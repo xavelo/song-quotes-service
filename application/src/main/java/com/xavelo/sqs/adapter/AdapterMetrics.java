@@ -18,7 +18,6 @@ public class AdapterMetrics {
     private static final Logger logger = LogManager.getLogger(AdapterMetrics.class);
 
     public static void countAdapterInvocation(String adapterName, Type type, Direction direction, Result result) {
-        logger.debug("countAdapterInvocation: {} - {} - {} - {}", adapterName, type.name(), direction.name(), result.name());
         Metrics.counter(
                 "adapter.invocation",
                 of(
