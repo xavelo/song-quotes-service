@@ -1,6 +1,7 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
 import com.xavelo.sqs.adapter.Adapter;
+import com.xavelo.sqs.adapter.CountAdapterInvocation;
 import com.xavelo.sqs.adapter.in.http.admin.mapper.AdminQuoteMapper;
 import com.xavelo.sqs.application.api.AdminApi;
 import com.xavelo.sqs.application.api.model.QuoteDto;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.IN;
+import static com.xavelo.sqs.adapter.AdapterMetrics.Type.HTTP;
 
 @Adapter
 @RestController
@@ -50,6 +54,7 @@ public class AdminController implements AdminApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "create-quote", direction = IN, type = HTTP)
     public ResponseEntity<Long> createQuote(@Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
         Long id = storeQuoteUseCase.storeQuote(quote);
@@ -57,6 +62,7 @@ public class AdminController implements AdminApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "create-quotes", direction = IN, type = HTTP)
     public ResponseEntity<List<Long>> createQuotes(@Valid @RequestBody List<@Valid QuoteDto> quoteDtos) {
         List<Quote> quotes = quoteMapper.toDomain(quoteDtos);
         List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
@@ -64,12 +70,14 @@ public class AdminController implements AdminApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "delete-quote", direction = IN, type = HTTP)
     public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
         adminService.deleteQuote(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @CountAdapterInvocation(name = "update-quote", direction = IN, type = HTTP)
     public ResponseEntity<Void> updateQuote(@PathVariable Long id, @Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
         if (containsRestrictedFields(quote)) {
@@ -84,6 +92,7 @@ public class AdminController implements AdminApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "patch-quote", direction = IN, type = HTTP)
     public ResponseEntity<Void> patchQuote(@PathVariable Long id, @Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
         if (containsRestrictedFields(quote)) {
@@ -94,6 +103,7 @@ public class AdminController implements AdminApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "update-outbox-worker-batch-size", direction = IN, type = HTTP)
     public ResponseEntity<Void> updateOutboxWorkerBatchSize(@Valid @RequestBody UpdateOutboxBatchSizeRequestDto updateOutboxBatchSizeRequestDto) {
         int batchSize = updateOutboxBatchSizeRequestDto.getBatchSize();
         adminService.updateOutboxWorkerBatchSize(batchSize);
@@ -101,18 +111,21 @@ public class AdminController implements AdminApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "export-quotes", direction = IN, type = HTTP)
     public ResponseEntity<String> exportQuotes() {
         String sql = adminService.exportQuotesAsSql();
         return ResponseEntity.ok(sql);
     }
 
     @Override
+    @CountAdapterInvocation(name = "reset-quote-hits", direction = IN, type = HTTP)
     public ResponseEntity<Void> resetQuoteHits() {
         resetQuoteHitsUseCase.resetQuoteHits();
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @CountAdapterInvocation(name = "reset-quote-posts", direction = IN, type = HTTP)
     public ResponseEntity<Void> resetQuotePosts() {
         resetQuotePostsUseCase.resetQuotePosts();
         return ResponseEntity.noContent().build();

@@ -2,10 +2,14 @@ package com.xavelo.sqs.adapter.out.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xavelo.sqs.adapter.CountAdapterInvocation;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.out.PublishQuoteCreatedPort;
 import org.springframework.kafka.core.KafkaTemplate;
 import com.xavelo.sqs.adapter.Adapter;
+
+import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.OUT;
+import static com.xavelo.sqs.adapter.AdapterMetrics.Type.KAFKA;
 
 @Adapter
 public class QuoteCreatedKafkaAdapter implements PublishQuoteCreatedPort {
@@ -21,6 +25,7 @@ public class QuoteCreatedKafkaAdapter implements PublishQuoteCreatedPort {
     }
 
     @Override
+    @CountAdapterInvocation(name = "publish-quote-created", direction = OUT, type = KAFKA)
     public void publishQuoteCreated(Quote quote) {
         try {
             String payload = objectMapper.writeValueAsString(quote);
