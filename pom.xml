@@ -20,6 +20,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>adapter-metrics</module>
         <module>api</module>
         <module>application</module>
     </modules>
