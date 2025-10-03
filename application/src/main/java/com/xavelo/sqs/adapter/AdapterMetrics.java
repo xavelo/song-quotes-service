@@ -2,6 +2,7 @@ package com.xavelo.sqs.adapter;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,12 +39,16 @@ public class AdapterMetrics {
         }
     }
 
-    public static void timeAdapterDuration(String metricName, Type type, Direction direction, Duration duration) {
-        try {
-            timeAdapterDuration(metricName, type, direction, duration);
-        } catch (DateTimeException | ArithmeticException e) {
-            logger.error("Exception");
-        }
+    public static void timeAdapterDuration(String adapterName, Type type, Direction direction, Duration duration) {
+        Timer.builder("adapter.duration")
+            .tags(of(
+                    Tag.of("name", adapterName),
+                    Tag.of("type", type.name().toLowerCase(UK)),
+                    Tag.of("direction", direction.name().toLowerCase(UK))
+            ))
+            .publishPercentiles(0.95, 0.99)
+            .register(Metrics.globalRegistry)
+            .record(duration);
     }
 
     public enum Type {
