@@ -1,5 +1,6 @@
 package com.xavelo.sqs.adapter.out.spotify;
 
+import com.xavelo.sqs.adapter.CountAdapterInvocation;
 import com.xavelo.sqs.adapter.out.spotify.client.SpotifyArtistClient;
 import com.xavelo.sqs.adapter.out.spotify.client.SpotifyArtistResponse;
 import com.xavelo.sqs.adapter.out.spotify.client.SpotifySearchClient;
@@ -13,6 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.Collections;
 import java.util.List;
+
+import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.OUT;
+import static com.xavelo.sqs.adapter.AdapterMetrics.Type.HTTP;
 
 @Adapter
 public class SpotifyAdapter implements GetArtistMetadataPort {
@@ -30,6 +34,7 @@ public class SpotifyAdapter implements GetArtistMetadataPort {
     }
 
     @Override
+    @CountAdapterInvocation(name = "get-artist-metadata", direction = OUT, type = HTTP)
     public Artist getArtistMetadata(String artistName) {
         SpotifySearchResponse searchResponse = spotifySearchClient.searchArtist(artistName);
         if (searchResponse != null && searchResponse.artists() != null && searchResponse.artists().items() != null && !searchResponse.artists().items().isEmpty()) {

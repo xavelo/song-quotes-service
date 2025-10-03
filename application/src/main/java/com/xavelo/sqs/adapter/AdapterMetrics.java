@@ -53,7 +53,9 @@ public class AdapterMetrics {
 
     public enum Type {
         HTTP,
-        KAFKA
+        KAFKA,
+        DATABASE,
+        METRICS
     }
 
     public enum Direction {

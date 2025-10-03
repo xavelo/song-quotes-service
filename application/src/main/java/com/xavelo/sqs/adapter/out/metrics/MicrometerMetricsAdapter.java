@@ -1,11 +1,15 @@
 package com.xavelo.sqs.adapter.out.metrics;
 
 import com.xavelo.sqs.adapter.Adapter;
+import com.xavelo.sqs.adapter.CountAdapterInvocation;
 import com.xavelo.sqs.port.out.MetricsPort;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.OUT;
+import static com.xavelo.sqs.adapter.AdapterMetrics.Type.METRICS;
 
 /**
  * Adapter using Micrometer to record metrics.
@@ -33,16 +37,19 @@ public class MicrometerMetricsAdapter implements MetricsPort {
     }
 
     @Override
+    @CountAdapterInvocation(name = "increment-total-hits", direction = OUT, type = METRICS)
     public void incrementTotalHits() {
         totalHitsCounter.increment();
     }
 
     @Override
+    @CountAdapterInvocation(name = "increment-stored-quotes", direction = OUT, type = METRICS)
     public void incrementStoredQuotes() {
         storedQuotesCounter.increment();
     }
 
     @Override
+    @CountAdapterInvocation(name = "increment-quote-hits", direction = OUT, type = METRICS)
     public void incrementQuoteHits(Long quoteId) {
         if (quoteId == null) {
             return;

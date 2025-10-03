@@ -3,8 +3,12 @@ package com.xavelo.sqs.adapter.out.mysql.outbox;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import com.xavelo.sqs.adapter.Adapter;
+import com.xavelo.sqs.adapter.CountAdapterInvocation;
 
 import java.time.LocalDateTime;
+
+import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.OUT;
+import static com.xavelo.sqs.adapter.AdapterMetrics.Type.METRICS;
 
 /**
  * Publishes Micrometer gauges that expose the state of the quote event outbox.
@@ -39,16 +43,19 @@ public class QuoteEventOutboxMetrics {
                 .register(meterRegistry);
     }
 
+    @CountAdapterInvocation(name = "count-ready-outbox-events", direction = OUT, type = METRICS)
     double countReadyEvents() {
         LocalDateTime now = LocalDateTime.now();
         return repository.countByStatusAndAvailableAtLessThanEqual(QuoteEventStatus.PENDING, now);
     }
 
+    @CountAdapterInvocation(name = "count-delayed-outbox-events", direction = OUT, type = METRICS)
     double countDelayedEvents() {
         LocalDateTime now = LocalDateTime.now();
         return repository.countByStatusAndAvailableAtAfter(QuoteEventStatus.PENDING, now);
     }
 
+    @CountAdapterInvocation(name = "count-processing-outbox-events", direction = OUT, type = METRICS)
     double countProcessingEvents() {
         return repository.countByStatus(QuoteEventStatus.PROCESSING);
     }

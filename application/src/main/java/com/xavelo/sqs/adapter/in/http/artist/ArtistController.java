@@ -1,6 +1,7 @@
 package com.xavelo.sqs.adapter.in.http.artist;
 
 import com.xavelo.sqs.adapter.Adapter;
+import com.xavelo.sqs.adapter.CountAdapterInvocation;
 import com.xavelo.sqs.adapter.in.http.artist.mapper.ArtistMapper;
 import com.xavelo.sqs.application.api.ArtistApi;
 import com.xavelo.sqs.application.api.model.ArtistDto;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.IN;
+import static com.xavelo.sqs.adapter.AdapterMetrics.Type.HTTP;
 
 @Adapter
 @RestController
@@ -33,6 +37,7 @@ public class ArtistController implements ArtistApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "get-artist", direction = IN, type = HTTP)
     public ResponseEntity<ArtistDto> getArtist(@PathVariable String id) {
         Artist artist = getArtistUseCase.getArtist(id);
         return artist != null
@@ -41,6 +46,7 @@ public class ArtistController implements ArtistApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "get-artists", direction = IN, type = HTTP)
     public ResponseEntity<List<ArtistQuoteCountDto>> getArtists() {
         List<ArtistQuoteCount> artists = getArtistQuoteCountsUseCase.getArtistQuoteCounts();
         return ResponseEntity.ok(artistMapper.toQuoteCountDtos(artists));

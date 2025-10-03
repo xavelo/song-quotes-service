@@ -48,12 +48,14 @@ public class QuoteController implements QuoteApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "get-quotes", direction = IN, type = HTTP)
     public ResponseEntity<List<QuoteDto>> getQuotes() {
         List<Quote> quotes = getQuotesUseCase.getQuotes();
         return ResponseEntity.ok(quoteMapper.toDtos(quotes));
     }
 
     @Override
+    @CountAdapterInvocation(name = "count-quotes", direction = IN, type = HTTP)
     public ResponseEntity<Long> getQuotesCount() {
         Long count = countQuotesUseCase.countQuotes();
         return ResponseEntity.ok(count);
@@ -69,6 +71,7 @@ public class QuoteController implements QuoteApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "get-quote", direction = IN, type = HTTP)
     public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") Long id) {
         Quote quote = getQuoteUseCase.getQuote(id);
         return quote != null
@@ -77,6 +80,7 @@ public class QuoteController implements QuoteApi {
     }
 
     @Override
+    @CountAdapterInvocation(name = "top10-quotes", direction = IN, type = HTTP)
     public ResponseEntity<List<QuoteDto>> getTop10Quotes() {
         List<Quote> quotes = getTop10QuotesUseCase.getTop10Quotes();
         return ResponseEntity.ok(quoteMapper.toDtos(quotes));
