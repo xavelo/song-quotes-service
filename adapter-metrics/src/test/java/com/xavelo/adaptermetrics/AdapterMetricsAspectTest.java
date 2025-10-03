@@ -1,4 +1,4 @@
-package com.xavelo.sqs.adapter;
+package com.xavelo.adaptermetrics;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;

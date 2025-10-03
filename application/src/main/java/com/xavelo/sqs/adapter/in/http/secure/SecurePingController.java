@@ -1,15 +1,15 @@
 package com.xavelo.sqs.adapter.in.http.secure;
 
-import com.xavelo.sqs.adapter.Adapter;
-import com.xavelo.sqs.adapter.CountAdapterInvocation;
+import com.xavelo.adaptermetrics.Adapter;
+import com.xavelo.adaptermetrics.CountAdapterInvocation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.xavelo.sqs.adapter.AdapterMetrics.Direction.IN;
-import static com.xavelo.sqs.adapter.AdapterMetrics.Type.HTTP;
+import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.IN;
+import static com.xavelo.adaptermetrics.AdapterMetrics.Type.HTTP;
 
 @Adapter
 @RestController

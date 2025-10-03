@@ -1,4 +1,4 @@
-package com.xavelo.sqs.adapter;
+package com.xavelo.adaptermetrics;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
@@ -13,9 +13,12 @@ import java.time.Instant;
 import static io.micrometer.core.instrument.Tags.of;
 import static java.util.Locale.UK;
 
-public class AdapterMetrics {
+public final class AdapterMetrics {
 
     private static final Logger logger = LogManager.getLogger(AdapterMetrics.class);
+
+    private AdapterMetrics() {
+    }
 
     public static void countAdapterInvocation(String adapterName, Type type, Direction direction, Result result) {
         Metrics.counter(
@@ -73,5 +76,4 @@ public class AdapterMetrics {
         SUCCESS,
         ERROR
     }
-
 }

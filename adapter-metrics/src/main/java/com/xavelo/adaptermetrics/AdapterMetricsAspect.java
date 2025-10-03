@@ -1,16 +1,12 @@
-package com.xavelo.sqs.adapter;
+package com.xavelo.adaptermetrics;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.stereotype.Component;
-
-import com.xavelo.sqs.adapter.AdapterMetrics.Result;
 
 import java.time.Instant;
 
 @Aspect
-@Component
 public class AdapterMetricsAspect {
 
     @Around("@annotation(annotation)")
@@ -18,23 +14,21 @@ public class AdapterMetricsAspect {
         Instant start = Instant.now();
         try {
             Object proceed = joinPoint.proceed();
-            count(annotation, Result.SUCCESS);
+            count(annotation, AdapterMetrics.Result.SUCCESS);
             return proceed;
         } catch (Throwable t) {
-            count(annotation, Result.ERROR);
+            count(annotation, AdapterMetrics.Result.ERROR);
             throw t;
         } finally {
             time(annotation, start, Instant.now());
         }
-
     }
 
-    private void count(CountAdapterInvocation annotation, Result result) {
+    private void count(CountAdapterInvocation annotation, AdapterMetrics.Result result) {
         AdapterMetrics.countAdapterInvocation(annotation.name(), annotation.type(), annotation.direction(), result);
     }
 
     private void time(CountAdapterInvocation annotation, Instant start, Instant end) {
         AdapterMetrics.timeAdapterDuration(annotation.name(), annotation.type(), annotation.direction(), start, end);
     }
-
 }

@@ -19,6 +19,11 @@
     <dependencies>
         <dependency>
             <groupId>com.xavelo.sqs</groupId>
+            <artifactId>adapter-metrics</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xavelo.sqs</groupId>
             <artifactId>song-quotes-service-api</artifactId>
             <version>${project.version}</version>
         </dependency>

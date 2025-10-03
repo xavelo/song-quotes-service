@@ -1,4 +1,4 @@
-package com.xavelo.sqs.adapter;
+package com.xavelo.adaptermetrics;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,5 +12,4 @@ public @interface CountAdapterInvocation {
     String name();
     AdapterMetrics.Direction direction();
     AdapterMetrics.Type type();
-
 }
