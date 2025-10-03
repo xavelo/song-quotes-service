@@ -1,17 +1,16 @@
 package com.xavelo.sqs.adapter.out.metrics;
 
+import com.xavelo.sqs.adapter.Adapter;
 import com.xavelo.sqs.port.out.MetricsPort;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.stereotype.Component;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
  * Adapter using Micrometer to record metrics.
  */
-@Component
+@Adapter
 public class MicrometerMetricsAdapter implements MetricsPort {
 
     private static final String TOTAL_HITS_METRIC_NAME = "quote_hits_total";

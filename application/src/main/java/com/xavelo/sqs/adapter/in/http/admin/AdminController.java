@@ -1,5 +1,6 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
+import com.xavelo.sqs.adapter.Adapter;
 import com.xavelo.sqs.adapter.in.http.admin.mapper.AdminQuoteMapper;
 import com.xavelo.sqs.application.api.AdminApi;
 import com.xavelo.sqs.application.api.model.QuoteDto;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Adapter
 @RestController
 public class AdminController implements AdminApi {
 

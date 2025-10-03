@@ -7,15 +7,14 @@ import com.xavelo.sqs.adapter.out.spotify.client.SpotifySearchResponse;
 import com.xavelo.sqs.adapter.out.spotify.client.SpotifyTopTracksClient;
 import com.xavelo.sqs.adapter.out.spotify.client.SpotifyTopTracksResponse;
 import com.xavelo.sqs.application.domain.Artist;
+import com.xavelo.sqs.adapter.Adapter;
 import com.xavelo.sqs.port.out.metadata.GetArtistMetadataPort;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 
-@Component
+@Adapter
 public class SpotifyAdapter implements GetArtistMetadataPort {
 
     private static final Logger logger = LogManager.getLogger(SpotifyAdapter.class);

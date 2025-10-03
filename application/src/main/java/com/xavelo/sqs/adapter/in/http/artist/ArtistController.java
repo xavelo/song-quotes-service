@@ -1,5 +1,6 @@
 package com.xavelo.sqs.adapter.in.http.artist;
 
+import com.xavelo.sqs.adapter.Adapter;
 import com.xavelo.sqs.adapter.in.http.artist.mapper.ArtistMapper;
 import com.xavelo.sqs.application.api.ArtistApi;
 import com.xavelo.sqs.application.api.model.ArtistDto;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Adapter
 @RestController
 @RequestMapping("/api")
 public class ArtistController implements ArtistApi {
