@@ -5,6 +5,8 @@ import io.micrometer.core.instrument.Tag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.DateTimeException;
+import java.time.Duration;
 import java.time.Instant;
 
 import static io.micrometer.core.instrument.Tags.of;
@@ -29,7 +31,19 @@ public class AdapterMetrics {
     }
 
     public static void timeAdapterDuration(String metricName, Type type, Direction direction, Instant start, Instant end) {
+        try {
+            timeAdapterDuration(metricName, type, direction, Duration.between(start, end));
+        } catch (DateTimeException | ArithmeticException e) {
+            logger.error("Exception");
+        }
+    }
 
+    public static void timeAdapterDuration(String metricName, Type type, Direction direction, Duration duration) {
+        try {
+            timeAdapterDuration(metricName, type, direction, duration);
+        } catch (DateTimeException | ArithmeticException e) {
+            logger.error("Exception");
+        }
     }
 
     public enum Type {
