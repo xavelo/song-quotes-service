@@ -10,12 +10,11 @@ import java.time.Instant;
 public class AdapterMetricsAspect {
 
     @Around("@annotation(annotation)")
-    public Object countAdapterInvocation(ProceedingJoinPoint joinPoint, CountAdapterInvocation annotation) throws Throwable {
+    public void countAdapterInvocation(ProceedingJoinPoint joinPoint, CountAdapterInvocation annotation) throws Throwable {
         Instant start = Instant.now();
         try {
             Object proceed = joinPoint.proceed();
             count(annotation, AdapterMetrics.Result.SUCCESS);
-            return proceed;
         } catch (Throwable t) {
             count(annotation, AdapterMetrics.Result.ERROR);
             throw t;
@@ -31,4 +30,5 @@ public class AdapterMetricsAspect {
     private void time(CountAdapterInvocation annotation, Instant start, Instant end) {
         AdapterMetrics.timeAdapterDuration(annotation.name(), annotation.type(), annotation.direction(), start, end);
     }
+
 }

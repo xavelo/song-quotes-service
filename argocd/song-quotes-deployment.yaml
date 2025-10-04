@@ -23,6 +23,16 @@ spec:
         - name: song-quotes-service
           image: 'xavelo/song-quotes-service:1d76cae5f0af09895971a37fe3bad47cda239fb3'
           env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-song-quotes-secret.yaml
+                  key: user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-song-quotes-secret.yaml
+                  key: password
             - name: SPOTIFY_CLIENT_ID
               valueFrom:
                 secretKeyRef:
