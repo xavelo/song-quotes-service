@@ -26,12 +26,12 @@ spec:
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: mysql-song-quotes-secret.yaml
+                  name: mysql-song-quotes-secret
                   key: user
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-song-quotes-secret.yaml
+                  name: mysql-song-quotes-secret
                   key: password
             - name: SPOTIFY_CLIENT_ID
               valueFrom:
