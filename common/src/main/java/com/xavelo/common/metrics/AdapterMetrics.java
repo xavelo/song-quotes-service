@@ -1,66 +1,78 @@
 package com.xavelo.common.metrics;
 
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static io.micrometer.core.instrument.Tags.of;
-import static java.util.Locale.UK;
-
+/**
+ * Helper for recording adapter invocation metrics using Micrometer.
+ */
 public final class AdapterMetrics {
 
-    private static final Logger logger = LogManager.getLogger(AdapterMetrics.class);
+    public static final String METRIC_ADAPTER_INVOCATIONS = "adapter.invocations";
+    public static final String METRIC_ADAPTER_DURATION = "adapter.duration";
+    private static final String TAG_ADAPTER_NAME = "adapter";
+    private static final String TAG_ADAPTER_TYPE = "type";
+    private static final String TAG_ADAPTER_DIRECTION = "direction";
+    private static final String TAG_ADAPTER_RESULT = "result";
 
-    public static void countAdapterInvocation(String adapterName, Type type, Direction direction, Result result) {
-        Metrics.counter(
-                "adapter.invocation",
-                of(
-                        Tag.of("name", adapterName),
-                        Tag.of("type", type.name().toLowerCase(UK)),
-                        Tag.of("direction", direction.name().toLowerCase(UK)),
-                        Tag.of("result", result.name().toLowerCase(UK))
-                )
-            )
-            .increment();
+    private static final Logger log = LoggerFactory.getLogger(AdapterMetrics.class);
+
+    private AdapterMetrics() {
     }
 
-    public static void timeAdapterDuration(String metricName, Type type, Direction direction, Instant start, Instant end) {
-        try {
-            timeAdapterDuration(metricName, type, direction, Duration.between(start, end));
-        } catch (DateTimeException | ArithmeticException e) {
-            logger.error("Failed to compute adapter duration for {} - {} - {}", metricName, type, direction, e);
+    /**
+     * Records an adapter invocation counter using the provided metadata.
+     */
+    public static void countAdapterInvocation(String name, Type type, Direction direction, Result result) {
+        Tags tags = Tags.of(
+                TAG_ADAPTER_NAME, name,
+                TAG_ADAPTER_TYPE, type.name(),
+                TAG_ADAPTER_DIRECTION, direction.name(),
+                TAG_ADAPTER_RESULT, result.name());
+        Counter counter = Metrics.counter(METRIC_ADAPTER_INVOCATIONS, tags);
+        counter.increment();
+    }
+
+    /**
+     * Records the adapter duration in a timer.
+     */
+    public static void timeAdapterDuration(String name, Type type, Direction direction, Instant start, Instant end) {
+        if (start == null || end == null) {
+            log.warn("Unable to capture adapter duration for {} because start [{}] or end [{}] is null", name, start, end);
+            return;
         }
-    }
 
-    public static void timeAdapterDuration(String adapterName, Type type, Direction direction, Duration duration) {
-        logger.info(
-            "adapter duration: {} - {} - {} -> {} ms",
-            adapterName,
-            type.name(),
-            direction.name(),
-            duration.toMillis()
-        );
-        Timer.builder("adapter.duration")
-            .tags(of(
-                    Tag.of("name", adapterName),
-                    Tag.of("type", type.name().toLowerCase(UK)),
-                    Tag.of("direction", direction.name().toLowerCase(UK))
-            ))
-            .publishPercentiles(0.95, 0.99)
-            .register(Metrics.globalRegistry)
-            .record(duration);
+        if (end.isBefore(start)) {
+            log.warn("Unable to capture adapter duration for {} because end [{}] is before start [{}]", name, end, start);
+            return;
+        }
+
+        Duration duration = Duration.between(start, end);
+        log.debug(
+                "Adapter {} of type {} with direction {} completed in {} ms",
+                name,
+                type,
+                direction,
+                duration.toMillis());
+
+        Tags tags = Tags.of(
+                TAG_ADAPTER_NAME, name,
+                TAG_ADAPTER_TYPE, type.name(),
+                TAG_ADAPTER_DIRECTION, direction.name());
+        Timer timer = Metrics.timer(METRIC_ADAPTER_DURATION, tags);
+        timer.record(duration);
     }
 
     public enum Type {
         HTTP,
         KAFKA,
-        MYSQL,
+        DATABASE,
         METRICS
     }
 

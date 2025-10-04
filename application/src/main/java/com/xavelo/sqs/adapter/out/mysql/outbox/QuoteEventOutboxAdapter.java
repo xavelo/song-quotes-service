@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.common.metrics.AdapterMetrics.Type.MYSQL;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.DATABASE;
 
 @Adapter
 public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {
@@ -31,14 +31,14 @@ public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {
 
     @Override
     @Transactional
-    @CountAdapterInvocation(name = "record-quote-created-event", direction = OUT, type = MYSQL)
+    @CountAdapterInvocation(name = "record-quote-created-event", direction = OUT, type = DATABASE)
     public void recordQuoteCreatedEvent(Quote quote) {
         persistEvent(quote, QuoteEventType.CREATED);
     }
 
     @Override
     @Transactional
-    @CountAdapterInvocation(name = "record-quote-hit-event", direction = OUT, type = MYSQL)
+    @CountAdapterInvocation(name = "record-quote-hit-event", direction = OUT, type = DATABASE)
     public void recordQuoteHitEvent(Quote quote) {
         persistEvent(quote, QuoteEventType.HIT);
     }
@@ -55,7 +55,7 @@ public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {
 
     @Override
     @Transactional
-    @CountAdapterInvocation(name = "fetch-pending-outbox-events", direction = OUT, type = MYSQL)
+    @CountAdapterInvocation(name = "fetch-pending-outbox-events", direction = OUT, type = DATABASE)
     public List<QuoteEvent> fetchPendingEvents(int batchSize) {
         List<QuoteEventEntity> entities = repository.findPendingEvents(
                 QuoteEventStatus.PENDING,
@@ -84,7 +84,7 @@ public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {
 
     @Override
     @Transactional
-    @CountAdapterInvocation(name = "mark-event-published", direction = OUT, type = MYSQL)
+    @CountAdapterInvocation(name = "mark-event-published", direction = OUT, type = DATABASE)
     public void markEventPublished(Long id) {
         repository.findById(id).ifPresent(entity -> {
             entity.setStatus(QuoteEventStatus.PUBLISHED);
@@ -94,7 +94,7 @@ public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {
 
     @Override
     @Transactional
-    @CountAdapterInvocation(name = "mark-event-failed", direction = OUT, type = MYSQL)
+    @CountAdapterInvocation(name = "mark-event-failed", direction = OUT, type = DATABASE)
     public void markEventFailed(Long id, String errorMessage, Duration retryDelay) {
         repository.findById(id).ifPresent(entity -> {
             entity.setStatus(QuoteEventStatus.PENDING);
