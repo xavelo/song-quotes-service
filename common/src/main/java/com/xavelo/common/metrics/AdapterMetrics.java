@@ -1,4 +1,4 @@
-package com.xavelo.adaptermetrics;
+package com.xavelo.common.metrics;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;

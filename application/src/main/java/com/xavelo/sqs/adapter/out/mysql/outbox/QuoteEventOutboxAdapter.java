@@ -2,8 +2,8 @@ package com.xavelo.sqs.adapter.out.mysql.outbox;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xavelo.adaptermetrics.Adapter;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.Adapter;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.application.domain.QuoteEvent;
 import com.xavelo.sqs.application.domain.QuoteEventType;
@@ -15,8 +15,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.DATABASE;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.DATABASE;
 
 @Adapter
 public class QuoteEventOutboxAdapter implements QuoteEventOutboxPort {

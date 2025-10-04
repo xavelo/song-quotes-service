@@ -1,4 +1,4 @@
-package com.xavelo.adaptermetrics;
+package com.xavelo.common.metrics;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

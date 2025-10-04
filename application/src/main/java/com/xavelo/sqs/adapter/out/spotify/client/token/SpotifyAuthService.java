@@ -1,14 +1,14 @@
 package com.xavelo.sqs.adapter.out.spotify.client.token;
 
-import com.xavelo.adaptermetrics.Adapter;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.Adapter;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.configuration.spotify.SpotifyProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import java.util.Base64;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.HTTP;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.HTTP;
 
 @Adapter
 public class SpotifyAuthService {
