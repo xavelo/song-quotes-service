@@ -1,7 +1,7 @@
 package com.xavelo.sqs.adapter.in.http.admin;
 
-import com.xavelo.adaptermetrics.Adapter;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.Adapter;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.adapter.in.http.admin.mapper.AdminQuoteMapper;
 import com.xavelo.sqs.application.api.AdminApi;
 import com.xavelo.sqs.application.api.model.QuoteDto;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.IN;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.HTTP;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.IN;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.HTTP;
 
 @Adapter
 @RestController

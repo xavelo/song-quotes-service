@@ -2,8 +2,8 @@ package com.xavelo.sqs.adapter.out.mysql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.xavelo.adaptermetrics.Adapter;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.Adapter;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataEntity;
 import com.xavelo.sqs.adapter.out.mysql.spotify.SpotifyArtistMetadataRepository;
 import com.xavelo.sqs.application.domain.Artist;
@@ -16,8 +16,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.DATABASE;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.DATABASE;
 
 @Adapter
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort, SyncArtistMetadataPort, ResetQuoteHitsPort, ResetQuotePostsPort {

@@ -1,4 +1,4 @@
-package com.xavelo.adaptermetrics;
+package com.xavelo.common.metrics;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

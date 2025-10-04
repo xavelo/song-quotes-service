@@ -1,15 +1,15 @@
 package com.xavelo.sqs.adapter.out.metrics;
 
-import com.xavelo.adaptermetrics.Adapter;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.Adapter;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.port.out.MetricsPort;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.METRICS;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.METRICS;
 
 /**
  * Adapter using Micrometer to record metrics.

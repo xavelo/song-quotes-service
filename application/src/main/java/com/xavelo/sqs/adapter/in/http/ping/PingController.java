@@ -1,13 +1,13 @@
 package com.xavelo.sqs.adapter.in.http.ping;
 
-import com.xavelo.adaptermetrics.Adapter;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.Adapter;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.IN;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.HTTP;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.IN;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.HTTP;
 
 @Adapter
 @RestController

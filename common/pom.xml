@@ -11,8 +11,8 @@
         <relativePath>..</relativePath>
     </parent>
 
-    <artifactId>adapter-metrics</artifactId>
-    <name>adapter-metrics</name>
+    <artifactId>common</artifactId>
+    <name>common</name>
     <description>Reusable annotations and metrics aspect for adapter instrumentation</description>
     <packaging>jar</packaging>
 

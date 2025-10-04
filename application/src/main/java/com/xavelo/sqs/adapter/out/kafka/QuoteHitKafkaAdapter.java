@@ -2,14 +2,14 @@ package com.xavelo.sqs.adapter.out.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xavelo.adaptermetrics.CountAdapterInvocation;
+import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.application.domain.Quote;
 import com.xavelo.sqs.port.out.PublishQuoteHitPort;
 import org.springframework.kafka.core.KafkaTemplate;
-import com.xavelo.adaptermetrics.Adapter;
+import com.xavelo.common.metrics.Adapter;
 
-import static com.xavelo.adaptermetrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.adaptermetrics.AdapterMetrics.Type.KAFKA;
+import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.KAFKA;
 
 @Adapter
 public class QuoteHitKafkaAdapter implements PublishQuoteHitPort {

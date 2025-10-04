@@ -1,4 +1,4 @@
-package com.xavelo.adaptermetrics.autoconfigure;
+package com.xavelo.common.metrics.autoconfigure;
 
 import org.springframework.context.annotation.Import;
 
