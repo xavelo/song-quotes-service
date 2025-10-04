@@ -21,6 +21,7 @@ spring:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.MySQLDialect
   flyway:
+    baseline-on-migrate: true
     mysql:
       enabled: true
 
