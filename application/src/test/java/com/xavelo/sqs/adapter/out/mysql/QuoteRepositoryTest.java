@@ -37,13 +37,13 @@ class QuoteRepositoryTest {
     }
 
     @Test
-    void findRandomQuoteReturnsEntity() {
-        createEntity("q1", "a1", "id-1");
+    void saveGeneratesUuidIdentifier() {
+        QuoteEntity saved = createEntity("q1", "a1", "id-1");
         entityManager.flush();
 
-        QuoteEntity result = quoteRepository.findRandomQuote();
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isNotNull();
+        assertThat(saved.getId()).isNotBlank();
+        assertThat(saved.getId()).hasSize(36);
+        assertThat(saved.getId()).contains("-");
     }
 
     //@Test

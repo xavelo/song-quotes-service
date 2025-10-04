@@ -55,30 +55,30 @@ public class AdminController implements AdminApi {
 
     @Override
     @CountAdapterInvocation(name = "create-quote", direction = IN, type = HTTP)
-    public ResponseEntity<Long> createQuote(@Valid @RequestBody QuoteDto quoteDto) {
+    public ResponseEntity<String> createQuote(@Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
-        Long id = storeQuoteUseCase.storeQuote(quote);
+        String id = storeQuoteUseCase.storeQuote(quote);
         return ResponseEntity.ok(id);
     }
 
     @Override
     @CountAdapterInvocation(name = "create-quotes", direction = IN, type = HTTP)
-    public ResponseEntity<List<Long>> createQuotes(@Valid @RequestBody List<@Valid QuoteDto> quoteDtos) {
+    public ResponseEntity<List<String>> createQuotes(@Valid @RequestBody List<@Valid QuoteDto> quoteDtos) {
         List<Quote> quotes = quoteMapper.toDomain(quoteDtos);
-        List<Long> ids = storeQuoteUseCase.storeQuotes(quotes);
+        List<String> ids = storeQuoteUseCase.storeQuotes(quotes);
         return ResponseEntity.ok(ids);
     }
 
     @Override
     @CountAdapterInvocation(name = "delete-quote", direction = IN, type = HTTP)
-    public ResponseEntity<Void> deleteQuote(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteQuote(@PathVariable String id) {
         adminService.deleteQuote(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @CountAdapterInvocation(name = "update-quote", direction = IN, type = HTTP)
-    public ResponseEntity<Void> updateQuote(@PathVariable Long id, @Valid @RequestBody QuoteDto quoteDto) {
+    public ResponseEntity<Void> updateQuote(@PathVariable String id, @Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
         if (containsRestrictedFields(quote)) {
             return ResponseEntity.badRequest().build();
@@ -93,7 +93,7 @@ public class AdminController implements AdminApi {
 
     @Override
     @CountAdapterInvocation(name = "patch-quote", direction = IN, type = HTTP)
-    public ResponseEntity<Void> patchQuote(@PathVariable Long id, @Valid @RequestBody QuoteDto quoteDto) {
+    public ResponseEntity<Void> patchQuote(@PathVariable String id, @Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
         if (containsRestrictedFields(quote)) {
             return ResponseEntity.badRequest().build();
