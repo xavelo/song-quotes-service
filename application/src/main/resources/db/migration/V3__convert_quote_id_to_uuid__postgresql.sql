@@ -1,0 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+ALTER TABLE quotes ADD COLUMN id_uuid VARCHAR(36);
+UPDATE quotes SET id_uuid = uuid_generate_v4()::text WHERE id_uuid IS NULL;
+ALTER TABLE quotes DROP CONSTRAINT IF EXISTS quotes_pkey;
+ALTER TABLE quotes DROP COLUMN id;
+ALTER TABLE quotes RENAME COLUMN id_uuid TO id;
+ALTER TABLE quotes ALTER COLUMN id SET NOT NULL;
+ALTER TABLE quotes ADD PRIMARY KEY (id);

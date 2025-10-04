@@ -1,19 +1,20 @@
 package com.xavelo.sqs.adapter.out.mysql;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 @Entity
 @Table(name = "quotes")
 public class QuoteEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36, nullable = false)
+    private String id;
 
     private String quote;
     private String song;
@@ -28,11 +29,11 @@ public class QuoteEntity {
     @Column(name = "spotify_artist_id")
     private String spotifyArtistId;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

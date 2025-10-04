@@ -42,7 +42,7 @@ class QuoteEventRelayWorkerTest {
 
     @Test
     void relayOutbox_publishesCreatedEvent() {
-        Quote quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 0, null);
+        Quote quote = new Quote("id-1", "quote", "song", "album", 1990, "artist", 0, 0, null);
         QuoteEvent event = new QuoteEvent(1L, QuoteEventType.CREATED, quote, 1);
         when(quoteEventOutboxPort.fetchPendingEvents(10)).thenReturn(List.of(event));
 
@@ -54,7 +54,7 @@ class QuoteEventRelayWorkerTest {
 
     @Test
     void relayOutbox_handlesPublishFailure() {
-        Quote quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 0, null);
+        Quote quote = new Quote("id-1", "quote", "song", "album", 1990, "artist", 0, 0, null);
         QuoteEvent event = new QuoteEvent(1L, QuoteEventType.CREATED, quote, 1);
         when(quoteEventOutboxPort.fetchPendingEvents(10)).thenReturn(List.of(event));
         doThrow(new RuntimeException("boom")).when(publishQuoteCreatedPort).publishQuoteCreated(quote);
@@ -66,7 +66,7 @@ class QuoteEventRelayWorkerTest {
 
     @Test
     void relayOutbox_publishesHitEvent() {
-        Quote quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 1, null);
+        Quote quote = new Quote("id-1", "quote", "song", "album", 1990, "artist", 0, 1, null);
         QuoteEvent event = new QuoteEvent(2L, QuoteEventType.HIT, quote, 1);
         when(quoteEventOutboxPort.fetchPendingEvents(10)).thenReturn(List.of(event));
 
