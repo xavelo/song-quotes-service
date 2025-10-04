@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.List;
 
 import static com.xavelo.common.metrics.AdapterMetrics.Direction.OUT;
-import static com.xavelo.common.metrics.AdapterMetrics.Type.DATABASE;
+import static com.xavelo.common.metrics.AdapterMetrics.Type.MYSQL;
 
 @Adapter
 public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuotePort, QuotesCountPort, IncrementPostsPort, IncrementHitsPort, LoadArtistQuoteCountsPort, UpdateQuotePort, LoadTop10QuotesPort, PatchQuotePort, LoadArtistPort, SyncArtistMetadataPort, ResetQuoteHitsPort, ResetQuotePostsPort {
@@ -37,7 +37,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "store-quote", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "store-quote", direction = OUT, type = MYSQL)
     public Long storeQuote(Quote quote, Artist artistMetadata) {
         QuoteEntity entity = quoteMapper.toEntity(quote);
         if (artistMetadata != null) {
@@ -61,7 +61,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "sync-artist-metadata", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "sync-artist-metadata", direction = OUT, type = MYSQL)
     public void syncArtistMetadata(String artistName, Artist artistMetadata) {
         if (artistMetadata == null || artistMetadata.id() == null) {
             logger.warn("Cannot sync metadata for artist {} due to missing Spotify id", artistName);
@@ -88,7 +88,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "store-quotes", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "store-quotes", direction = OUT, type = MYSQL)
     public java.util.List<Long> storeQuotes(List<Quote> quotes) {
         java.util.List<QuoteEntity> entities = quotes.stream()
                 .map(quoteMapper::toEntity)
@@ -98,7 +98,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "load-quotes", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "load-quotes", direction = OUT, type = MYSQL)
     public java.util.List<Quote> loadQuotes() {
         java.util.List<QuoteEntity> entities = quoteRepository.findAll();
         return entities.stream()
@@ -107,7 +107,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "load-quote", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "load-quote", direction = OUT, type = MYSQL)
     public Quote loadQuote(Long id) {
         return quoteRepository.findById(id)
                 .map(quoteMapper::toDomain)
@@ -115,7 +115,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "load-random-quote", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "load-random-quote", direction = OUT, type = MYSQL)
     public Quote loadRandomQuote() {
         QuoteEntity entity = quoteRepository.findRandomQuote();
         if (entity == null) {
@@ -125,43 +125,43 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "delete-quote", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "delete-quote", direction = OUT, type = MYSQL)
     public void deleteQuote(Long id) {
         quoteRepository.deleteById(id);
     }
 
     @Override
-    @CountAdapterInvocation(name = "count-quotes", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "count-quotes", direction = OUT, type = MYSQL)
     public Long countQuotes() {
         return quoteRepository.count();
     }
 
     @Override
-    @CountAdapterInvocation(name = "increment-posts", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "increment-posts", direction = OUT, type = MYSQL)
     public void incrementPosts(Long id) {
         quoteRepository.incrementPosts(id);
     }
 
     @Override
-    @CountAdapterInvocation(name = "increment-hits", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "increment-hits", direction = OUT, type = MYSQL)
     public void incrementHits(Long id) {
         quoteRepository.incrementHits(id);
     }
 
     @Override
-    @CountAdapterInvocation(name = "reset-quote-hits", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "reset-quote-hits", direction = OUT, type = MYSQL)
     public void resetQuoteHits() {
         quoteRepository.resetHits();
     }
 
     @Override
-    @CountAdapterInvocation(name = "reset-quote-posts", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "reset-quote-posts", direction = OUT, type = MYSQL)
     public void resetQuotePosts() {
         quoteRepository.resetPosts();
     }
 
     @Override
-    @CountAdapterInvocation(name = "load-artist-quote-counts", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "load-artist-quote-counts", direction = OUT, type = MYSQL)
     public java.util.List<ArtistQuoteCount> loadArtistQuoteCounts() {
         java.util.List<ArtistQuoteCountView> views = quoteRepository.findArtistQuoteCounts();
         return views.stream()
@@ -170,7 +170,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "update-quote", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "update-quote", direction = OUT, type = MYSQL)
     public void updateQuote(Quote quote) {
         QuoteEntity entity = quoteRepository.findById(quote.id()).orElse(null);
         if (entity != null) {
@@ -184,7 +184,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "load-top10-quotes", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "load-top10-quotes", direction = OUT, type = MYSQL)
     public List<Quote> loadTop10Quotes() {
         List<QuoteEntity> entities = quoteRepository.findTop10ByOrderByHitsDesc();
         return entities.stream()
@@ -193,7 +193,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     }
 
     @Override
-    @CountAdapterInvocation(name = "patch-quote", direction = OUT, type = DATABASE)
+    @CountAdapterInvocation(name = "patch-quote", direction = OUT, type = MYSQL)
     public void patchQuote(Long id, Quote quote) {
         QuoteEntity entity = quoteRepository.findById(id).orElse(null);
         if (entity != null) {
