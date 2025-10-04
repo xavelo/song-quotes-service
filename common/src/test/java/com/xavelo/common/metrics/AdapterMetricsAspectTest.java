@@ -1,81 +1,100 @@
 package com.xavelo.common.metrics;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
 class AdapterMetricsAspectTest {
 
-    @Mock
-    private ProceedingJoinPoint joinPoint;
-
-    private AdapterMetricsAspect aspect;
-
-    private SimpleMeterRegistry meterRegistry;
-
-    private CountAdapterInvocation annotation;
+    private SimpleMeterRegistry registry;
 
     @BeforeEach
     void setUp() {
-        aspect = new AdapterMetricsAspect();
-        meterRegistry = new SimpleMeterRegistry();
-        Metrics.globalRegistry.add(meterRegistry);
-        annotation = new CountAdapterInvocation() {
-            @Override
-            public String name() {
-                return "test-adapter";
-            }
-
-            @Override
-            public AdapterMetrics.Direction direction() {
-                return AdapterMetrics.Direction.OUT;
-            }
-
-            @Override
-            public AdapterMetrics.Type type() {
-                return AdapterMetrics.Type.HTTP;
-            }
-
-            @Override
-            public Class<? extends java.lang.annotation.Annotation> annotationType() {
-                return CountAdapterInvocation.class;
-            }
-        };
+        registry = new SimpleMeterRegistry();
+        Metrics.globalRegistry.add(registry);
     }
 
     @AfterEach
     void tearDown() {
-        Metrics.globalRegistry.remove(meterRegistry);
-        meterRegistry.close();
+        Metrics.globalRegistry.remove(registry);
+        registry.close();
     }
 
     @Test
-    void countAdapterInvocation_recordsErrorOnThrowable() throws Throwable {
-        Error error = new Error("boom");
-        when(joinPoint.proceed()).thenThrow(error);
+    void successfulInvocationIncrementsSuccessCounterAndRecordsDuration() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+            context.register(TestConfiguration.class);
+            context.refresh();
 
-        assertThatThrownBy(() -> aspect.countAdapterInvocation(joinPoint, annotation))
-                .isSameAs(error);
+            TestAdapter adapter = context.getBean(TestAdapter.class);
+            adapter.invoke();
 
-        double errorCount = meterRegistry.get("adapter.invocation")
-                .tag("name", "test-adapter")
-                .tag("type", "http")
-                .tag("direction", "out")
-                .tag("result", "error")
-                .counter()
-                .count();
+            var successCounter = registry
+                    .find(AdapterMetrics.METRIC_ADAPTER_INVOCATIONS)
+                    .tags("adapter", "test-adapter", "type", "HTTP", "direction", "OUT", "result", "SUCCESS")
+                    .counter();
+            assertThat(successCounter).isNotNull();
+            assertThat(successCounter.count()).isEqualTo(1.0d);
 
-        assertThat(errorCount).isEqualTo(1.0d);
+            Timer timer = registry
+                    .find(AdapterMetrics.METRIC_ADAPTER_DURATION)
+                    .tags("adapter", "test-adapter", "type", "HTTP", "direction", "OUT")
+                    .timer();
+            assertThat(timer).isNotNull();
+            assertThat(timer.count()).isEqualTo(1L);
+        }
+    }
+
+    @Test
+    void failedInvocationIncrementsErrorCounterAndPropagatesException() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+            context.register(TestConfiguration.class);
+            context.refresh();
+
+            TestAdapter adapter = context.getBean(TestAdapter.class);
+
+            assertThatThrownBy(adapter::fail)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("boom");
+
+            var errorCounter = registry
+                    .find(AdapterMetrics.METRIC_ADAPTER_INVOCATIONS)
+                    .tags("adapter", "test-adapter", "type", "HTTP", "direction", "OUT", "result", "ERROR")
+                    .counter();
+            assertThat(errorCounter).isNotNull();
+            assertThat(errorCounter.count()).isEqualTo(1.0d);
+        }
+    }
+
+    @Configuration
+    @EnableAdapterMetrics
+    static class TestConfiguration {
+
+        @Bean
+        TestAdapter testAdapter() {
+            return new TestAdapter();
+        }
+    }
+
+    static class TestAdapter {
+
+        @CountAdapterInvocation(name = "test-adapter", type = AdapterMetrics.Type.HTTP, direction = AdapterMetrics.Direction.OUT)
+        public String invoke() {
+            return "ok";
+        }
+
+        @CountAdapterInvocation(name = "test-adapter", type = AdapterMetrics.Type.HTTP, direction = AdapterMetrics.Direction.OUT)
+        public String fail() {
+            throw new IllegalStateException("boom");
+        }
     }
 }

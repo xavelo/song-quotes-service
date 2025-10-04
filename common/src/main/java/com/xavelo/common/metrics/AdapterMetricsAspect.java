@@ -1,34 +1,31 @@
 package com.xavelo.common.metrics;
 
+import java.time.Instant;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
-import java.time.Instant;
-
+/**
+ * Aspect that captures adapter metrics for annotated methods.
+ */
 @Aspect
 public class AdapterMetricsAspect {
 
     @Around("@annotation(annotation)")
-    public void countAdapterInvocation(ProceedingJoinPoint joinPoint, CountAdapterInvocation annotation) throws Throwable {
+    public Object recordMetrics(ProceedingJoinPoint joinPoint, CountAdapterInvocation annotation) throws Throwable {
         Instant start = Instant.now();
         try {
-            Object proceed = joinPoint.proceed();
-            count(annotation, AdapterMetrics.Result.SUCCESS);
-        } catch (Throwable t) {
-            count(annotation, AdapterMetrics.Result.ERROR);
-            throw t;
+            Object result = joinPoint.proceed();
+            AdapterMetrics.countAdapterInvocation(
+                    annotation.name(), annotation.type(), annotation.direction(), AdapterMetrics.Result.SUCCESS);
+            return result;
+        } catch (Throwable throwable) {
+            AdapterMetrics.countAdapterInvocation(
+                    annotation.name(), annotation.type(), annotation.direction(), AdapterMetrics.Result.ERROR);
+            throw throwable;
         } finally {
-            time(annotation, start, Instant.now());
+            Instant end = Instant.now();
+            AdapterMetrics.timeAdapterDuration(annotation.name(), annotation.type(), annotation.direction(), start, end);
         }
     }
-
-    private void count(CountAdapterInvocation annotation, AdapterMetrics.Result result) {
-        AdapterMetrics.countAdapterInvocation(annotation.name(), annotation.type(), annotation.direction(), result);
-    }
-
-    private void time(CountAdapterInvocation annotation, Instant start, Instant end) {
-        AdapterMetrics.timeAdapterDuration(annotation.name(), annotation.type(), annotation.direction(), start, end);
-    }
-
 }
