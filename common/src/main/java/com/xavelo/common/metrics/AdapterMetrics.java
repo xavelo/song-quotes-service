@@ -63,7 +63,7 @@ public final class AdapterMetrics {
     public enum Type {
         HTTP,
         KAFKA,
-        DATABASE,
+        MYSQL,
         METRICS
     }
 
