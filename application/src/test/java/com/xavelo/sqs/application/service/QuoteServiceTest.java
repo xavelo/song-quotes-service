@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
+import java.util.UUID;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class QuoteServiceTest {
 
-    private static final String QUOTE_ID = "11111111-1111-1111-1111-111111111111";
+    private static final UUID QUOTE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
     @Mock
     private StoreQuotePort storeQuotePort;
@@ -74,11 +75,12 @@ class QuoteServiceTest {
 
     @Test
     void storeQuote_sanitizesAndDelegates() {
-        when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn("generated-id");
+        UUID generatedId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn(generatedId);
         when(metadataService.getArtistMetadata(anyString()))
                 .thenReturn(new Artist("id", "name", List.of(), 0, "imageUrl", "spotifyUrl", List.of()));
 
-        String id = quoteService.storeQuote(sampleQuote);
+        UUID id = quoteService.storeQuote(sampleQuote);
 
         verify(storeQuotePort).storeQuote(quoteCaptor.capture(), any(Artist.class));
         Quote sent = quoteCaptor.getValue();
@@ -86,21 +88,23 @@ class QuoteServiceTest {
         assertEquals(0, sent.hits());
         verify(quoteEventOutboxPort).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         Quote published = publishedQuoteCaptor.getValue();
-        assertEquals("generated-id", published.id());
+        assertEquals(generatedId, published.id());
         assertEquals(sent.quote(), published.quote());
-        assertEquals("generated-id", id);
+        assertEquals(generatedId, id);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         Object event = eventCaptor.getValue();
         assertTrue(event instanceof QuoteStoredEvent);
-        assertEquals("generated-id", ((QuoteStoredEvent) event).quote().id());
+        assertEquals(generatedId, ((QuoteStoredEvent) event).quote().id());
     }
 
     @Test
     void storeQuotes_sanitizesAllQuotesAndDelegates() {
-        when(storeQuotePort.storeQuotes(any())).thenReturn(List.of("id-1", "id-2"));
+        UUID id1 = UUID.fromString("11111111-1111-1111-1111-111111111112");
+        UUID id2 = UUID.fromString("11111111-1111-1111-1111-111111111113");
+        when(storeQuotePort.storeQuotes(any())).thenReturn(List.of(id1, id2));
 
-        Quote q2 = new Quote("22222222-2222-2222-2222-222222222222", "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
-        List<String> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
+        Quote q2 = new Quote(UUID.fromString("22222222-2222-2222-2222-222222222222"), "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
+        List<UUID> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
 
         verify(storeQuotePort).storeQuotes(quoteListCaptor.capture());
         List<Quote> sent = quoteListCaptor.getValue();
@@ -112,7 +116,7 @@ class QuoteServiceTest {
         verify(quoteEventOutboxPort, times(2)).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         List<Quote> published = publishedQuoteCaptor.getAllValues();
         assertEquals(2, published.size());
-        assertEquals(List.of("id-1", "id-2"), ids);
+        assertEquals(List.of(id1, id2), ids);
         verify(applicationEventPublisher, times(2)).publishEvent(eventCaptor.capture());
         List<Object> events = eventCaptor.getAllValues();
         assertEquals(2, events.size());

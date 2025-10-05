@@ -1,7 +1,9 @@
 package com.xavelo.sqs.application.domain;
 
+import java.util.UUID;
+
 public record Quote(
-        String id,
+        UUID id,
         String quote,
         String song,
         String album,

@@ -74,7 +74,7 @@ public class QuoteController implements QuoteApi {
     @Override
     @CountAdapterInvocation(name = "get-quote", direction = IN, type = HTTP)
     public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") UUID id) {
-        Quote quote = getQuoteUseCase.getQuote(id.toString());
+        Quote quote = getQuoteUseCase.getQuote(id);
         return quote != null
                 ? ResponseEntity.ok(quoteMapper.toDto(quote))
                 : ResponseEntity.notFound().build();

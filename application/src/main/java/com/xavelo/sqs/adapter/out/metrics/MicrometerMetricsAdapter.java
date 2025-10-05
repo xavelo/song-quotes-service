@@ -5,6 +5,7 @@ import com.xavelo.common.metrics.CountAdapterInvocation;
 import com.xavelo.sqs.port.out.MetricsPort;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -24,7 +25,7 @@ public class MicrometerMetricsAdapter implements MetricsPort {
     private final MeterRegistry meterRegistry;
     private final Counter totalHitsCounter;
     private final Counter storedQuotesCounter;
-    private final ConcurrentMap<String, Counter> quoteHitsCounters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, Counter> quoteHitsCounters = new ConcurrentHashMap<>();
 
     public MicrometerMetricsAdapter(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -50,7 +51,7 @@ public class MicrometerMetricsAdapter implements MetricsPort {
 
     @Override
     @CountAdapterInvocation(name = "increment-quote-hits", direction = OUT, type = METRICS)
-    public void incrementQuoteHits(String quoteId) {
+    public void incrementQuoteHits(UUID quoteId) {
         if (quoteId == null) {
             return;
         }
@@ -60,10 +61,10 @@ public class MicrometerMetricsAdapter implements MetricsPort {
                 .increment();
     }
 
-    private Counter createQuoteHitsCounter(String quoteId) {
+    private Counter createQuoteHitsCounter(UUID quoteId) {
         return Counter.builder(QUOTE_HITS_METRIC_NAME)
                 .description("Number of times a specific quote was requested")
-                .tag("quote_id", quoteId)
+                .tag("quote_id", quoteId.toString())
                 .register(meterRegistry);
     }
 }

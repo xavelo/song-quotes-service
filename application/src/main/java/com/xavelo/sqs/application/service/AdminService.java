@@ -14,6 +14,7 @@ import com.xavelo.sqs.port.out.UpdateQuotePort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, UpdateQuoteUseCase, ResetQuoteHitsUseCase, ResetQuotePostsUseCase {
@@ -46,7 +47,7 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
         for (Quote quote : quotes) {
             sqlBuilder.append(String.format(
                     "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES ('%s', '%s', '%s', '%s', %d, '%s', %d, %d);\n",
-                    quote.id(),
+                    quote.id() != null ? quote.id().toString() : null,
                     quote.quote().replace("'", "''"),
                     quote.song().replace("'", "''"),
                     quote.album().replace("'", "''"),
@@ -60,7 +61,7 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     }
 
     @Override
-    public void deleteQuote(String id) {
+    public void deleteQuote(UUID id) {
         deleteQuotePort.deleteQuote(id);
     }
 

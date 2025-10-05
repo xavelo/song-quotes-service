@@ -1,5 +1,7 @@
 package com.xavelo.sqs.port.out;
 
+import java.util.UUID;
+
 /**
  * Port for publishing application metrics.
  */
@@ -19,5 +21,5 @@ public interface MetricsPort {
      *
      * @param quoteId the identifier of the quote that was served
      */
-    void incrementQuoteHits(String quoteId);
+    void incrementQuoteHits(UUID quoteId);
 }
