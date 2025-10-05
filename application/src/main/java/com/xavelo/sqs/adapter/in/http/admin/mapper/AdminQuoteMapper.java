@@ -12,4 +12,8 @@ public interface AdminQuoteMapper {
     Quote toDomain(QuoteDto quoteDto);
 
     List<Quote> toDomain(List<QuoteDto> quoteDtos);
+
+    QuoteDto toDto(Quote quote);
+
+    List<QuoteDto> toDto(List<Quote> quotes);
 }
