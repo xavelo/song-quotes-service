@@ -15,6 +15,8 @@ import com.xavelo.sqs.port.in.ResetQuotePostsUseCase;
 import com.xavelo.sqs.port.in.StoreQuoteUseCase;
 import com.xavelo.sqs.port.in.UpdateQuoteUseCase;
 import jakarta.validation.Valid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +41,8 @@ public class AdminController implements AdminApi {
     private final ResetQuotePostsUseCase resetQuotePostsUseCase;
     private final AdminQuoteMapper quoteMapper;
 
+    private static final Logger logger = LogManager.getLogger(AdminController.class);
+
     public AdminController(AdminService adminService,
                            StoreQuoteUseCase storeQuoteUseCase,
                            UpdateQuoteUseCase updateQuoteUseCase,
@@ -60,6 +64,7 @@ public class AdminController implements AdminApi {
     public ResponseEntity<UUID> createQuote(@Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
         String id = storeQuoteUseCase.storeQuote(quote);
+        logger.debug("returning id {}", id);
         return ResponseEntity.ok(UUID.fromString(id));
     }
 
