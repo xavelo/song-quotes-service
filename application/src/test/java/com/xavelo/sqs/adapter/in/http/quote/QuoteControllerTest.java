@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -20,8 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(QuoteController.class)
 class QuoteControllerTest {
 
-    private static final String QUOTE_ID = "55555555-5555-5555-5555-555555555555";
-    private static final String MISSING_QUOTE_ID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    private static final UUID QUOTE_ID = UUID.fromString("55555555-5555-5555-5555-555555555555");
+    private static final UUID MISSING_QUOTE_ID = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,7 +42,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null));
+        List<Quote> quotes = List.of(new Quote(QUOTE_ID.toString(), "q", "s", "a", 1999, "art", 0, 0, null));
         List<QuoteDto> dtos = List.of(new QuoteDto()
                 .id(QUOTE_ID)
                 .quote("q")
@@ -71,7 +72,7 @@ class QuoteControllerTest {
 
     @Test
     void getRandomQuoteFound() throws Exception {
-        Quote quote = new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID.toString(), "q", "s", "a", 1999, "art", 0, 0, null);
         QuoteDto dto = new QuoteDto()
                 .id(QUOTE_ID)
                 .quote("q")
@@ -92,7 +93,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteFound() throws Exception {
-        Quote quote = new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID.toString(), "q", "s", "a", 1999, "art", 0, 0, null);
         QuoteDto dto = new QuoteDto()
                 .id(QUOTE_ID)
                 .quote("q")
@@ -103,7 +104,7 @@ class QuoteControllerTest {
                 .posts(0)
                 .hits(0)
                 .spotifyArtistId(null);
-        when(getQuoteUseCase.getQuote(QUOTE_ID)).thenReturn(quote);
+        when(getQuoteUseCase.getQuote(QUOTE_ID.toString())).thenReturn(quote);
         when(quoteMapper.toDto(quote)).thenReturn(dto);
 
         mockMvc.perform(get("/api/quote/" + QUOTE_ID))
@@ -113,7 +114,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteNotFound() throws Exception {
-        when(getQuoteUseCase.getQuote(MISSING_QUOTE_ID)).thenReturn(null);
+        when(getQuoteUseCase.getQuote(MISSING_QUOTE_ID.toString())).thenReturn(null);
 
         mockMvc.perform(get("/api/quote/" + MISSING_QUOTE_ID))
                 .andExpect(status().isNotFound());
@@ -127,7 +128,7 @@ class QuoteControllerTest {
         );
         List<QuoteDto> dtos = List.of(
                 new QuoteDto()
-                        .id("66666666-6666-6666-6666-666666666666")
+                        .id(UUID.fromString("66666666-6666-6666-6666-666666666666"))
                         .quote("q1")
                         .song("s1")
                         .album("a1")
@@ -137,7 +138,7 @@ class QuoteControllerTest {
                         .hits(10)
                         .spotifyArtistId(null),
                 new QuoteDto()
-                        .id("77777777-7777-7777-7777-777777777777")
+                        .id(UUID.fromString("77777777-7777-7777-7777-777777777777"))
                         .quote("q2")
                         .song("s2")
                         .album("a2")
