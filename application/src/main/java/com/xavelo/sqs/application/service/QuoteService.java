@@ -24,11 +24,13 @@ import com.xavelo.sqs.port.out.QuoteEventOutboxPort;
 import com.xavelo.sqs.port.out.PatchQuotePort;
 import com.xavelo.sqs.port.out.SyncArtistMetadataPort;
 import com.xavelo.sqs.application.service.MetadataService;
+import com.xavelo.sqs.application.service.exception.DuplicatedSongQuoteException;
 import com.xavelo.sqs.application.domain.Artist;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.transaction.annotation.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -91,15 +93,22 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     public UUID storeQuote(Quote quote) {
         Quote toStore = QuoteHelper.sanitize(quote);
         Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
-        UUID id = storeQuotePort.storeQuote(toStore, artistMetadata);
-        String spotifyArtistId = artistMetadata != null ? artistMetadata.id() : null;
-        Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, spotifyArtistId);
-        quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
-        applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
-        if (artistMetadata != null) {
-            logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+        try {
+            UUID id = storeQuotePort.storeQuote(toStore, artistMetadata);
+            String spotifyArtistId = artistMetadata != null ? artistMetadata.id() : null;
+            Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, spotifyArtistId);
+            quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
+            applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
+            if (artistMetadata != null) {
+                logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+            }
+            return id;
+        } catch (DataIntegrityViolationException ex) {
+            if (isDuplicatedQuoteConstraint(ex)) {
+                throw new DuplicatedSongQuoteException(toStore.quote(), ex);
+            }
+            throw ex;
         }
-        return id;
     }
 
     @Override
@@ -113,22 +122,37 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
                 .map(quote -> metadataService.getArtistMetadata(quote.artist()))
                 .toList();
 
-        List<UUID> ids = storeQuotePort.storeQuotes(sanitized, artistsMetadata);
+        try {
+            List<UUID> ids = storeQuotePort.storeQuotes(sanitized, artistsMetadata);
 
-        for (int i = 0; i < ids.size(); i++) {
-            Quote sanitizedQuote = sanitized.get(i);
-            Artist artistMetadata = artistsMetadata.size() > i ? artistsMetadata.get(i) : null;
-            String spotifyArtistId = artistMetadata != null ? artistMetadata.id() : null;
+            for (int i = 0; i < ids.size(); i++) {
+                Quote sanitizedQuote = sanitized.get(i);
+                Artist artistMetadata = artistsMetadata.size() > i ? artistsMetadata.get(i) : null;
+                String spotifyArtistId = artistMetadata != null ? artistMetadata.id() : null;
 
-            Quote stored = QuoteHelper.withSpotifyArtistId(sanitizedQuote, ids.get(i), spotifyArtistId);
-            quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
-            applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
+                Quote stored = QuoteHelper.withSpotifyArtistId(sanitizedQuote, ids.get(i), spotifyArtistId);
+                quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
+                applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
 
-            if (artistMetadata != null) {
-                logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+                if (artistMetadata != null) {
+                    logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+                }
             }
+            return ids;
+        } catch (DataIntegrityViolationException ex) {
+            if (isDuplicatedQuoteConstraint(ex)) {
+                throw new DuplicatedSongQuoteException("One or more quotes already exist", ex);
+            }
+            throw ex;
         }
-        return ids;
+    }
+
+    private boolean isDuplicatedQuoteConstraint(DataIntegrityViolationException exception) {
+        Throwable cause = exception.getMostSpecificCause();
+        if (cause == null || cause.getMessage() == null) {
+            return false;
+        }
+        return cause.getMessage().contains("uq_quotes_quote") || cause.getMessage().contains("quotes.quote");
     }
 
     @Override

@@ -13,6 +13,7 @@ public class QuoteEntity {
     @Column(length = 36, columnDefinition = "char(36)")
     private String id;
 
+    @Column(unique = true, length = 1000)
     private String quote;
     private String song;
     private String album;
