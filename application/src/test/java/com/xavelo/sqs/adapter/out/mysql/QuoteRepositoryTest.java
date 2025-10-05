@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +26,7 @@ class QuoteRepositoryTest {
 
     private QuoteEntity createEntity(String quote, String artist, String spotifyArtistId) {
         QuoteEntity e = new QuoteEntity();
+        e.setId(UUID.randomUUID().toString());
         e.setQuote(quote);
         e.setSong("song");
         e.setAlbum("album");

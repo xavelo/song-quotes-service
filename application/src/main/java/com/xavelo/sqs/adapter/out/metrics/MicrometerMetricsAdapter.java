@@ -24,7 +24,7 @@ public class MicrometerMetricsAdapter implements MetricsPort {
     private final MeterRegistry meterRegistry;
     private final Counter totalHitsCounter;
     private final Counter storedQuotesCounter;
-    private final ConcurrentMap<Long, Counter> quoteHitsCounters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Counter> quoteHitsCounters = new ConcurrentHashMap<>();
 
     public MicrometerMetricsAdapter(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
@@ -50,7 +50,7 @@ public class MicrometerMetricsAdapter implements MetricsPort {
 
     @Override
     @CountAdapterInvocation(name = "increment-quote-hits", direction = OUT, type = METRICS)
-    public void incrementQuoteHits(Long quoteId) {
+    public void incrementQuoteHits(String quoteId) {
         if (quoteId == null) {
             return;
         }
@@ -60,10 +60,10 @@ public class MicrometerMetricsAdapter implements MetricsPort {
                 .increment();
     }
 
-    private Counter createQuoteHitsCounter(Long quoteId) {
+    private Counter createQuoteHitsCounter(String quoteId) {
         return Counter.builder(QUOTE_HITS_METRIC_NAME)
                 .description("Number of times a specific quote was requested")
-                .tag("quote_id", quoteId.toString())
+                .tag("quote_id", quoteId)
                 .register(meterRegistry);
     }
 }

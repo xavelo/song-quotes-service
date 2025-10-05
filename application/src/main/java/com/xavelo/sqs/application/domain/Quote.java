@@ -1,7 +1,7 @@
 package com.xavelo.sqs.application.domain;
 
 public record Quote(
-        Long id,
+        String id,
         String quote,
         String song,
         String album,

@@ -1,5 +1,5 @@
 CREATE TABLE quotes (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id CHAR(36) PRIMARY KEY,
     quote VARCHAR(1000),
     song VARCHAR(255),
     album VARCHAR(255),
