@@ -44,23 +44,29 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
         List<Quote> quotes = loadQuotePort.loadQuotes();
         StringBuilder sqlBuilder = new StringBuilder();
         for (Quote quote : quotes) {
-            sqlBuilder.append(String.format(
-                    "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (%d, '%s', '%s', '%s', %d, '%s', %d, %d);\n",
-                    quote.id(),
-                    quote.quote().replace("'", "''"),
-                    quote.song().replace("'", "''"),
-                    quote.album().replace("'", "''"),
-                    quote.year(),
-                    quote.artist().replace("'", "''"),
-                    quote.hits(),
-                    quote.posts()
-            ));
+            sqlBuilder.append("INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (")
+                    .append(toSqlStringLiteral(quote.id()))
+                    .append(", ")
+                    .append(toSqlStringLiteral(quote.quote()))
+                    .append(", ")
+                    .append(toSqlStringLiteral(quote.song()))
+                    .append(", ")
+                    .append(toSqlStringLiteral(quote.album()))
+                    .append(", ")
+                    .append(toSqlNumberLiteral(quote.year()))
+                    .append(", ")
+                    .append(toSqlStringLiteral(quote.artist()))
+                    .append(", ")
+                    .append(toSqlNumberLiteral(quote.hits()))
+                    .append(", ")
+                    .append(toSqlNumberLiteral(quote.posts()))
+                    .append(");\n");
         }
         return sqlBuilder.toString();
     }
 
     @Override
-    public void deleteQuote(Long id) {
+    public void deleteQuote(String id) {
         deleteQuotePort.deleteQuote(id);
     }
 
@@ -81,5 +87,16 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
 
     public void updateOutboxWorkerBatchSize(int batchSize) {
         quoteEventRelayWorker.updateBatchSize(batchSize);
+    }
+
+    private String toSqlStringLiteral(String value) {
+        if (value == null) {
+            return "NULL";
+        }
+        return "'" + value.replace("'", "''") + "'";
+    }
+
+    private String toSqlNumberLiteral(Number value) {
+        return value != null ? value.toString() : "NULL";
     }
 }

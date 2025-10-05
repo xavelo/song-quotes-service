@@ -72,7 +72,7 @@ public class QuoteController implements QuoteApi {
 
     @Override
     @CountAdapterInvocation(name = "get-quote", direction = IN, type = HTTP)
-    public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") Long id) {
+    public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") String id) {
         Quote quote = getQuoteUseCase.getQuote(id);
         return quote != null
                 ? ResponseEntity.ok(quoteMapper.toDto(quote))

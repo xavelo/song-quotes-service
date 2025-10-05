@@ -6,7 +6,7 @@ import java.util.List;
 public interface LoadQuotePort {
     List<Quote> loadQuotes();
 
-    Quote loadQuote(Long id);
+    Quote loadQuote(String id);
 
     /**
      * Retrieve a random quote from the storage.

@@ -33,7 +33,7 @@ public final class QuoteHelper {
     /**
      * Returns a copy of the given quote with the supplied id.
      */
-    public static Quote withId(Quote quote, Long id) {
+    public static Quote withId(Quote quote, String id) {
         if (quote == null) {
             return null;
         }
@@ -53,7 +53,7 @@ public final class QuoteHelper {
     /**
      * Returns a copy of the given quote with the supplied id and spotify artist id
      */
-    public static Quote withSpotifyArtistId(Quote quote, Long id, String spotifyArtistId) {
+    public static Quote withSpotifyArtistId(Quote quote, String id, String spotifyArtistId) {
         if (quote == null) {
             return null;
         }

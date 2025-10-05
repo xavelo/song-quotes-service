@@ -27,8 +27,8 @@ paths:
           content:
             application/json:
               schema:
-                type: integer
-                format: int64
+                type: string
+                format: uuid
   /admin/quotes:
     post:
       tags:
@@ -51,16 +51,16 @@ paths:
               schema:
                 type: array
                 items:
-                  type: integer
-                  format: int64
+                  type: string
+                  format: uuid
   /admin/quote/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
     delete:
       tags:
         - Admin
