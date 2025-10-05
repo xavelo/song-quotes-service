@@ -17,6 +17,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @ExtendWith(MockitoExtension.class)
 class QuoteMetricsServiceTest {
 
+    private static final String QUOTE_ID = "44444444-4444-4444-4444-444444444444";
+
     @Mock
     private MetricsPort metricsPort;
 
@@ -27,7 +29,7 @@ class QuoteMetricsServiceTest {
 
     @BeforeEach
     void setUp() {
-        quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 1, null);
+        quote = new Quote(QUOTE_ID, "quote", "song", "album", 1990, "artist", 0, 1, null);
     }
 
     @Test
