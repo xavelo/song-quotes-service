@@ -43,7 +43,7 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     @Override
     public List<Quote> exportQuotes() {
         return loadQuotePort.loadQuotes().stream()
-                .map(QuoteHelper::sanitize)
+                .map(QuoteHelper::sanitizeForExport)
                 .toList();
     }
 
