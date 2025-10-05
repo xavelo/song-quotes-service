@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(QuoteController.class)
 class QuoteControllerTest {
 
+    private static final String QUOTE_ID = "55555555-5555-5555-5555-555555555555";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -38,9 +40,9 @@ class QuoteControllerTest {
 
     @Test
     void getQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null));
+        List<Quote> quotes = List.of(new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null));
         List<QuoteDto> dtos = List.of(new QuoteDto()
-                .id(1L)
+                .id(QUOTE_ID)
                 .quote("q")
                 .song("s")
                 .album("a")
@@ -68,9 +70,9 @@ class QuoteControllerTest {
 
     @Test
     void getRandomQuoteFound() throws Exception {
-        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null);
         QuoteDto dto = new QuoteDto()
-                .id(1L)
+                .id(QUOTE_ID)
                 .quote("q")
                 .song("s")
                 .album("a")
@@ -89,9 +91,9 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteFound() throws Exception {
-        Quote quote = new Quote(1L, "q", "s", "a", 1999, "art", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null);
         QuoteDto dto = new QuoteDto()
-                .id(1L)
+                .id(QUOTE_ID)
                 .quote("q")
                 .song("s")
                 .album("a")
@@ -100,31 +102,31 @@ class QuoteControllerTest {
                 .posts(0)
                 .hits(0)
                 .spotifyArtistId(null);
-        when(getQuoteUseCase.getQuote(1L)).thenReturn(quote);
+        when(getQuoteUseCase.getQuote(QUOTE_ID)).thenReturn(quote);
         when(quoteMapper.toDto(quote)).thenReturn(dto);
 
-        mockMvc.perform(get("/api/quote/1"))
+        mockMvc.perform(get("/api/quote/" + QUOTE_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(dto)));
     }
 
     @Test
     void getQuoteNotFound() throws Exception {
-        when(getQuoteUseCase.getQuote(2L)).thenReturn(null);
+        when(getQuoteUseCase.getQuote("non-existent-id")).thenReturn(null);
 
-        mockMvc.perform(get("/api/quote/2"))
+        mockMvc.perform(get("/api/quote/non-existent-id"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void getTop10Quotes() throws Exception {
         List<Quote> quotes = List.of(
-                new Quote(1L, "q1", "s1", "a1", 2000, "art1", 100, 10, null),
-                new Quote(2L, "q2", "s2", "a2", 2001, "art2", 90, 9, null)
+                new Quote("66666666-6666-6666-6666-666666666666", "q1", "s1", "a1", 2000, "art1", 100, 10, null),
+                new Quote("77777777-7777-7777-7777-777777777777", "q2", "s2", "a2", 2001, "art2", 90, 9, null)
         );
         List<QuoteDto> dtos = List.of(
                 new QuoteDto()
-                        .id(1L)
+                        .id("66666666-6666-6666-6666-666666666666")
                         .quote("q1")
                         .song("s1")
                         .album("a1")
@@ -134,7 +136,7 @@ class QuoteControllerTest {
                         .hits(10)
                         .spotifyArtistId(null),
                 new QuoteDto()
-                        .id(2L)
+                        .id("77777777-7777-7777-7777-777777777777")
                         .quote("q2")
                         .song("s2")
                         .album("a2")

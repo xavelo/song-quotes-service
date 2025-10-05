@@ -1,0 +1,21 @@
+ALTER TABLE quotes
+    ADD COLUMN new_id CHAR(36) NULL AFTER id;
+
+UPDATE quotes
+SET new_id = UUID()
+WHERE new_id IS NULL;
+
+ALTER TABLE quotes
+    MODIFY COLUMN new_id CHAR(36) NOT NULL;
+
+ALTER TABLE quotes
+    DROP PRIMARY KEY;
+
+ALTER TABLE quotes
+    DROP COLUMN id;
+
+ALTER TABLE quotes
+    CHANGE COLUMN new_id id CHAR(36) NOT NULL;
+
+ALTER TABLE quotes
+    ADD PRIMARY KEY (id);

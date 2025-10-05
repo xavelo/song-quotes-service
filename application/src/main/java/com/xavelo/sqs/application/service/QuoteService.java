@@ -76,7 +76,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
     }
 
     @Override
-    public void patchQuote(Long id, Quote quote) {
+    public void patchQuote(String id, Quote quote) {
         patchQuotePort.patchQuote(id, quote);
     }
 
@@ -87,24 +87,27 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
 
     @Override
     @Transactional
-    public Long storeQuote(Quote quote) {
+    public String storeQuote(Quote quote) {
         Quote toStore = QuoteHelper.sanitize(quote);
         Artist artistMetadata = metadataService.getArtistMetadata(toStore.artist());
-        Long id = storeQuotePort.storeQuote(toStore, artistMetadata);
-        Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, artistMetadata.id());
+        String id = storeQuotePort.storeQuote(toStore, artistMetadata);
+        String spotifyArtistId = artistMetadata != null ? artistMetadata.id() : null;
+        Quote stored = QuoteHelper.withSpotifyArtistId(toStore, id, spotifyArtistId);
         quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
         applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
-        logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+        if (artistMetadata != null) {
+            logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+        }
         return id;
     }
 
     @Override
     @Transactional
-    public java.util.List<Long> storeQuotes(List<Quote> quotes) {
-        java.util.List<Quote> sanitized = quotes.stream()
+    public List<String> storeQuotes(List<Quote> quotes) {
+        List<Quote> sanitized = quotes.stream()
                 .map(QuoteHelper::sanitize)
                 .toList();
-        java.util.List<Long> ids = storeQuotePort.storeQuotes(sanitized);
+        List<String> ids = storeQuotePort.storeQuotes(sanitized);
         for (int i = 0; i < ids.size(); i++) {
             Quote s = sanitized.get(i);
             Quote stored = QuoteHelper.withId(s, ids.get(i));
@@ -121,7 +124,7 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
 
     @Override
     @Transactional
-    public Quote getQuote(Long id) {
+    public Quote getQuote(String id) {
         Quote quote = loadQuotePort.loadQuote(id);
         if (quote != null) {
             incrementHitsPort.incrementHits(id);

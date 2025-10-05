@@ -24,6 +24,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class QuoteEventRelayWorkerTest {
 
+    private static final String QUOTE_ID = "33333333-3333-3333-3333-333333333333";
+
     @Mock
     private QuoteEventOutboxPort quoteEventOutboxPort;
 
@@ -42,7 +44,7 @@ class QuoteEventRelayWorkerTest {
 
     @Test
     void relayOutbox_publishesCreatedEvent() {
-        Quote quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID, "quote", "song", "album", 1990, "artist", 0, 0, null);
         QuoteEvent event = new QuoteEvent(1L, QuoteEventType.CREATED, quote, 1);
         when(quoteEventOutboxPort.fetchPendingEvents(10)).thenReturn(List.of(event));
 
@@ -54,7 +56,7 @@ class QuoteEventRelayWorkerTest {
 
     @Test
     void relayOutbox_handlesPublishFailure() {
-        Quote quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID, "quote", "song", "album", 1990, "artist", 0, 0, null);
         QuoteEvent event = new QuoteEvent(1L, QuoteEventType.CREATED, quote, 1);
         when(quoteEventOutboxPort.fetchPendingEvents(10)).thenReturn(List.of(event));
         doThrow(new RuntimeException("boom")).when(publishQuoteCreatedPort).publishQuoteCreated(quote);
@@ -66,7 +68,7 @@ class QuoteEventRelayWorkerTest {
 
     @Test
     void relayOutbox_publishesHitEvent() {
-        Quote quote = new Quote(1L, "quote", "song", "album", 1990, "artist", 0, 1, null);
+        Quote quote = new Quote(QUOTE_ID, "quote", "song", "album", 1990, "artist", 0, 1, null);
         QuoteEvent event = new QuoteEvent(2L, QuoteEventType.HIT, quote, 1);
         when(quoteEventOutboxPort.fetchPendingEvents(10)).thenReturn(List.of(event));
 

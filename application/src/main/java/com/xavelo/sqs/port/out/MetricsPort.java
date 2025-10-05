@@ -19,5 +19,5 @@ public interface MetricsPort {
      *
      * @param quoteId the identifier of the quote that was served
      */
-    void incrementQuoteHits(Long quoteId);
+    void incrementQuoteHits(String quoteId);
 }

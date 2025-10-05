@@ -45,7 +45,7 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
         StringBuilder sqlBuilder = new StringBuilder();
         for (Quote quote : quotes) {
             sqlBuilder.append(String.format(
-                    "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES (%d, '%s', '%s', '%s', %d, '%s', %d, %d);\n",
+                    "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES ('%s', '%s', '%s', '%s', %d, '%s', %d, %d);\n",
                     quote.id(),
                     quote.quote().replace("'", "''"),
                     quote.song().replace("'", "''"),
@@ -60,7 +60,7 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     }
 
     @Override
-    public void deleteQuote(Long id) {
+    public void deleteQuote(String id) {
         deleteQuotePort.deleteQuote(id);
     }
 
