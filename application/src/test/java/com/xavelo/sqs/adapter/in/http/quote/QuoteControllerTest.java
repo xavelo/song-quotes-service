@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class QuoteControllerTest {
 
     private static final String QUOTE_ID = "55555555-5555-5555-5555-555555555555";
+    private static final String MISSING_QUOTE_ID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
     @Autowired
     private MockMvc mockMvc;
@@ -112,9 +113,9 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteNotFound() throws Exception {
-        when(getQuoteUseCase.getQuote("non-existent-id")).thenReturn(null);
+        when(getQuoteUseCase.getQuote(MISSING_QUOTE_ID)).thenReturn(null);
 
-        mockMvc.perform(get("/api/quote/non-existent-id"))
+        mockMvc.perform(get("/api/quote/" + MISSING_QUOTE_ID))
                 .andExpect(status().isNotFound());
     }
 

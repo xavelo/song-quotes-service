@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.xavelo.common.metrics.AdapterMetrics.Direction.IN;
 import static com.xavelo.common.metrics.AdapterMetrics.Type.HTTP;
@@ -72,8 +73,8 @@ public class QuoteController implements QuoteApi {
 
     @Override
     @CountAdapterInvocation(name = "get-quote", direction = IN, type = HTTP)
-    public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") String id) {
-        Quote quote = getQuoteUseCase.getQuote(id);
+    public ResponseEntity<QuoteDto> getQuote(@PathVariable("id") UUID id) {
+        Quote quote = getQuoteUseCase.getQuote(id.toString());
         return quote != null
                 ? ResponseEntity.ok(quoteMapper.toDto(quote))
                 : ResponseEntity.notFound().build();
