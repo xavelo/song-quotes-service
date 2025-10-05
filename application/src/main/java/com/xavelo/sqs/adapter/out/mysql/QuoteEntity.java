@@ -1,19 +1,20 @@
 package com.xavelo.sqs.adapter.out.mysql;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.persistence.PrePersist;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "quotes")
 public class QuoteEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 36, nullable = false, updatable = false)
+    private String id;
 
     private String quote;
     private String song;
@@ -28,11 +29,11 @@ public class QuoteEntity {
     @Column(name = "spotify_artist_id")
     private String spotifyArtistId;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -98,5 +99,18 @@ public class QuoteEntity {
 
     public void setSpotifyArtistId(String spotifyArtistId) {
         this.spotifyArtistId = spotifyArtistId;
+    }
+
+    @PrePersist
+    void ensureId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+        if (this.posts == null) {
+            this.posts = 0;
+        }
+        if (this.hits == null) {
+            this.hits = 0;
+        }
     }
 }

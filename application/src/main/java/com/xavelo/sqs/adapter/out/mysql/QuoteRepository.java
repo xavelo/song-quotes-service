@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.xavelo.sqs.adapter.out.mysql.ArtistQuoteCountView;
 
-public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
+public interface QuoteRepository extends JpaRepository<QuoteEntity, String> {
 
     /**
      * Retrieve a single random quote entity.
@@ -20,12 +20,12 @@ public interface QuoteRepository extends JpaRepository<QuoteEntity, Long> {
     @Transactional
     @Modifying
     @Query("update QuoteEntity q set q.posts = q.posts + 1 where q.id = :id")
-    void incrementPosts(@Param("id") Long id);
+    void incrementPosts(@Param("id") String id);
 
     @Transactional
     @Modifying
     @Query("update QuoteEntity q set q.hits = q.hits + 1 where q.id = :id")
-    void incrementHits(@Param("id") Long id);
+    void incrementHits(@Param("id") String id);
 
     @Transactional
     @Modifying

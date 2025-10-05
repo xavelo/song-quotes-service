@@ -67,16 +67,16 @@ class QuoteServiceTest {
 
     @BeforeEach
     void setUp() {
-        sampleQuote = new Quote(1L, "q", "s", "a", 2000, "artist", 5, 7, null);
+        sampleQuote = new Quote("quote-1", "q", "s", "a", 2000, "artist", 5, 7, null);
     }
 
     @Test
     void storeQuote_sanitizesAndDelegates() {
-        when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn(10L);
+        when(storeQuotePort.storeQuote(any(Quote.class), any(Artist.class))).thenReturn("new-id");
         when(metadataService.getArtistMetadata(anyString()))
                 .thenReturn(new Artist("id", "name", List.of(), 0, "imageUrl", "spotifyUrl", List.of()));
 
-        Long id = quoteService.storeQuote(sampleQuote);
+        String id = quoteService.storeQuote(sampleQuote);
 
         verify(storeQuotePort).storeQuote(quoteCaptor.capture(), any(Artist.class));
         Quote sent = quoteCaptor.getValue();
@@ -84,21 +84,21 @@ class QuoteServiceTest {
         assertEquals(0, sent.hits());
         verify(quoteEventOutboxPort).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         Quote published = publishedQuoteCaptor.getValue();
-        assertEquals(10L, published.id());
+        assertEquals("new-id", published.id());
         assertEquals(sent.quote(), published.quote());
-        assertEquals(10L, id);
+        assertEquals("new-id", id);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         Object event = eventCaptor.getValue();
         assertTrue(event instanceof QuoteStoredEvent);
-        assertEquals(10L, ((QuoteStoredEvent) event).quote().id());
+        assertEquals("new-id", ((QuoteStoredEvent) event).quote().id());
     }
 
     @Test
     void storeQuotes_sanitizesAllQuotesAndDelegates() {
-        when(storeQuotePort.storeQuotes(any())).thenReturn(List.of(1L, 2L));
+        when(storeQuotePort.storeQuotes(any())).thenReturn(List.of("id-1", "id-2"));
 
-        Quote q2 = new Quote(2L, "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
-        List<Long> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
+        Quote q2 = new Quote("quote-2", "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
+        List<String> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
 
         verify(storeQuotePort).storeQuotes(quoteListCaptor.capture());
         List<Quote> sent = quoteListCaptor.getValue();
@@ -110,7 +110,7 @@ class QuoteServiceTest {
         verify(quoteEventOutboxPort, times(2)).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         List<Quote> published = publishedQuoteCaptor.getAllValues();
         assertEquals(2, published.size());
-        assertEquals(List.of(1L, 2L), ids);
+        assertEquals(List.of("id-1", "id-2"), ids);
         verify(applicationEventPublisher, times(2)).publishEvent(eventCaptor.capture());
         List<Object> events = eventCaptor.getAllValues();
         assertEquals(2, events.size());
@@ -119,16 +119,16 @@ class QuoteServiceTest {
 
     @Test
     void getQuote_incrementsHitsAndReturnsUpdatedQuote() {
-        when(loadQuotePort.loadQuote(1L)).thenReturn(sampleQuote);
+        when(loadQuotePort.loadQuote("quote-1")).thenReturn(sampleQuote);
 
-        Quote result = quoteService.getQuote(1L);
+        Quote result = quoteService.getQuote("quote-1");
 
-        verify(incrementHitsPort).incrementHits(1L);
+        verify(incrementHitsPort).incrementHits("quote-1");
         verify(quoteEventOutboxPort).recordQuoteHitEvent(result);
         verify(applicationEventPublisher).publishEvent(eventCaptor.capture());
         Object event = eventCaptor.getValue();
         assertTrue(event instanceof QuoteHitEvent);
-        assertEquals(1L, ((QuoteHitEvent) event).quote().id());
+        assertEquals("quote-1", ((QuoteHitEvent) event).quote().id());
         assertNotNull(result);
         assertEquals(Integer.valueOf(sampleQuote.hits() + 1), result.hits());
         assertEquals(sampleQuote.posts(), result.posts());
