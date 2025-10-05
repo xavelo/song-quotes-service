@@ -41,23 +41,10 @@ public class AdminService implements ExportQuotesUseCase, DeleteQuoteUseCase, Up
     }
 
     @Override
-    public String exportQuotesAsSql() {
-        List<Quote> quotes = loadQuotePort.loadQuotes();
-        StringBuilder sqlBuilder = new StringBuilder();
-        for (Quote quote : quotes) {
-            sqlBuilder.append(String.format(
-                    "INSERT INTO quotes (id, quote, song, album, album_year, artist, hits, posts) VALUES ('%s', '%s', '%s', '%s', %d, '%s', %d, %d);\n",
-                    quote.id() != null ? quote.id().toString() : null,
-                    quote.quote().replace("'", "''"),
-                    quote.song().replace("'", "''"),
-                    quote.album().replace("'", "''"),
-                    quote.year(),
-                    quote.artist().replace("'", "''"),
-                    quote.hits(),
-                    quote.posts()
-            ));
-        }
-        return sqlBuilder.toString();
+    public List<Quote> exportQuotes() {
+        return loadQuotePort.loadQuotes().stream()
+                .map(QuoteHelper::sanitize)
+                .toList();
     }
 
     @Override

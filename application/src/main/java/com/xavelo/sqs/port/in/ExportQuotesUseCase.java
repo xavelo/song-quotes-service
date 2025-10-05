@@ -1,5 +1,5 @@
 package com.xavelo.sqs.port.in;
 
 public interface ExportQuotesUseCase {
-    String exportQuotesAsSql();
+    java.util.List<com.xavelo.sqs.application.domain.Quote> exportQuotes();
 }

@@ -127,7 +127,7 @@ All endpoints default to JSON and are served on port `8080`.
 | `PUT` | `/admin/quote/{id}` | Replace a quote (excluding restricted counters). |
 | `PATCH` | `/admin/quote/{id}` | Partially update a quote (excluding restricted counters). |
 | `DELETE` | `/admin/quote/{id}` | Delete a quote by id. |
-| `GET` | `/admin/export` | Export all quotes as SQL insert statements for backup or migration purposes. |
+| `GET` | `/admin/export` | Export all quotes as JSON objects ready to be sent to `POST /admin/quotes`. |
 
 ## Observability
 

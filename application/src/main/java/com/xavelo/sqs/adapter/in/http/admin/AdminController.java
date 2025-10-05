@@ -118,9 +118,10 @@ public class AdminController implements AdminApi {
 
     @Override
     @CountAdapterInvocation(name = "export-quotes", direction = IN, type = HTTP)
-    public ResponseEntity<String> exportQuotes() {
-        String sql = adminService.exportQuotesAsSql();
-        return ResponseEntity.ok(sql);
+    public ResponseEntity<List<QuoteDto>> exportQuotes() {
+        List<Quote> quotes = adminService.exportQuotes();
+        List<QuoteDto> exportPayload = quoteMapper.toDto(quotes);
+        return ResponseEntity.ok(exportPayload);
     }
 
     @Override

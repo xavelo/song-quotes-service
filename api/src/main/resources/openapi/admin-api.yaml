@@ -138,15 +138,17 @@ paths:
     get:
       tags:
         - Admin
-      summary: Export all quotes as SQL statements
+      summary: Export all quotes as JSON payloads
       operationId: exportQuotes
       responses:
         '200':
-          description: SQL export of all quotes
+          description: Export of all quotes formatted for POST /admin/quotes
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  $ref: './components/schemas.yaml#/components/schemas/Quote'
 components:
   schemas:
     Quote:
