@@ -2,6 +2,8 @@ package com.xavelo.sqs.application.service;
 
 import com.xavelo.sqs.application.domain.Quote;
 
+import java.util.UUID;
+
 /**
  * Utility methods for manipulating {@link Quote} instances.
  */
@@ -33,7 +35,7 @@ public final class QuoteHelper {
     /**
      * Returns a copy of the given quote with the supplied id.
      */
-    public static Quote withId(Quote quote, String id) {
+    public static Quote withId(Quote quote, UUID id) {
         if (quote == null) {
             return null;
         }
@@ -53,7 +55,7 @@ public final class QuoteHelper {
     /**
      * Returns a copy of the given quote with the supplied id and spotify artist id
      */
-    public static Quote withSpotifyArtistId(Quote quote, String id, String spotifyArtistId) {
+    public static Quote withSpotifyArtistId(Quote quote, UUID id, String spotifyArtistId) {
         if (quote == null) {
             return null;
         }

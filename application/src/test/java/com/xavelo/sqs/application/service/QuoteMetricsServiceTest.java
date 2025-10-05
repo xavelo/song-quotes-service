@@ -14,10 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 class QuoteMetricsServiceTest {
 
-    private static final String QUOTE_ID = "44444444-4444-4444-4444-444444444444";
+    private static final UUID QUOTE_ID = UUID.fromString("44444444-4444-4444-4444-444444444444");
 
     @Mock
     private MetricsPort metricsPort;

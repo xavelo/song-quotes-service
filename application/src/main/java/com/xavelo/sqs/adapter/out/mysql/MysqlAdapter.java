@@ -38,7 +38,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "store-quote", direction = OUT, type = DATABASE)
-    public String storeQuote(Quote quote, Artist artistMetadata) {
+    public UUID storeQuote(Quote quote, Artist artistMetadata) {
         QuoteEntity entity = quoteMapper.toEntity(quote);
         ensureId(entity);
         if (artistMetadata != null) {
@@ -46,7 +46,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
             saveArtistMetadataIfNotExists(artistMetadata);
         }
         QuoteEntity saved = quoteRepository.save(entity);
-        return saved.getId();
+        return UUID.fromString(saved.getId());
     }
 
     private void saveArtistMetadataIfNotExists(Artist artist) {
@@ -90,13 +90,13 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "store-quotes", direction = OUT, type = DATABASE)
-    public java.util.List<String> storeQuotes(List<Quote> quotes) {
+    public java.util.List<UUID> storeQuotes(List<Quote> quotes) {
         java.util.List<QuoteEntity> entities = quotes.stream()
                 .map(quoteMapper::toEntity)
                 .toList();
         entities.forEach(this::ensureId);
         java.util.List<QuoteEntity> saved = quoteRepository.saveAll(entities);
-        return saved.stream().map(QuoteEntity::getId).toList();
+        return saved.stream().map(QuoteEntity::getId).map(UUID::fromString).toList();
     }
 
     @Override
@@ -110,8 +110,8 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "load-quote", direction = OUT, type = DATABASE)
-    public Quote loadQuote(String id) {
-        return quoteRepository.findById(id)
+    public Quote loadQuote(UUID id) {
+        return quoteRepository.findById(id.toString())
                 .map(quoteMapper::toDomain)
                 .orElse(null);
     }
@@ -128,8 +128,8 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "delete-quote", direction = OUT, type = DATABASE)
-    public void deleteQuote(String id) {
-        quoteRepository.deleteById(id);
+    public void deleteQuote(UUID id) {
+        quoteRepository.deleteById(id.toString());
     }
 
     @Override
@@ -140,14 +140,14 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "increment-posts", direction = OUT, type = DATABASE)
-    public void incrementPosts(String id) {
-        quoteRepository.incrementPosts(id);
+    public void incrementPosts(UUID id) {
+        quoteRepository.incrementPosts(id.toString());
     }
 
     @Override
     @CountAdapterInvocation(name = "increment-hits", direction = OUT, type = DATABASE)
-    public void incrementHits(String id) {
-        quoteRepository.incrementHits(id);
+    public void incrementHits(UUID id) {
+        quoteRepository.incrementHits(id.toString());
     }
 
     @Override
@@ -174,7 +174,7 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
     @Override
     @CountAdapterInvocation(name = "update-quote", direction = OUT, type = DATABASE)
     public void updateQuote(Quote quote) {
-        QuoteEntity entity = quoteRepository.findById(quote.id()).orElse(null);
+        QuoteEntity entity = quoteRepository.findById(quote.id().toString()).orElse(null);
         if (entity != null) {
             entity.setQuote(quote.quote());
             entity.setSong(quote.song());
@@ -196,8 +196,8 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "patch-quote", direction = OUT, type = DATABASE)
-    public void patchQuote(String id, Quote quote) {
-        QuoteEntity entity = quoteRepository.findById(id).orElse(null);
+    public void patchQuote(UUID id, Quote quote) {
+        QuoteEntity entity = quoteRepository.findById(id.toString()).orElse(null);
         if (entity != null) {
             if (quote.quote() != null) {
                 entity.setQuote(quote.quote());
@@ -224,11 +224,10 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
         }
     }
 
-    private String ensureId(QuoteEntity entity) {
+    private void ensureId(QuoteEntity entity) {
         if (entity.getId() == null || entity.getId().isBlank()) {
             entity.setId(UUID.randomUUID().toString());
         }
-        return entity.getId();
     }
 
     @Override

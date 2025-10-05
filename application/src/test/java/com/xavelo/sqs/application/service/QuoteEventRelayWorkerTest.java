@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class QuoteEventRelayWorkerTest {
 
-    private static final String QUOTE_ID = "33333333-3333-3333-3333-333333333333";
+    private static final UUID QUOTE_ID = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
     @Mock
     private QuoteEventOutboxPort quoteEventOutboxPort;

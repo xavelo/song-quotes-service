@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.xavelo.common.metrics.AdapterMetrics.Direction.IN;
 import static com.xavelo.common.metrics.AdapterMetrics.Type.HTTP;
@@ -63,26 +62,23 @@ public class AdminController implements AdminApi {
     @CountAdapterInvocation(name = "create-quote", direction = IN, type = HTTP)
     public ResponseEntity<UUID> createQuote(@Valid @RequestBody QuoteDto quoteDto) {
         Quote quote = quoteMapper.toDomain(quoteDto);
-        String id = storeQuoteUseCase.storeQuote(quote);
+        UUID id = storeQuoteUseCase.storeQuote(quote);
         logger.debug("returning id {}", id);
-        return ResponseEntity.ok(UUID.fromString(id));
+        return ResponseEntity.ok(id);
     }
 
     @Override
     @CountAdapterInvocation(name = "create-quotes", direction = IN, type = HTTP)
     public ResponseEntity<List<UUID>> createQuotes(@Valid @RequestBody List<@Valid QuoteDto> quoteDtos) {
         List<Quote> quotes = quoteMapper.toDomain(quoteDtos);
-        List<String> ids = storeQuoteUseCase.storeQuotes(quotes);
-        List<UUID> uuids = ids.stream()
-                .map(UUID::fromString)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(uuids);
+        List<UUID> ids = storeQuoteUseCase.storeQuotes(quotes);
+        return ResponseEntity.ok(ids);
     }
 
     @Override
     @CountAdapterInvocation(name = "delete-quote", direction = IN, type = HTTP)
     public ResponseEntity<Void> deleteQuote(@PathVariable UUID id) {
-        adminService.deleteQuote(id.toString());
+        adminService.deleteQuote(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -93,7 +89,7 @@ public class AdminController implements AdminApi {
         if (containsRestrictedFields(quote)) {
             return ResponseEntity.badRequest().build();
         }
-        updateQuoteUseCase.updateQuote(QuoteHelper.withId(quote, id.toString()));
+        updateQuoteUseCase.updateQuote(QuoteHelper.withId(quote, id));
         return ResponseEntity.noContent().build();
     }
 
@@ -108,7 +104,7 @@ public class AdminController implements AdminApi {
         if (containsRestrictedFields(quote)) {
             return ResponseEntity.badRequest().build();
         }
-        patchQuoteUseCase.patchQuote(id.toString(), quote);
+        patchQuoteUseCase.patchQuote(id, quote);
         return ResponseEntity.noContent().build();
     }
 

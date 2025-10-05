@@ -42,7 +42,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuotes() throws Exception {
-        List<Quote> quotes = List.of(new Quote(QUOTE_ID.toString(), "q", "s", "a", 1999, "art", 0, 0, null));
+        List<Quote> quotes = List.of(new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null));
         List<QuoteDto> dtos = List.of(new QuoteDto()
                 .id(QUOTE_ID)
                 .quote("q")
@@ -72,7 +72,7 @@ class QuoteControllerTest {
 
     @Test
     void getRandomQuoteFound() throws Exception {
-        Quote quote = new Quote(QUOTE_ID.toString(), "q", "s", "a", 1999, "art", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null);
         QuoteDto dto = new QuoteDto()
                 .id(QUOTE_ID)
                 .quote("q")
@@ -93,7 +93,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteFound() throws Exception {
-        Quote quote = new Quote(QUOTE_ID.toString(), "q", "s", "a", 1999, "art", 0, 0, null);
+        Quote quote = new Quote(QUOTE_ID, "q", "s", "a", 1999, "art", 0, 0, null);
         QuoteDto dto = new QuoteDto()
                 .id(QUOTE_ID)
                 .quote("q")
@@ -104,7 +104,7 @@ class QuoteControllerTest {
                 .posts(0)
                 .hits(0)
                 .spotifyArtistId(null);
-        when(getQuoteUseCase.getQuote(QUOTE_ID.toString())).thenReturn(quote);
+        when(getQuoteUseCase.getQuote(QUOTE_ID)).thenReturn(quote);
         when(quoteMapper.toDto(quote)).thenReturn(dto);
 
         mockMvc.perform(get("/api/quote/" + QUOTE_ID))
@@ -114,7 +114,7 @@ class QuoteControllerTest {
 
     @Test
     void getQuoteNotFound() throws Exception {
-        when(getQuoteUseCase.getQuote(MISSING_QUOTE_ID.toString())).thenReturn(null);
+        when(getQuoteUseCase.getQuote(MISSING_QUOTE_ID)).thenReturn(null);
 
         mockMvc.perform(get("/api/quote/" + MISSING_QUOTE_ID))
                 .andExpect(status().isNotFound());
@@ -123,8 +123,8 @@ class QuoteControllerTest {
     @Test
     void getTop10Quotes() throws Exception {
         List<Quote> quotes = List.of(
-                new Quote("66666666-6666-6666-6666-666666666666", "q1", "s1", "a1", 2000, "art1", 100, 10, null),
-                new Quote("77777777-7777-7777-7777-777777777777", "q2", "s2", "a2", 2001, "art2", 90, 9, null)
+                new Quote(UUID.fromString("66666666-6666-6666-6666-666666666666"), "q1", "s1", "a1", 2000, "art1", 100, 10, null),
+                new Quote(UUID.fromString("77777777-7777-7777-7777-777777777777"), "q2", "s2", "a2", 2001, "art2", 90, 9, null)
         );
         List<QuoteDto> dtos = List.of(
                 new QuoteDto()
