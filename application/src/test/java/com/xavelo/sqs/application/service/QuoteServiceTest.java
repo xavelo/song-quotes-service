@@ -62,6 +62,8 @@ class QuoteServiceTest {
     @Captor
     private ArgumentCaptor<List<Quote>> quoteListCaptor;
     @Captor
+    private ArgumentCaptor<List<Artist>> artistListCaptor;
+    @Captor
     private ArgumentCaptor<Quote> publishedQuoteCaptor;
     @Captor
     private ArgumentCaptor<Object> eventCaptor;
@@ -101,21 +103,30 @@ class QuoteServiceTest {
     void storeQuotes_sanitizesAllQuotesAndDelegates() {
         UUID id1 = UUID.fromString("11111111-1111-1111-1111-111111111112");
         UUID id2 = UUID.fromString("11111111-1111-1111-1111-111111111113");
-        when(storeQuotePort.storeQuotes(any())).thenReturn(List.of(id1, id2));
+        when(storeQuotePort.storeQuotes(any(), any())).thenReturn(List.of(id1, id2));
+
+        Artist metadata1 = new Artist("spotify-artist-1", "artist", List.of(), 10, "image1", "url1", List.of());
+        Artist metadata2 = new Artist("spotify-artist-2", "artist2", List.of(), 20, "image2", "url2", List.of());
+        when(metadataService.getArtistMetadata("artist")).thenReturn(metadata1);
+        when(metadataService.getArtistMetadata("artist2")).thenReturn(metadata2);
 
         Quote q2 = new Quote(UUID.fromString("22222222-2222-2222-2222-222222222222"), "q2", "s2", "a2", 1999, "artist2", 3, 4, null);
         List<UUID> ids = quoteService.storeQuotes(List.of(sampleQuote, q2));
 
-        verify(storeQuotePort).storeQuotes(quoteListCaptor.capture());
+        verify(storeQuotePort).storeQuotes(quoteListCaptor.capture(), artistListCaptor.capture());
         List<Quote> sent = quoteListCaptor.getValue();
         assertEquals(2, sent.size());
         for (Quote q : sent) {
             assertEquals(0, q.posts());
             assertEquals(0, q.hits());
         }
+        List<Artist> sentMetadata = artistListCaptor.getValue();
+        assertEquals(List.of(metadata1, metadata2), sentMetadata);
         verify(quoteEventOutboxPort, times(2)).recordQuoteCreatedEvent(publishedQuoteCaptor.capture());
         List<Quote> published = publishedQuoteCaptor.getAllValues();
         assertEquals(2, published.size());
+        assertEquals("spotify-artist-1", published.get(0).spotifyArtistId());
+        assertEquals("spotify-artist-2", published.get(1).spotifyArtistId());
         assertEquals(List.of(id1, id2), ids);
         verify(applicationEventPublisher, times(2)).publishEvent(eventCaptor.capture());
         List<Object> events = eventCaptor.getAllValues();

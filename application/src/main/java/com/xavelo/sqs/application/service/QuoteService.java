@@ -108,12 +108,25 @@ public class QuoteService implements StoreQuoteUseCase, GetQuotesUseCase, GetQuo
         List<Quote> sanitized = quotes.stream()
                 .map(QuoteHelper::sanitize)
                 .toList();
-        List<UUID> ids = storeQuotePort.storeQuotes(sanitized);
+
+        List<Artist> artistsMetadata = sanitized.stream()
+                .map(quote -> metadataService.getArtistMetadata(quote.artist()))
+                .toList();
+
+        List<UUID> ids = storeQuotePort.storeQuotes(sanitized, artistsMetadata);
+
         for (int i = 0; i < ids.size(); i++) {
-            Quote s = sanitized.get(i);
-            Quote stored = QuoteHelper.withId(s, ids.get(i));
+            Quote sanitizedQuote = sanitized.get(i);
+            Artist artistMetadata = artistsMetadata.size() > i ? artistsMetadata.get(i) : null;
+            String spotifyArtistId = artistMetadata != null ? artistMetadata.id() : null;
+
+            Quote stored = QuoteHelper.withSpotifyArtistId(sanitizedQuote, ids.get(i), spotifyArtistId);
             quoteEventOutboxPort.recordQuoteCreatedEvent(stored);
             applicationEventPublisher.publishEvent(new QuoteStoredEvent(stored));
+
+            if (artistMetadata != null) {
+                logger.debug("Artist {} (id {}, popularity {})", artistMetadata.name(), artistMetadata.id(), artistMetadata.popularity());
+            }
         }
         return ids;
     }

@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface StoreQuotePort {
     UUID storeQuote(Quote quote, Artist artistMetadata);
-    List<UUID> storeQuotes(List<Quote> quotes);
+    List<UUID> storeQuotes(List<Quote> quotes, List<Artist> artistsMetadata);
 }

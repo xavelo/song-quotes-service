@@ -90,11 +90,24 @@ public class MysqlAdapter implements StoreQuotePort, LoadQuotePort, DeleteQuoteP
 
     @Override
     @CountAdapterInvocation(name = "store-quotes", direction = OUT, type = DATABASE)
-    public java.util.List<UUID> storeQuotes(List<Quote> quotes) {
-        java.util.List<QuoteEntity> entities = quotes.stream()
-                .map(quoteMapper::toEntity)
-                .toList();
-        entities.forEach(this::ensureId);
+    public java.util.List<UUID> storeQuotes(List<Quote> quotes, List<Artist> artistsMetadata) {
+        java.util.List<QuoteEntity> entities = new java.util.ArrayList<>(quotes.size());
+
+        for (int i = 0; i < quotes.size(); i++) {
+            Quote quote = quotes.get(i);
+            Artist artistMetadata = artistsMetadata != null && artistsMetadata.size() > i ? artistsMetadata.get(i) : null;
+
+            QuoteEntity entity = quoteMapper.toEntity(quote);
+            ensureId(entity);
+
+            if (artistMetadata != null) {
+                entity.setSpotifyArtistId(artistMetadata.id());
+                saveArtistMetadataIfNotExists(artistMetadata);
+            }
+
+            entities.add(entity);
+        }
+
         java.util.List<QuoteEntity> saved = quoteRepository.saveAll(entities);
         return saved.stream().map(QuoteEntity::getId).map(UUID::fromString).toList();
     }
