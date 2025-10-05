@@ -33,6 +33,26 @@ public final class QuoteHelper {
     }
 
     /**
+     * Returns a copy of the given quote without attributes that should not be exported.
+     */
+    public static Quote sanitizeForExport(Quote quote) {
+        if (quote == null) {
+            return null;
+        }
+        return new Quote(
+                null,
+                quote.quote(),
+                quote.song(),
+                quote.album(),
+                quote.year(),
+                quote.artist(),
+                null,
+                null,
+                null
+        );
+    }
+
+    /**
      * Returns a copy of the given quote with the supplied id.
      */
     public static Quote withId(Quote quote, UUID id) {
